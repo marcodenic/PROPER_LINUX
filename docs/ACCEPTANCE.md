@@ -1,0 +1,173 @@
+# Proper Linux acceptance criteria
+
+## Purpose
+
+These checks define whether Proper Linux behaves like the intended product. They are focused on the visible experience and the build/install path required to deliver it. They are not a general Fedora certification programme.
+
+## Global gates
+
+Every version 0.1 candidate must satisfy all of these:
+
+- Builds from the committed repository on BOX without manual changes inside the output filesystem.
+- Produces a bootable x86-64 ISO and checksum.
+- Boots a graphical live session under QEMU/KVM with UEFI firmware.
+- Installs to a blank virtual disk using the included graphical installer.
+- Boots the installed disk after the ISO is removed.
+- Preserves Fedora's normal network, update, package, and system-settings functionality.
+- Contains no secret, private signing key, access token, or user credential.
+- Does not require a terminal for the normal flows in this document.
+- Does not install an office suite by default.
+
+## PM checkpoint 1 — Login
+
+### Evidence
+
+- Short capture from boot splash to login
+- Login screenshot at normal orientation
+- Login screenshot or capture using a configured 90-degree display layout
+- Login-to-desktop transition
+- Login, lock-screen, and desktop wallpaper comparison
+
+### Pass criteria
+
+- Proper Linux identity is visible and restrained.
+- Login wallpaper matches the shipped Proper desktop wallpaper by default.
+- The chosen display layout can be applied to the login manager.
+- Password entry, user selection, power actions, and session selection are usable.
+- No Fedora placeholder wallpaper or obviously mismatched theme remains.
+- No custom login-layout patch is required merely for novelty.
+
+## PM checkpoint 2 — Desktop and taskbar
+
+### Evidence
+
+- Clean desktop at rest
+- Taskbar with no applications running
+- Taskbar with multiple pinned and running applications
+- Active, inactive, urgent, and hover states
+- System tray/clock and a notification
+- Light and dark variants
+- 100% and high-DPI rendering
+- Wallpaper-click “show desktop” prototype
+
+### Pass criteria
+
+- The taskbar is floating, bottom-aligned, translucent, and visually balanced.
+- It remains visible by default and exposes hide behaviour through settings.
+- Pinned and running applications are obvious without excessive decoration.
+- Blur, colour, contrast, spacing, and animation feel coherent.
+- Normal application content remains readable.
+- Disabling blur does not leave broken or illegible surfaces.
+- The desktop does not resemble an unmodified Fedora KDE screenshot.
+
+## PM checkpoint 3 — Launchers and windows
+
+### AppGrid mouse path
+
+1. Click the Proper launcher icon.
+2. Browse categories.
+3. Scroll results.
+4. Open an application.
+5. Use a secondary/right-click application action.
+
+### Vicinae mouse path
+
+1. Click the command/search affordance.
+2. Click a favourite or empty-state action.
+3. Search for an application or file.
+4. Scroll and click a result.
+5. Open and choose a secondary action without a required shortcut.
+
+### Keyboard path
+
+1. Press `Meta+Space` and launch an application through Vicinae.
+2. Press `Alt+F2` and confirm KRunner remains available.
+3. Use the documented quick-tile shortcuts.
+
+### Window path
+
+- Drag and resize a floating window normally.
+- Drag a window into left/right halves and all supported quadrants.
+- Maximise by dragging to the top.
+- Use `Meta`+arrow keys for equivalent placement.
+- Restore the window to floating state.
+- Use at least three retained Omarchy-inspired shortcuts.
+
+### Pass criteria
+
+- No primary launcher or window action requires memorising a key.
+- AppGrid and Vicinae have distinct, understandable roles.
+- Pointer selection and scrolling work reliably in both launchers.
+- Launcher surfaces open on a sensible display, preferably the display containing the pointer.
+- Floating behaviour is always available.
+- The product manager decides whether both launchers remain after this demonstration.
+
+## PM checkpoint 4 — Proper Apps
+
+### Evidence
+
+- Catalogue home and category view
+- Search results
+- Detail view for a priority application
+- Install progress and installed state
+- Launch and uninstall/recovery affordances
+- An intentional failure state
+- Advanced source details
+- One AI-agent installation/launch path
+
+### Pass criteria
+
+- The main path asks which application the user wants, not which package format they prefer.
+- One Install action initiates the selected maintained provider.
+- Authentication prompts come from expected system mechanisms.
+- Progress and errors are understandable.
+- Source, licence, and maintenance status are still inspectable.
+- At least one Flatpak, Fedora RPM, and official vendor-source path has been exercised.
+- No office suite appears in the default image; office applications are not a launch priority.
+
+## PM checkpoint 5 — Final installed system
+
+### Journey
+
+1. Boot the live ISO.
+2. Inspect the live desktop.
+3. Start the graphical installer.
+4. Create the user and install to a blank virtual disk.
+5. Reboot to the installed login screen.
+6. Log in.
+7. Launch Chrome or another installed browser.
+8. Browse applications and use Vicinae.
+9. Arrange several windows by mouse and keyboard.
+10. Toggle the dropdown Ghostty terminal.
+11. Run `btop`.
+12. Install one priority application through Proper Apps.
+13. Check for updates through Fedora's normal UI.
+14. Change a visible Proper default, reboot, and confirm the user's choice persists.
+
+### Pass criteria
+
+- The complete journey contains no unexplained terminal requirement.
+- There is no long post-install setup journey.
+- No high-priority visual paper cut remains in login, taskbar, launcher, terminal, or software installation.
+- User settings are not reset by reboot or normal Proper package updates.
+- The product manager says the installed experience is worth using.
+
+## Focused compatibility views
+
+Before version 0.1 approval, capture at least:
+
+- 1920×1080 at 100% scaling;
+- a high-DPI mode at 200% scaling;
+- a two-display virtual arrangement; and
+- one rotated virtual display configuration.
+
+These checks exist because layout and login orientation are part of the product. They do not imply general hardware certification.
+
+## Defect priority
+
+- **P0:** cannot build, boot, install, or log in; destructive data risk.
+- **P1:** core mouse interaction unavailable; wrong login orientation/wallpaper; launcher, taskbar, terminal, app installation, or updates unusable.
+- **P2:** visible inconsistency or interaction defect that materially damages the Proper experience.
+- **P3:** polish issue that can be scheduled after the current checkpoint.
+
+No release candidate may contain P0 or P1 defects. The product manager decides whether P2 defects block approval.

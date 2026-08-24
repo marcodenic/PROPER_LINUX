@@ -1,0 +1,30 @@
+# Host/editor noise
+.DS_Store
+*~
+*.swp
+
+# Image and VM artifacts
+/build/
+/out/
+/artifacts/
+*.iso
+*.img
+*.raw
+*.qcow2
+*.vmdk
+*.fd
+
+# Package build output
+*.rpm
+*.src.rpm
+/RPMS/
+/SRPMS/
+
+# Build caches and logs
+/.cache/
+*.log
+
+# Credentials and signing material
+*.key
+*.pem
+!*.pub
