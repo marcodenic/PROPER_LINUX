@@ -79,6 +79,8 @@ Deliver the core visual identity and daily mouse surface.
 - Place the launcher, pinned/running applications, terminal affordance, system tray, and clock.
 - Style taskbar states and system overlays coherently.
 - Configure wallpaper-click “show desktop” as a reversible prototype.
+- Simplify and style Dolphin as the initial Proper “Files” experience.
+- Install current Nautilus and COSMIC Files in the development VM for a like-for-like PM comparison without adding them to the image.
 - Verify light/dark variants, blur-disabled fallback, 100% scaling, and a high-DPI configuration.
 - Ensure changes apply to new users without overwriting later customisation.
 
@@ -91,7 +93,7 @@ Deliver the core visual identity and daily mouse surface.
 
 ### PM checkpoint 2 — Desktop/taskbar
 
-Show the clean desktop, taskbar idle and active states, tray, notifications, light/dark treatment, an overlapping-window scene, and the wallpaper-click behaviour.
+Show the clean desktop, taskbar idle and active states, tray, notifications, light/dark treatment, an overlapping-window scene, the wallpaper-click behaviour, and the configured file manager beside Nautilus and COSMIC Files.
 
 ## Phase 3 — Launching and window workflow
 
@@ -101,9 +103,8 @@ Combine excellent pointer discovery with fast command and window shortcuts.
 
 ### Work
 
-- Package or pin AppGrid and configure the Proper launcher icon to open it.
 - Package a pinned Vicinae release as a Proper-managed RPM if no suitable trusted Fedora package exists.
-- Configure the command/search taskbar action and `Meta+Space`.
+- Configure the Proper taskbar launcher action and `Meta+Space` to open Vicinae.
 - Seed useful Vicinae favourites and empty-state actions.
 - Keep `Alt+F2` mapped to KRunner.
 - Audit all primary Vicinae actions with a mouse.
@@ -114,13 +115,13 @@ Combine excellent pointer discovery with fast command and window shortcuts.
 
 ### Deliverables
 
-- distinct AppGrid and Vicinae entry points
+- a single polished, pointer-accessible Vicinae entry point
 - working mouse and keyboard window arrangement
 - shortcut manifest and user reference
 
 ### PM checkpoint 3 — Launcher and windows
 
-Demonstrate browsing apps entirely with the mouse, searching and acting in Vicinae with both mouse and keyboard, dragging/snapping windows, quick tiling, and normal floating-window behaviour. Decide whether both launchers remain.
+Demonstrate launching pinned/recent applications entirely with the mouse, searching and acting in Vicinae with both mouse and keyboard, dragging/snapping windows, quick tiling, and normal floating-window behaviour.
 
 ## Phase 4 — Terminal and developer essentials
 

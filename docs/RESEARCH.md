@@ -72,12 +72,40 @@ Vicinae is the closest current open-source Raycast-style product for Linux. It u
 
 The launcher should be packaged as a pinned Proper RPM rather than Flatpak because it requires broad desktop integration. Keep styling/configuration separate from upstream source where possible.
 
-### AppGrid
+### Rejected: AppGrid
 
 - Product site: <https://appgrid.xarbit.dev/>
-- Source/Fedora packaging: <https://github.com/xarbit/plasma6-applet-appgrid>
 
-AppGrid is a native Plasma application grid with categories, favourites, drag/drop, right-click actions, blur, opacity, and KRunner-backed search. It is a stronger pointer-driven browse surface than Vicinae but not a Raycast-equivalent extension platform.
+AppGrid was evaluated and rejected by the product manager on visual grounds. It must not be added as a fallback launcher unless the PM explicitly reopens the decision.
+
+## File managers
+
+### Dolphin
+
+- KDE product page and screenshots: <https://apps.kde.org/dolphin/>
+- Fedora 44 package: <https://packages.fedoraproject.org/pkgs/dolphin/dolphin/fedora-44-updates.html>
+
+Dolphin is current, lightweight, native to KDE, and supports tabs, split view, custom actions, plugins, remote/cloud locations, previews, and an embedded terminal. Its weakness for Proper Linux is stock visual density, which can be addressed through defaults before considering a replacement.
+
+### GNOME Files / Nautilus
+
+- Product page and screenshots: <https://apps.gnome.org/Nautilus/>
+- Fedora 44 package: <https://packages.fedoraproject.org/pkgs/nautilus/nautilus/fedora-44.html>
+
+Nautilus provides an exceptionally clean interface and covers ordinary local, network, removable-media, search, grid/list, script, and plugin flows. It is designed around GNOME/libadwaita, has fewer power features than Dolphin, and would introduce a visibly different toolkit and settings model on a Plasma desktop.
+
+### COSMIC Files
+
+- Source: <https://github.com/pop-os/cosmic-files>
+- Fedora 44 package: <https://packages.fedoraproject.org/pkgs/cosmic-files/cosmic-files/fedora-44.html>
+
+COSMIC Files is a modern GPL-3.0 Rust/libcosmic file manager and is packaged in Fedora 44. It is the most interesting visual alternative, but it is designed for the COSMIC desktop and requires its own theme/icon dependencies. Its Plasma behaviour and feature completeness must be judged in the actual VM.
+
+### Rejected for the default: Spacedrive
+
+- Source/status: <https://github.com/spacedriveapp/spacedrive>
+
+Spacedrive has a visually ambitious cross-device concept, but its current Linux release is explicitly alpha. It is not suitable as the default file manager for version 0.1.
 
 ## Terminal
 
@@ -101,7 +129,8 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
 ## Research still required during implementation
 
 - Exact Fedora KDE 44 KIWI profile/revision and local build invocation
-- Package and redistribution status for Vicinae, AppGrid, and Ghostty on Fedora 44
+- Package and redistribution status for Vicinae and Ghostty on Fedora 44
+- Like-for-like Dolphin, Nautilus, and COSMIC Files evaluation under Proper Plasma defaults
 - PLM installer-to-first-login display-layout transfer
 - Legal redistribution paths for proprietary catalogue applications
 - Best maintained GitHub Desktop Linux port and how clearly to label it

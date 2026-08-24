@@ -127,9 +127,8 @@ Defaults apply to new profiles. Updates must not continually reset user choices.
 
 Owns integration rather than upstream launcher source where possible:
 
-- AppGrid package dependency and Proper configuration
 - Vicinae package/repository or pinned build
-- launcher taskbar widgets/actions
+- Proper taskbar launcher action
 - `Meta+Space` and fallback shortcut bindings
 - initial Vicinae favourites, theme, and script commands
 
@@ -169,13 +168,26 @@ Do not replace Plasma or KWin for version 0.1. A shell replacement would discard
 Prototype with the native Plasma panel in floating, fit-content form plus supported widgets. Validate whether it can provide:
 
 - central pinned/running applications;
-- a Proper/AppGrid launcher;
-- a Vicinae search action;
+- a Proper/Vicinae launcher;
 - a toggleable Ghostty action;
 - system tray and clock; and
 - correct floating/translucent appearance.
 
 Only introduce a custom panel/shell if the prototype fails an explicit acceptance criterion.
+
+### File manager
+
+Dolphin is the version 0.1 baseline because it is current in Fedora 44, native to Qt/KDE, and already integrates KIO remote locations, removable devices, previews, tabs, split views, plugins, trash/undo, and Plasma defaults.
+
+Proper Linux should make it look and behave deliberate through `proper-defaults`:
+
+- simplified toolbar and hidden optional panels;
+- friendly “Files” launcher name;
+- approved view, spacing, sidebar, preview, and click defaults;
+- Ghostty context/action integration; and
+- no wholesale copy of a prepared user's Dolphin state.
+
+At PM checkpoint 2, compare the configured result against current Nautilus and COSMIC Files in the same Plasma VM. Replacing Dolphin is allowed only if the candidate passes the file-manager checks in `ACCEPTANCE.md` and does not create obvious toolkit/theme or desktop-integration regressions.
 
 ### Login manager
 

@@ -18,12 +18,12 @@ The first engineering objective is a Fedora KDE-based live ISO that installs int
 - Proper Linux boot, login, lock, wallpaper, and desktop branding
 - Correct login-screen display orientation
 - Tasteful translucent floating bottom taskbar
-- AppGrid for mouse-first application browsing
-- Vicinae for Raycast-style search and commands
+- Vicinae as the single mouse-accessible, Raycast-style application launcher and command surface
 - Floating windows with mouse snapping and `Meta`+arrow quick tiling
 - Useful Omarchy-inspired shortcuts as optional accelerators
 - Ghostty as the default terminal, with a taskbar-accessible dropdown mode
 - `btop` installed by default
+- A deliberately simplified and styled file-manager experience
 - Lean base installation
 - A curated, one-click application directory
 - Easy installation and launch of Codex, Claude Code, OpenCode, and related tools

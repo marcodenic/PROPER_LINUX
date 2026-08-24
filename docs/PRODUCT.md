@@ -56,7 +56,7 @@ Every normal desktop operation remains visually discoverable and usable with the
 
 ### Reject false choices
 
-Floating windows and tiling can coexist. A browsable app grid and a command palette can coexist. A lean installation and a rich software catalogue can coexist.
+Floating windows and tiling can coexist. Pointer discovery and typed commands can coexist in one launcher. A lean installation and a rich software catalogue can coexist.
 
 ### Curate aggressively, restrict sparingly
 
@@ -80,12 +80,9 @@ A tasteful translucent floating bottom taskbar provides applications, running-wi
 
 Windows float, overlap, drag, resize, minimise, maximise, and close normally. Dragging to edges offers halves and grids. `Meta` plus arrow keys provides fast Windows-style quick tiling. More advanced Omarchy-inspired bindings are available without becoming mandatory.
 
-### 4. Two deliberate launch surfaces
+### 4. One deliberate launcher
 
-- AppGrid answers “show me my applications” with a mouse-friendly browsable grid.
-- Vicinae answers “find or do something” with Raycast-style search, commands, files, actions, and extensions.
-
-Their roles must remain distinct. If the combined experience feels redundant at the launcher checkpoint, the product manager may reduce it to one.
+Vicinae answers both “open an application” and “find or do something” with a polished Raycast-style surface. Clicking the Proper button opens a useful mouse-accessible home state with pinned and recent applications; typing searches applications, files, commands, actions, and extensions.
 
 ### 5. A first-class terminal and agent workflow
 
@@ -104,7 +101,7 @@ Version 0.1 must include:
 - coherent system-wide wallpaper and visual defaults;
 - Plasma Login Manager configured for the correct wallpaper and display layout;
 - a polished floating bottom taskbar;
-- AppGrid and Vicinae with distinct entry points;
+- Vicinae as the single promoted application launcher and command surface;
 - mouse snapping and quick-tiling shortcuts;
 - a useful subset of Omarchy-inspired bindings;
 - Ghostty and `btop`;

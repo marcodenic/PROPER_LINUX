@@ -57,12 +57,12 @@ Status values:
 - **Decision:** Use a tasteful translucent floating bottom taskbar, visible by default with user-controlled hide behaviour. Do not add a top bar.
 - **Reason:** It is familiar, space-efficient, pointer-friendly, and matches the intended visual direction.
 
-## D008 — AppGrid plus Vicinae
+## D008 — Vicinae only
 
-- **Status:** Provisional through PM checkpoint 3
+- **Status:** Accepted
 - **Date:** 2026-08-24
-- **Decision:** AppGrid is the browsable mouse-first app surface. Vicinae is the Raycast-style command/search surface. KRunner remains a fallback.
-- **Reason:** The two products serve distinct browse and command intents. The PM will remove one if the installed prototype feels redundant.
+- **Decision:** Vicinae is the single promoted application launcher and Raycast-style command/search surface. The Proper taskbar button and `Meta+Space` both open it. KRunner remains an unobtrusive fallback.
+- **Reason:** AppGrid does not meet the product manager's visual standard. One well-configured Vicinae surface is more coherent than shipping an unattractive second launcher.
 
 ## D009 — Plasma Login Manager
 
@@ -154,3 +154,10 @@ Status values:
 - **Date:** 2026-08-24
 - **Decision:** Use five reviews: login, desktop/taskbar, launchers/windows, software directory, and final installed system.
 - **Reason:** The PM's taste is the central product input. Infrastructure work continues autonomously between those reviews.
+
+## D022 — Dolphin is the file-manager baseline
+
+- **Status:** Provisional through PM checkpoint 2
+- **Date:** 2026-08-24
+- **Decision:** Begin with a simplified and styled Dolphin configuration presented as “Files.” Compare it directly with current Nautilus and COSMIC Files in the Proper Plasma VM before locking the default.
+- **Reason:** Dolphin has the strongest Plasma integration and mature file operations, but stock Dolphin's visual density may not meet the product standard. Nautilus is cleaner but deliberately less capable and visually tied to GNOME; COSMIC Files is attractive and Fedora-packaged but brings its own toolkit/theme and less mature integration. The installed comparison should decide.

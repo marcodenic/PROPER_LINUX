@@ -14,7 +14,6 @@ Proper Apps is a curated directory and installation front end. It is not a new p
 - Dolphin file manager
 - Ghostty terminal
 - `btop`
-- AppGrid
 - Vicinae
 - KDE System Settings
 - KDE Discover and the system package/Flatpak backends Proper Apps delegates to

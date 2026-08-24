@@ -78,19 +78,12 @@ The first implementation should use supported Plasma panel and widget facilities
 
 ## Launching and finding
 
-### AppGrid
-
-AppGrid is the browse surface:
-
-- opened by clicking the Proper launcher icon;
-- supports categories, favourites, pointer scrolling, right-click actions, and drag-and-drop where upstream permits;
-- feels like a modern application menu, not a second command palette.
-
 ### Vicinae
 
-Vicinae is the command surface:
+Vicinae is the single promoted launch and command surface:
 
-- opened by clicking a search/command affordance or pressing `Meta+Space`;
+- opened by clicking the Proper launcher affordance or pressing `Meta+Space`;
+- presents a useful mouse-accessible home state with pinned applications, recent items, and common actions before the user types;
 - searches applications, files, commands, clipboard history, and supported extensions;
 - ships with a useful empty state and initial favourites so it is not a blank search box;
 - must support clicking results, scrolling, opening secondary actions, and choosing the screen containing the pointer;
@@ -99,6 +92,25 @@ Vicinae is the command surface:
 ### KRunner
 
 Stock KRunner remains available through `Alt+F2` as an unobtrusive fallback. It is not promoted as a third launcher.
+
+## File management
+
+The default file manager should look simpler than stock Dolphin without throwing away the mature operations and Plasma integration underneath it.
+
+Version 0.1 begins with Dolphin configured as a clean Proper “Files” experience:
+
+- a restrained toolbar containing back, forward, location/search, view, and essential actions;
+- a useful sidebar for Home, common folders, removable devices, and network locations;
+- comfortable grid and list views;
+- tabs, split view, previews, drag/drop, undo, trash, and remote locations retained;
+- noisy optional panels and redundant toolbar actions hidden by default;
+- double-click to open, ordinary selection, and familiar drag behaviour;
+- “Open in Ghostty” available from the current folder and context menu; and
+- no embedded terminal panel visible by default.
+
+The launcher may display the friendly name “Files” while About/help remains honest that the application is Dolphin. Configuration must use supported defaults and must not overwrite later user changes.
+
+Nautilus and COSMIC Files are comparison candidates at PM checkpoint 2. They should replace Dolphin only if their installed Plasma experience is materially better, not merely because one screenshot is cleaner.
 
 ## Window management
 

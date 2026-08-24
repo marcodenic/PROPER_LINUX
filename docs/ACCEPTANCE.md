@@ -49,6 +49,7 @@ Every version 0.1 candidate must satisfy all of these:
 - Light and dark variants
 - 100% and high-DPI rendering
 - Wallpaper-click “show desktop” prototype
+- The configured Dolphin “Files” view beside current Nautilus and COSMIC Files
 
 ### Pass criteria
 
@@ -59,21 +60,15 @@ Every version 0.1 candidate must satisfy all of these:
 - Normal application content remains readable.
 - Disabling blur does not leave broken or illegible surfaces.
 - The desktop does not resemble an unmodified Fedora KDE screenshot.
+- The default file manager has a restrained toolbar and sidebar, visually belongs on the Proper desktop, and completes ordinary copy/move/rename/trash/undo, removable-device, search, preview, tab, and drag/drop flows.
+- The PM explicitly confirms Dolphin, Nautilus, or COSMIC Files as the final default after the like-for-like comparison.
 
 ## PM checkpoint 3 — Launchers and windows
 
-### AppGrid mouse path
-
-1. Click the Proper launcher icon.
-2. Browse categories.
-3. Scroll results.
-4. Open an application.
-5. Use a secondary/right-click application action.
-
 ### Vicinae mouse path
 
-1. Click the command/search affordance.
-2. Click a favourite or empty-state action.
+1. Click the Proper launcher affordance.
+2. Click a pinned, recent, or empty-state application without typing.
 3. Search for an application or file.
 4. Scroll and click a result.
 5. Open and choose a secondary action without a required shortcut.
@@ -96,11 +91,10 @@ Every version 0.1 candidate must satisfy all of these:
 ### Pass criteria
 
 - No primary launcher or window action requires memorising a key.
-- AppGrid and Vicinae have distinct, understandable roles.
-- Pointer selection and scrolling work reliably in both launchers.
+- Vicinae works as both the obvious application launcher and the deeper command surface.
+- Pointer selection and scrolling work reliably throughout the promoted launcher flow.
 - Launcher surfaces open on a sensible display, preferably the display containing the pointer.
 - Floating behaviour is always available.
-- The product manager decides whether both launchers remain after this demonstration.
 
 ## PM checkpoint 4 — Proper Apps
 
