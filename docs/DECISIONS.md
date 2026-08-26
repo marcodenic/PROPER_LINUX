@@ -214,3 +214,14 @@ Status values:
 - **Reason:** The immutable final3 baseline reproduced a launcher exit when the search field was clicked or first typed into. A source build removes the incompatible private-Qt ABI shim; the exact source-built RPM and fresh ISO pass the focused interaction regression.
 - **Additional fetched build dependencies:** Upstream CMake FetchContent retrieves Glaze v7.2.0 at commit `b518eec7a22e56ffa238b072c07f47efa7cea97f` (MIT, <https://github.com/stephenberry/glaze>) and QtKeychain v0.14.0 at commit `e63da2868465db18eb35a312b2635c26fdc46923` (BSD-3-Clause, <https://github.com/frankosterfeld/qtkeychain>); these are build-only and must be re-audited and checksum-recorded on each Vicinae source update.
 - **Update method:** Audit the official Vicinae source commit, archive checksum, upstream dependency tags/commits and licences; rebuild in the pinned Fedora builder, install the RPM in a disposable guest, then rebuild and boot the exact ISO before promotion.
+
+## D030 — PM checkpoint 4 approval and Phase 6 continuation
+
+- **Status:** Accepted
+- **Date:** 2026-08-26
+- **Decision:** Treat PM checkpoint 4 and all preceding checkpoints as approved
+  for Phase 6 continuation. Preserve the source-built Vicinae ISO and its
+  evidence as the immutable baseline while producing a new integrated candidate.
+- **Reason:** The product manager explicitly approved the Phase 4/5 handoff;
+  remaining work is final-image curation, installation, persistence, display
+  compatibility, and the complete installed checkpoint-5 journey.

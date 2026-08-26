@@ -1,8 +1,15 @@
 # Phase 4/5 status — checkpoint 4 review package
 
+## PM approval
+
+Checkpoint 4 and all preceding checkpoints are approved by the product manager
+for Phase 6 continuation, dated 2026-08-26. This source-built ISO and evidence
+remain the immutable Phase 4 baseline; Phase 6 evidence must use its own exact
+final ISO and installed reference VM.
+
 ## Current integration artifact
 
-- Branch: `codex/complete-phase-4-and-5`
+- Branch: `codex/complete-phase-4-and-5` (approved baseline)
 - ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build-source-v1/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
 - ISO SHA-256: `31d8dab4c7d7b1001526268b2b2dd29ff67decfb252b0941101b79a94167c50d`
 - Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build-source-v1/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
@@ -54,12 +61,17 @@ Passed: `scripts/check-box`; `scripts/validate-catalogue`; `git diff --check`; `
 
 ## Acceptance state
 
-Checkpoint 4 is not PM-approved. Do not begin Phase 6. The exact-ISO package now includes catalogue, operation, AI-agent, Dolphin, Vicinae, retained Ghostty/btop, and focused 200% evidence. Perform PM visual review before requesting approval.
+Checkpoint 4 is approved for Phase 6 continuation. The exact-ISO package
+includes catalogue, operation, AI-agent, Dolphin, Vicinae, retained
+Ghostty/btop, and focused 200% evidence. Phase 6 carries the remaining
+installed-system and final-journey validation.
 
 ## Known defects
 
 - The final3 prebuilt-binary interaction defect is retained as the immutable comparison baseline; the source-built candidate no longer reproduces it in the fresh ISO guest.
 
-## PM handoff request
+## PM handoff
 
-After the evidence index is complete, request PM visual approval for checkpoint 4. No approval is asserted by this document.
+Approval was supplied in the Phase 6 objective on 2026-08-26 and recorded here
+to authorize continuation. No claim is made that this baseline is the final
+checkpoint-5 candidate.
