@@ -36,6 +36,10 @@ for package in proper-release proper-look-and-feel proper-defaults proper-launch
     [[ -s "$output_root/ghostty-themes.tgz" ]] || curl -L --fail --silent --show-error https://github.com/mbadolato/iTerm2-Color-Schemes/releases/download/release-20260525-155808-7335c0a/ghostty-themes.tgz -o "$output_root/ghostty-themes.tgz"
     podman build --quiet --tag proper-ghostty-builder-full --file "$project_root/image/Containerfile.ghostty" "$project_root/image" >/dev/null
     podman run --rm --volume "$package_root:/src:Z" --volume "$rpm_root/$package:/out:Z" proper-ghostty-builder-full bash -lc "cd /src && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /src' proper-terminal.spec && find /out -type f -name '*.rpm' -exec cp {} /out/ \\;"
+  elif [[ "$package" == proper-launchers ]]; then
+    download_verified https://github.com/vicinaehq/vicinae/releases/download/v0.24.0/vicinae-linux-x86_64-v0.24.0.tar.gz "$source_cache/vicinae-linux-x86_64-v0.24.0.tar.gz" 015a1ef2f8b23ea36a3f831a41de2d138f927cf45c987f62de3ec4add8dbafe7
+    cp "$source_cache/vicinae-linux-x86_64-v0.24.0.tar.gz" "$package_root/"
+    rpmbuild -bb --define "_tmppath /tmp" --define "_topdir $rpm_root/$package" --define "_sourcedir $package_root" "$spec"
   elif [[ "$package" == proper-apps ]]; then
     podman build --quiet --tag proper-apps-builder --file "$project_root/image/Containerfile.ghostty" "$project_root/image" >/dev/null
     podman run --rm --volume "$project_root:/repo:Z" --volume "$rpm_root/$package:/out:Z" proper-apps-builder bash -lc "cd /repo/packages/proper-apps && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /repo/packages/proper-apps' proper-apps.spec"
