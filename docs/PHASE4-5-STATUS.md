@@ -55,6 +55,8 @@ Additional fresh Phase 4/5 journey evidence from the same promoted ISO guest:
 - Fresh exact-ISO Flatpak success/recovery guest: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/flatpak-16g-1787750000/`. `flatpak-final.png` shows `State: Installed` with enabled Launch and Uninstall / recover actions (SHA-256 `6f6027b43947d6c9070f228d607c1e13b20582e92945f97ab7e779f295370df6`); `direct-launch.png` visibly shows the launched GNOME Calculator (SHA-256 `7b4f88757c25417c222e617e12b2b9f44dc172a469870d79857d4819f1b0e2f9`); `recovery-working.png` shows the returned `State: Available` (SHA-256 `77462cd4f657e3ff0089e5fb68a986621c11e1587d8dff669f9488683bfc9d8b`).
 - Fresh exact-ISO vendor path in the same disposable guest: `vendor-result.png` shows Google Chrome `State: Installed` (SHA-256 `adda47c8ef18f38460b45672135515b2bb65988e360d2a2a5745283fef766d4d`); `vendor-launch.png` shows Chrome's first-run terms window (SHA-256 `9392853cb95b4788cd86e880c3d051c20ece2aec5c3864b29b0a7fcece13d040`).
 - Fresh boot of the icon-enabled exact ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build-icons/vm/icons-1787760000/icons-home.png` visibly renders recognizable theme icons for all seven catalogue rows (SHA-256 `a71760c55c57faf7048222368cfa073e4372d2019cc4cfc144fc8a8f82c7fdf2`).
+- Fresh icon-enabled ISO Vicinae journey: `vicinae-search-icons.png` shows the searchable Proper Apps and Dropdown Terminal actions (SHA-256 `ba204dac3d164b50172f7342182eff3c9e9e0ea8d586ada72cead96fe00d2246`); selecting Dropdown Terminal opens the retained Proper Ghostty session in `vicinae-dropdown-action.png` (SHA-256 `ce5715eaab458eab9169ccc604b200c54f5503d7a24910469c153b568a95a45e`).
+- A fresh guest config marker was created before attempting `pkexec dnf reinstall -y proper-terminal`; the screenshot records that the package is not available from the live guest's enabled repositories, so this is not counted as reinstall-persistence evidence (`persistence-reinstall.png`, SHA-256 `61f6b9e0b6d28c745b0a8bc002071bc4770a158c7894dce17650f1ff6e5abd63`).
 - Codex agent path remains incomplete: the install attempt exhausted live writable space and the retry hit a partial npm directory (`codex-npm-retry.png`, SHA-256 `617f117264b1c8d4367bad64cc3eed641321a54a4d70e291a01992010d0954eb`); `codex-launch3.png` records the resulting Ghostty executable-not-found state (SHA-256 `5c0d18a77f23058072b519621b78f26ea3553de3778146dfec6c3bb253eb3cff`).
 - After freeing the disposable guest’s vendor/runtime payloads, the official npm install completed and `/usr/local/bin/codex` was verified; `codex-direct-final.png` shows the Codex welcome/authentication screen inside Ghostty (SHA-256 `69d3584a8c277fab3ff921d637a6afa3568e4ba0c79e6f6612210f3b2fe3a619`). The Ghostty launch log is captured in `codex-app-final.png` (SHA-256 `874e0bb47eacf67fb9c9aa62e2efbe603ad1b99158a5dffa7047d264d8d367a1`).
 - Fresh exact-ISO Flatpak provider attempt: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/flatpak-success-1787747000/gnome-working.png` shows the two-step transaction; `gnome-result.png` shows the understandable provider failure state. Terminal verification shows Flathub is present as a user remote. A confirmed Flatpak success remains open, so this attempt is not treated as success evidence.
@@ -109,7 +111,7 @@ the catalogue remains recognizable without bundling proprietary artwork.
 | Dropdown hide/reopen and Meta+J | Passed; fresh tablet and QMP evidence above |
 | btop renders | Passed; fresh maximized screenshot above |
 | Dolphin “Open terminal here” | Passed; fresh screenshot above |
-| Vicinae actions use Ghostty | Partially passed; Vicinae search/open Proper Apps; Ghostty action evidence remains open |
+| Vicinae actions use Ghostty | Passed; fresh Vicinae search exposes Proper Apps and Dropdown Terminal, which opens Ghostty |
 | Fresh-user defaults and upgrade persistence | Open for current release-ISO evidence |
 | Catalogue home/category/search/detail | Passed for home/detail/search/category; empty state and recognizable product icons passed in fresh exact-ISO captures |
 | Install progress and installed state | Passed; exact-ISO progress and installed-state screenshots above |
@@ -124,7 +126,7 @@ QMP command success, or historical screenshots.
 ## Remaining defects before PM approval
 
 - P2: fresh-user defaults and changed Ghostty setting persistence across package upgrade still need a fresh release-ISO capture.
-- P2: Vicinae Ghostty action and a polished vendor-specific recovery affordance remain only partially demonstrated.
+- P2: a package reinstall/upgrade persistence capture remains open because the live guest's enabled repositories do not expose the installed `proper-terminal` package for reinstall.
 - P3: the generic provider failure message does not include captured provider stderr, making root-cause diagnosis less direct.
 
 ## Remaining work
