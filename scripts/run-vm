@@ -102,7 +102,7 @@ if [[ -e "$monitor_socket" || -e "$qmp_socket" ]]; then
   done
 fi
 
-qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m 8192 -device "virtio-vga,xres=$vm_width,yres=$vm_height" -device qemu-xhci -device usb-tablet "${display_args[@]}" -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive file="$disk_path",if=virtio,format=qcow2 "${aux_drive_args[@]}" -cdrom "$iso_path" -boot order=d -nic user,model=virtio-net-pci &
+qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m 8192 -device "virtio-vga,xres=$vm_width,yres=$vm_height" -device qemu-xhci -device usb-tablet,id=proper_tablet "${display_args[@]}" -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive file="$disk_path",if=virtio,format=qcow2 "${aux_drive_args[@]}" -cdrom "$iso_path" -boot order=d -nic user,model=virtio-net-pci &
 qemu_pid=$!
 display_helper_pid=
 
