@@ -6,7 +6,7 @@ The current source state has been promoted through a full ISO rebuild.
 
 - Branch: `codex/complete-phase-4-and-5`
 - ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
-- ISO SHA-256: `1cb976e5dd1e4d087e2cfe5304f16eaebd5732dfdaa43b84f0906f30afd5a53e`
+- ISO SHA-256: `d56bc30abd62d4116ce070fe2b17a7ffd4950dffff73a654d66fc02bcf6a05ff`
 - Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
 - Manifest checks: `proper-apps-0.1-2.fc44.x86_64`, `proper-terminal-1.2.3-5.fc44.x86_64`, and no LibreOffice package.
 
@@ -14,8 +14,8 @@ The focused Proper Apps RPM build passed with qmake6, make, rpmbuild, and RPM
 metadata/file-list inspection. It is an intermediate build, not the release
 ISO artifact:
 
-- RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build/rpms/recovery-enable-1787720000/proper-apps-0.1-2.fc44.x86_64.rpm`
-- RPM SHA-256: `3070ff3b506b5281248c379607bce129f37e32c7017947b1cadb9bf931110068`
+- RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build/rpms/proper-apps/RPMS/x86_64/proper-apps-0.1-2.fc44.x86_64.rpm`
+- RPM SHA-256: `533b95f4022af403a0979411380d682d3ea8e50eead41a822b0f6507836053b8`
 
 ## VM-control evidence
 
@@ -45,6 +45,9 @@ Fresh graphical input evidence using the tablet VNC path on the promoted ISO:
 - Marker/session screenshot SHA-256: `d993623a9af04dca9a309f1fae806fa5547b3c81e1e032dad2f542bb687fad95`
 
 Additional fresh Phase 4/5 journey evidence from the same promoted ISO guest:
+
+- Latest exact-ISO Fedora install progress: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/fedora-latest-1787732000/install-working-final.png` (SHA-256 `69ed7d62e18186fb7d117b7a398c1a7012c27e1ec306de015b30c7c8d6228a92`)
+- Latest exact-ISO Fedora verification terminal: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/fedora-latest-1787732000/rpm-latest-result.png`; visible `rpm -q btop` output confirms `btop-1.4.7-1.fc44.x86_64`.
 
 - True QMP `Meta+J` hide/reopen: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/meta-hidden.png` and `meta-reopened.png` (SHA-256 `fdffb3a2aa441f63c36d5a09c6f238273a43da2a7bbd57fe8353683360b3a844`, `d5dfd94bea6375e2d8f032a769b47e6bb9d2bc843b3b72d3b122f2b682ffb405`)
 - Dolphin “Open Terminal Here”: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/dolphin-terminal.png` (SHA-256 `202c7faffcd424ff14eba6f7001ca5ff6f6f46e16fc849b8e6f28ca22f5ef1b7`)
@@ -97,7 +100,7 @@ recovery is enabled only after installed detection succeeds.
 | Vicinae actions use Ghostty | Partially passed; Vicinae search/open Proper Apps; Ghostty action evidence remains open |
 | Fresh-user defaults and upgrade persistence | Open for current release-ISO evidence |
 | Catalogue home/category/search/detail | Passed for home/detail/search/category; empty state passed in final fresh ISO UI capture |
-| Install progress and installed state | Installed state passed for btop; install progress remains open |
+| Install progress and installed state | Progress passed on exact ISO; installed-state UI is being rechecked after adding missing btop RPM detection metadata |
 | Launch and provider-specific recovery | Open for current release-ISO evidence |
 | Intentional failure and advanced source details | Advanced source details and intentional empty state passed; intentional provider failure remains open |
 | Fedora, Flatpak, vendor, and agent paths | Open |
