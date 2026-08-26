@@ -6,7 +6,7 @@ The current source state has been promoted through a full ISO rebuild.
 
 - Branch: `codex/complete-phase-4-and-5`
 - ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
-- ISO SHA-256: `fe530379bcd4f06b94576dec6ac621e216f60e90bf8d30780743e00a96bbb290`
+- ISO SHA-256: `1cb976e5dd1e4d087e2cfe5304f16eaebd5732dfdaa43b84f0906f30afd5a53e`
 - Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
 - Manifest checks: `proper-apps-0.1-2.fc44.x86_64`, `proper-terminal-1.2.3-5.fc44.x86_64`, and no LibreOffice package.
 
@@ -14,8 +14,8 @@ The focused Proper Apps RPM build passed with qmake6, make, rpmbuild, and RPM
 metadata/file-list inspection. It is an intermediate build, not the release
 ISO artifact:
 
-- RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build/rpms/proper-apps-empty-fix-1787718000/proper-apps-0.1-2.fc44.x86_64.rpm`
-- RPM SHA-256: `669c3f091d1ea341b66776d5e2f8f0cb8e017635f9aa2fdd4477f7b62ce8df84`
+- RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build/rpms/recovery-enable-1787720000/proper-apps-0.1-2.fc44.x86_64.rpm`
+- RPM SHA-256: `3070ff3b506b5281248c379607bce129f37e32c7017947b1cadb9bf931110068`
 
 ## VM-control evidence
 
@@ -61,6 +61,15 @@ Final Proper Apps UI verification from a fresh boot of the exact ISO above:
   architecture details: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/final-ui-1787718300/advanced-final4.png`
   (SHA-256 `21808bf93b45cf2679baa94e107ff85be30b56e76fdc82b8c46eaeda75a1ee41`)
 
+Final category-control verification from a fresh boot of the updated ISO:
+
+- Category dropdown visibly open with all five categories:
+  `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/category-1787721000/category-open4.png`
+  (SHA-256 `499593a4c2be38f160fd90ca07a728f360566b6d61a4cbc0a1b0d18c09eed128`)
+- Development category selected with filtered results:
+  `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/category-1787721000/category-development.png`
+  (SHA-256 `7088d06a5770fe5016cc8ff80bd96e885047cadcb2409f6796598858ace18883`)
+
 The fresh post-promotion capture proves the new ISO boots to the branded
 desktop. The earlier captures prove a working graphical control path for the
 demonstrated actions.
@@ -70,8 +79,9 @@ be treated as absolute coordinates between sessions.
 ## Source changes included in the ISO
 
 Proper Apps launch is separate from installation progress; successful
-operations refresh installed detection; and recovery uses provider-specific
-Flatpak or Fedora removal commands, with an explanatory vendor fallback.
+operations refresh installed detection; recovery uses provider-specific
+Flatpak or Fedora removal commands, with an explanatory vendor fallback; and
+recovery is enabled only after installed detection succeeds.
 `scripts/validate-catalogue` passes.
 
 ## Acceptance matrix
@@ -86,7 +96,7 @@ Flatpak or Fedora removal commands, with an explanatory vendor fallback.
 | Dolphin “Open terminal here” | Passed; fresh screenshot above |
 | Vicinae actions use Ghostty | Partially passed; Vicinae search/open Proper Apps; Ghostty action evidence remains open |
 | Fresh-user defaults and upgrade persistence | Open for current release-ISO evidence |
-| Catalogue home/category/search/detail | Passed for home/detail/search; category dropdown remains open; empty state passed in final fresh ISO UI capture |
+| Catalogue home/category/search/detail | Passed for home/detail/search/category; empty state passed in final fresh ISO UI capture |
 | Install progress and installed state | Installed state passed for btop; install progress remains open |
 | Launch and provider-specific recovery | Open for current release-ISO evidence |
 | Intentional failure and advanced source details | Advanced source details and intentional empty state passed; intentional provider failure remains open |
