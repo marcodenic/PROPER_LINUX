@@ -26,6 +26,8 @@ All evidence in `docs/evidence/checkpoint4-final/` must be captured from the ISO
 5. [Filtered category view](evidence/checkpoint4-final/05-category-filtered.png) — Web category narrows the catalogue to Google Chrome; SHA-256 `9660a58cd939a62a397767cf8856061cc3af3a93a0f20c305f6fa9ebc0e6343e`.
 6. [Search results](evidence/checkpoint4-final/06-search-results.png) — `btop` search returns the installed application and enables Launch/Uninstall; SHA-256 `b06e081ee4de614796800ff5f183461281da0bf0c4bd07861f491a618217f08c`.
 7. [High-DPI desktop](evidence/checkpoint4-final/07-hidpi-200-percent.png) — fresh 3840×2160 framebuffer at 200% scale; floating taskbar remains legible and proportionate; SHA-256 `59da004bfcdaa31e8efc10232173c6a91163735dad9ee3832bf218b497235e1a`.
+8. [Install progress](evidence/checkpoint4-final/08-install-progress.png) — Chrome vendor operation visibly reports `Working… step 1 of 1`; SHA-256 `350d5e9e382ee5df38a4af6c21353365ccddfcd063b6183bf83a4e8ba576ba41`.
+9. [Installed state](evidence/checkpoint4-final/09-installed-state.png) — Chrome detail shows Installed and exposes Launch and Uninstall / recover; SHA-256 `447ec7c72a62cf333402b6e2acdbd7938365702c7edc320c176a405b7fc0491d`.
 
 The remaining provider-operation, recovery, retained-desktop, and 200% journeys are still being recaptured from this exact ISO; screenshots from earlier ISO generations are intentionally not treated as current evidence.
 
@@ -39,7 +41,7 @@ Checkpoint 4 is not PM-approved. Do not begin Phase 6. Continue the single fresh
 
 ## Known defects
 
-- P3: provider-operation progress/installed/failure/recovery states, the AI-agent launch path, and retained desktop interactions remain to be captured from final2 before PM approval.
+- P3: provider failure/technical and recovery states, the AI-agent launch path, and retained desktop interactions remain to be captured from final2 before PM approval. The final2 guest did verify Chrome vendor progress and installed-state affordances.
 
 ## PM handoff request
 
