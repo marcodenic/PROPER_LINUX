@@ -45,6 +45,7 @@ vm_width="${PROPER_VM_WIDTH:-$profile_width}"
 vm_height="${PROPER_VM_HEIGHT:-$profile_height}"
 vm_scale="${PROPER_VM_SCALE:-$profile_scale}"
 vm_refresh="${PROPER_VM_REFRESH:-60}"
+vm_memory="${PROPER_VM_MEMORY:-8192}"
 vm_display_delay="${PROPER_VM_DISPLAY_DELAY:-35}"
 vm_auto_display="${PROPER_VM_AUTO_DISPLAY:-1}"
 vm_backend="${PROPER_VM_BACKEND:-gtk}"
@@ -81,6 +82,7 @@ fi
 [[ "$vm_width" =~ ^[0-9]+$ && "$vm_height" =~ ^[0-9]+$ ]] || { printf 'VM dimensions must be positive integers.\n' >&2; exit 1; }
 [[ "$vm_scale" =~ ^[0-9]+([.][0-9]+)?$ ]] || { printf 'VM scale must be a positive number.\n' >&2; exit 1; }
 [[ "$vm_refresh" =~ ^[0-9]+([.][0-9]+)?$ ]] || { printf 'VM refresh must be a positive number.\n' >&2; exit 1; }
+[[ "$vm_memory" =~ ^[0-9]+$ && "$vm_memory" -ge 1024 ]] || { printf 'PROPER_VM_MEMORY must be at least 1024 megabytes.\n' >&2; exit 1; }
 [[ "$vm_display_delay" =~ ^[0-9]+$ ]] || { printf 'VM display delay must be a non-negative integer.\n' >&2; exit 1; }
 [[ "$vm_auto_display" == 0 || "$vm_auto_display" == 1 ]] || { printf 'PROPER_VM_AUTO_DISPLAY must be 0 or 1.\n' >&2; exit 1; }
 [[ -c /dev/kvm && -r /dev/kvm && -w /dev/kvm ]] || { printf '/dev/kvm is unavailable; graphical acceptance requires host KVM access.\n' >&2; exit 1; }
@@ -110,7 +112,7 @@ if [[ -e "$monitor_socket" || -e "$qmp_socket" ]]; then
   done
 fi
 
-qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m 8192 -device "virtio-vga,xres=$vm_width,yres=$vm_height" "${pointer_args[@]}" "${display_args[@]}" -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive file="$disk_path",if=virtio,format=qcow2 "${aux_drive_args[@]}" -cdrom "$iso_path" -boot order=d -nic user,model=virtio-net-pci &
+qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m "$vm_memory" -device "virtio-vga,xres=$vm_width,yres=$vm_height" "${pointer_args[@]}" "${display_args[@]}" -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive file="$disk_path",if=virtio,format=qcow2 "${aux_drive_args[@]}" -cdrom "$iso_path" -boot order=d -nic user,model=virtio-net-pci &
 qemu_pid=$!
 display_helper_pid=
 
