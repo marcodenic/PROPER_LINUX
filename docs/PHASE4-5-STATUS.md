@@ -43,6 +43,19 @@ keyboard interaction.
 - Manifest checks: `proper-apps 0.1-2.fc44.x86_64`, `proper-terminal 1.2.3-5.fc44.x86_64`, and no LibreOffice entries
 - Fresh boot evidence: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/checkpoint4-1787714419/desktop.png` (SHA-256 `e596905dde724e8c711bd50dbbde1bc6c0693e867047d2d65b753fbb9b88afaa`)
 
+The relative-pointer VNC backend was then exercised against the same
+integrated ISO. A taskbar click opened Proper Terminal, and a unique marker was
+typed into the visible terminal; both states changed visibly:
+
+- Terminal opened: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/relative-1787714591/terminal-click.png`
+- Marker typed: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/relative-1787714591/marker.png`
+- Marker screenshot SHA-256: `fcf87b314c71c4fbc694d3e84a66adfd60542be82b67f9df13c1b18b5cb1b56a`
+
+This is the first verified graphical input success in the current continuation.
+The relative backend uses relative RFB coordinates, so subsequent absolute
+coordinate assumptions were discarded rather than counted as acceptance
+actions. The full Phase 4 and checkpoint 4 journeys remain open.
+
 The supplied completed ISO was verified before testing:
 
 - ISO: `/home/code/Documents/GitHub/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
