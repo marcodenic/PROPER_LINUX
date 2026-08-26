@@ -44,6 +44,14 @@ Fresh graphical input evidence using the tablet VNC path on the promoted ISO:
 - Rendered btop: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/tablet-1787716500/btop-final.png`
 - Marker/session screenshot SHA-256: `d993623a9af04dca9a309f1fae806fa5547b3c81e1e032dad2f542bb687fad95`
 
+Additional fresh Phase 4/5 journey evidence from the same promoted ISO guest:
+
+- True QMP `Meta+J` hide/reopen: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/meta-hidden.png` and `meta-reopened.png` (SHA-256 `fdffb3a2aa441f63c36d5a09c6f238273a43da2a7bbd57fe8353683360b3a844`, `d5dfd94bea6375e2d8f032a769b47e6bb9d2bc843b3b72d3b122f2b682ffb405`)
+- Dolphin “Open Terminal Here”: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/dolphin-terminal.png` (SHA-256 `202c7faffcd424ff14eba6f7001ca5ff6f6f46e16fc849b8e6f28ca22f5ef1b7`)
+- Vicinae search for Proper Apps: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/vicinae-search.png` (SHA-256 `4d892fab6af22ff81af3ef7acc0a0324dbc79b8eee1753e7c716ab3bf6dd28c6`)
+- Proper Apps home/detail: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/proper-apps.png` (SHA-256 `e0776bbb5a713ac500d2c975b84c5afe8371bd4cfd4bf21e7f95f084c883a5d7`)
+- Proper Apps search and installed-state detail for btop: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/apps-search.png` (SHA-256 `b138ab8feab787a0872654e5e53e29bc062e305f62c763fee864cdf6f3160ec3`)
+
 The fresh post-promotion capture proves the new ISO boots to the branded
 desktop. The earlier captures prove a working graphical control path for the
 demonstrated actions.
@@ -64,13 +72,13 @@ Flatpak or Fedora removal commands, with an explanatory vendor fallback.
 | ISO boots to Proper desktop | Passed; fresh screenshot above |
 | Pointer control and visible typing | Passed; fresh tablet-VNC evidence above |
 | Retained dropdown Ghostty session | Passed; fresh hide/reopen evidence above |
-| Dropdown hide/reopen and Meta+J | Open |
+| Dropdown hide/reopen and Meta+J | Passed; fresh tablet and QMP evidence above |
 | btop renders | Passed; fresh maximized screenshot above |
-| Dolphin “Open terminal here” | Open |
-| Vicinae actions use Ghostty | Open |
+| Dolphin “Open terminal here” | Passed; fresh screenshot above |
+| Vicinae actions use Ghostty | Partially passed; Vicinae search/open Proper Apps; Ghostty action evidence remains open |
 | Fresh-user defaults and upgrade persistence | Open for current release-ISO evidence |
-| Catalogue home/category/search/detail | Open for current release-ISO evidence |
-| Install progress and installed state | Open for current release-ISO evidence |
+| Catalogue home/category/search/detail | Passed for home/detail/search; category dropdown and empty state remain open |
+| Install progress and installed state | Installed state passed for btop; install progress remains open |
 | Launch and provider-specific recovery | Open for current release-ISO evidence |
 | Intentional failure and advanced source details | Open |
 | Fedora, Flatpak, vendor, and agent paths | Open |
