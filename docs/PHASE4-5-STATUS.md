@@ -47,6 +47,7 @@ Fresh graphical input evidence using the tablet VNC path on the promoted ISO:
 Additional fresh Phase 4/5 journey evidence from the same promoted ISO guest:
 
 - Latest exact-ISO Fedora install progress: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/fedora-latest-1787732000/install-working-final.png` (SHA-256 `69ed7d62e18186fb7d117b7a398c1a7012c27e1ec306de015b30c7c8d6228a92`)
+- Fresh exact-ISO btop state/launch/recovery cycle: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/fedora-postfix-1787735000/btop-active.png` shows `State: Installed` (SHA-256 `8e741b7f4c46971daeec8ab3c3ad0ab961297713b98ea7013d088b1bafa973ce`); `btop-launch.png` shows Ghostty launch (SHA-256 `348de918773d84473bc02c0ca9b1f260fc65cd9a933195e35c0d649404d0a9e4`); `recovery-working.png` shows recovery in progress (SHA-256 `ec9b510a49ec6404d8342ef756a7754bf6fa7fc335563dbcff23a8342c469d1f`); `recovery-complete.png` shows the returned Available state (SHA-256 `7630f243aff259fe4618d8d170b6e7f62d821e9a1b4da523aac7e9753bbd1bf9`).
 - Latest exact-ISO Fedora verification terminal: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/fedora-latest-1787732000/rpm-latest-result.png`; visible `rpm -q btop` output confirms `btop-1.4.7-1.fc44.x86_64`.
 
 - True QMP `Meta+J` hide/reopen: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/meta-hidden.png` and `meta-reopened.png` (SHA-256 `fdffb3a2aa441f63c36d5a09c6f238273a43da2a7bbd57fe8353683360b3a844`, `d5dfd94bea6375e2d8f032a769b47e6bb9d2bc843b3b72d3b122f2b682ffb405`)
@@ -100,8 +101,8 @@ recovery is enabled only after installed detection succeeds.
 | Vicinae actions use Ghostty | Partially passed; Vicinae search/open Proper Apps; Ghostty action evidence remains open |
 | Fresh-user defaults and upgrade persistence | Open for current release-ISO evidence |
 | Catalogue home/category/search/detail | Passed for home/detail/search/category; empty state passed in final fresh ISO UI capture |
-| Install progress and installed state | Progress passed on exact ISO; installed-state UI is being rechecked after adding missing btop RPM detection metadata |
-| Launch and provider-specific recovery | Open for current release-ISO evidence |
+| Install progress and installed state | Passed; exact-ISO progress and installed-state screenshots above |
+| Launch and provider-specific recovery | Passed for Fedora btop; exact-ISO launch and recovery screenshots above |
 | Intentional failure and advanced source details | Advanced source details and intentional empty state passed; intentional provider failure remains open |
 | Fedora, Flatpak, vendor, and agent paths | Open |
 | PM checkpoint 4 | Not approved |
