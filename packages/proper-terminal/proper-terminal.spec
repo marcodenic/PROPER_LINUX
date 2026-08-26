@@ -1,6 +1,6 @@
 Name: proper-terminal
 Version: 1.2.3
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Ghostty terminal and Proper developer essentials
 License: MIT
 URL: https://ghostty.org/
@@ -76,6 +76,9 @@ install -Dpm 0644 %{SOURCE12} %{buildroot}%{_sysconfdir}/xdg/autostart/proper-dr
 %config(noreplace) %{_sysconfdir}/skel/.config/ghostty/config
 %config(noreplace) %{_sysconfdir}/xdg/ghostty/config
 %changelog
+* Wed Aug 26 2026 Proper Linux <maintainers@properlinux.example> - 1.2.3-6
+- Give the retained dropdown enough columns and rows for btop and normal shell use.
+
 * Wed Aug 26 2026 Proper Linux <proper@example.invalid> - 1.2.3-5
 - Explicitly load and start the retained KWin script through its scripting service.
 
