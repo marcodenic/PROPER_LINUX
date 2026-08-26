@@ -1,4 +1,26 @@
-# Phase 4/5 implementation status — 2026-08-25
+# Phase 4/5 implementation status — 2026-08-26
+
+## Fresh ISO verification attempt
+
+The supplied completed ISO was verified before testing:
+
+- ISO: `/home/code/Documents/GitHub/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
+- SHA-256: `27573b85e899cc83ef7a9457e2a07fcbdcd5fb7d3d91e1dcbba40ea542bc57af`
+- manifest spot checks: `proper-terminal 1.2.3-5`, `proper-apps 0.1-2`, LibreOffice absent
+
+A new disposable qcow2 disk was booted with one UEFI QEMU/KVM process at
+1920×1080. The live guest reached the branded Proper Linux desktop and the
+floating bottom taskbar. The raw and converted display captures are retained
+under `/home/code/Documents/GitHub/proper-linux-build/vm/phase45-final.CNgqkx/`:
+`live.ppm`/`live.png` capture the boot menu and `boot.ppm`/`boot.png` capture
+the live desktop.
+
+The host-side QEMU display capture works, but the available QMP pointer and
+keyboard injection did not produce reliable visible interaction in this
+guest. Consequently the graphical installer and the requested in-guest
+journeys were not completed in this attempt. No success is inferred from
+socket commands, package metadata, or source inspection. Phase 4/5 therefore
+remains open and no checkpoint approval is claimed.
 
 Checkpoint 3 is approved and remains the regression baseline.
 
