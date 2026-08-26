@@ -31,6 +31,18 @@ passed in the Fedora 44 builder:
 This RPM is not ISO-integrated and has not yet been visually verified in a
 guest. Phase 4 and PM checkpoint 4 remain open.
 
+The promotion loop has since completed for the current source state. The full
+ISO rebuild succeeded, and a fresh disposable VNC guest booted it to the
+Proper desktop with the expected wallpaper and floating taskbar. This proves
+image composition and boot observation only; it does not prove pointer or
+keyboard interaction.
+
+- Integrated ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
+- Integrated ISO SHA-256: `ca99f14b146b481c19de4fa219175202907696298de531d60b5fd7480d63f9e1`
+- Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
+- Manifest checks: `proper-apps 0.1-2.fc44.x86_64`, `proper-terminal 1.2.3-5.fc44.x86_64`, and no LibreOffice entries
+- Fresh boot evidence: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/checkpoint4-1787714419/desktop.png` (SHA-256 `e596905dde724e8c711bd50dbbde1bc6c0693e867047d2d65b753fbb9b88afaa`)
+
 The supplied completed ISO was verified before testing:
 
 - ISO: `/home/code/Documents/GitHub/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
