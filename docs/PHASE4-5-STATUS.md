@@ -6,7 +6,7 @@ The current source state has been promoted through a full ISO rebuild.
 
 - Branch: `codex/complete-phase-4-and-5`
 - ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
-- ISO SHA-256: `0760160f9b94a84e62ec957a30464d2ff0fed132ebf6ff4af32f61b22ea96daa`
+- ISO SHA-256: `1696d71ac19940d408f9547a86b269b68cf75bd09a5ad11bc6b61cc6d6aa7cd2`
 - Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
 - Manifest checks: `proper-apps-0.1-2.fc44.x86_64`, `proper-terminal-1.2.3-5.fc44.x86_64`, and no LibreOffice package.
 
@@ -14,8 +14,8 @@ The focused Proper Apps RPM build passed with qmake6, make, rpmbuild, and RPM
 metadata/file-list inspection. It is an intermediate build, not the release
 ISO artifact:
 
-- RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build/rpms/proper-apps-recovery-fix-1787715600/proper-apps-0.1-2.fc44.x86_64.rpm`
-- RPM SHA-256: `d7f437ffa429f849f4002dfa78f5e3c188d541082499676a0d2ce92df89d88d8`
+- RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build/rpms/proper-apps-disclosure-1787717500/proper-apps-0.1-2.fc44.x86_64.rpm`
+- RPM SHA-256: `265e1d8079ac7cfb4a48d5d91dfc486249666ecbee7c295bf8142218c5e0f5d3`
 
 ## VM-control evidence
 
