@@ -15,6 +15,5 @@ All numbered captures in this directory are from the final3 ISO recorded in `doc
 ## Still required before PM approval
 
 - A Vicinae search-and-launch action from the open launcher surface.
-- A single combined retained-desktop capture showing the Ghostty dropdown and btop path (the individual states are already captured).
 
-These items remain explicitly open; all numbered screenshots now refer to the final3 ISO.
+This item remains explicitly open; all numbered screenshots now refer to the final3 ISO. The retained Ghostty dropdown, restored state, and readable btop session are individually captured in items 14–16.

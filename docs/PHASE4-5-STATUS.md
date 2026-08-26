@@ -52,7 +52,7 @@ Checkpoint 4 is not PM-approved. Do not begin Phase 6. The exact-ISO package now
 
 ## Known defects
 
-- P2: A Vicinae search-and-launch action and one combined Ghostty/btop retained-session capture remain open for PM review. AI-agent launch and Dolphin “Open Terminal Here” are directly evidenced.
+- P2: A Vicinae search-and-launch action remains directly unevidenced. AI-agent launch, Dolphin “Open Terminal Here,” and the retained Ghostty/btop states are directly evidenced.
 
 ## PM handoff request
 
