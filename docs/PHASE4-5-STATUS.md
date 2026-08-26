@@ -119,14 +119,13 @@ the catalogue remains recognizable without bundling proprietary artwork.
 | Launch and provider-specific recovery | Passed for Fedora btop and Flatpak GNOME Calculator; exact-ISO launch and recovery screenshots above |
 | Intentional failure and advanced source details | Advanced source details and intentional empty state passed; fresh Flatpak provider failure captured |
 | Fedora, Flatpak, vendor, and agent paths | Fedora, Flatpak, vendor, and Codex agent paths passed |
-| PM checkpoint 4 | Not approved |
+| PM checkpoint 4 | Ready for PM review; no approval asserted |
 
 No completion claim is based solely on source inspection, package metadata,
 QMP command success, or historical screenshots.
 
 ## Remaining defects before PM approval
 
-- P2: fresh-user defaults and changed Ghostty setting persistence across package upgrade still need a fresh release-ISO capture.
 - P3: the generic provider failure message does not include captured provider stderr, making root-cause diagnosis less direct.
 
 ## Remaining work
@@ -134,3 +133,23 @@ QMP command success, or historical screenshots.
 Continue with fresh disposable guests booted from the ISO above. Capture the
 remaining acceptance journeys, update this matrix with paths and checksums,
 and stop at PM checkpoint 4. Do not begin Phase 6.
+
+## PM checkpoint 4 handoff
+
+- Branch: `codex/complete-phase-4-and-5`
+- Verification commits: `3c8e9d1` (catalogue icons), `3da2e53` (icon-enabled
+  ISO), `490a097` (Vicinae Ghostty action), `c5f0465` (Ghostty reinstall
+  persistence), plus the clean follow-up status commit.
+- Exact ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build-icons/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
+- Exact ISO SHA-256: `6470b8410607790e73e558e703572b2ab71f200459dd2ee94470e2719fcf2aaf`
+- Exact Proper Apps RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build-icons/rpms/proper-apps/RPMS/x86_64/proper-apps-0.1-2.fc44.x86_64.rpm`
+- Exact RPM SHA-256: `c1dd255a4ac9156745a39f3c166661add88bbf72e139df6307b6d3dc4e36fbbf`
+- Verification commands: `scripts/validate-catalogue`, `git diff --check`,
+  `bash -n scripts/run-vm`, and the full `PROPER_OUTPUT_DIR=... scripts/build-iso`
+  pipeline all passed.
+- Final evidence covers the retained dropdown, btop, Dolphin terminal,
+  Vicinae/Ghostty, fresh defaults, RPM persistence, catalogue controls/icons,
+  progress, installed detection, launch, recovery, intentional failure,
+  advanced source details, Fedora, Flatpak, vendor, and Codex paths.
+- Worktree status at handoff: clean. Remaining defect: P3 generic provider
+  failure text omits provider stderr.
