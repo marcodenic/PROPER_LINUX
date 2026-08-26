@@ -6,7 +6,7 @@ The current source state has been promoted through a full ISO rebuild.
 
 - Branch: `codex/complete-phase-4-and-5`
 - ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
-- ISO SHA-256: `d56bc30abd62d4116ce070fe2b17a7ffd4950dffff73a654d66fc02bcf6a05ff`
+- ISO SHA-256: `9f0ed9df1fc39f8ea26be2da77856f322deace22f3f90c7cc58f5fc518dd0903`
 - Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
 - Manifest checks: `proper-apps-0.1-2.fc44.x86_64`, `proper-terminal-1.2.3-5.fc44.x86_64`, and no LibreOffice package.
 
@@ -15,7 +15,7 @@ metadata/file-list inspection. It is an intermediate build, not the release
 ISO artifact:
 
 - RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build/rpms/proper-apps/RPMS/x86_64/proper-apps-0.1-2.fc44.x86_64.rpm`
-- RPM SHA-256: `533b95f4022af403a0979411380d682d3ea8e50eead41a822b0f6507836053b8`
+- RPM SHA-256: `31e3637a0669933ce9d062a34246eb3168045a737c6ad7e6cb7f3ed99f01d6b4`
 
 ## VM-control evidence
 
