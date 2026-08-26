@@ -22,9 +22,12 @@ All evidence in `docs/evidence/checkpoint4-final/` must be captured from the ISO
 1. [Fresh 1920×1080 Proper desktop](evidence/checkpoint4-final/01-desktop.png) — wallpaper and floating taskbar visible; SHA-256 `b517798b6570aec78b09998f2ff510c0fbad231bade477d958e60cb355e14d84`.
 2. [Proper Apps catalogue home](evidence/checkpoint4-final/02-proper-apps-home.png) — recognizable catalogue icons, detail hierarchy, and primary/secondary actions; SHA-256 `1ae74c9c4176c4b7cea20233273b25546ef7cc0c7fcc331472bbe7ccf1b122fd`.
 3. [Advanced control focused](evidence/checkpoint4-final/03-advanced.png) — pointer/QMP focus state inspected; SHA-256 `7c0e18bf476b28a16f933a4f8b24b20354caebf5512d7e63e5bd1d5f0d0b857a`.
-4. [Category control state](evidence/checkpoint4-final/04-categories-open.png) — category control received the verified click but the popup was not visibly open; SHA-256 `f099fba5bf584ce1e0b9c245f5e709e9f1a7e6e5627dc19e085f8126c1f92441`.
+4. [Category control open](evidence/checkpoint4-final/04-categories-open.png) — category menu visibly exposes Web, Development, AI, and Utilities; SHA-256 `b8cfd883fc718d4a29aa48bcb77ad2b5ae18dfc95f6f47f6e0991caeedf3c3d1`.
+5. [Filtered category view](evidence/checkpoint4-final/05-category-filtered.png) — Web category narrows the catalogue to Google Chrome; SHA-256 `9660a58cd939a62a397767cf8856061cc3af3a93a0f20c305f6fa9ebc0e6343e`.
+6. [Search results](evidence/checkpoint4-final/06-search-results.png) — `btop` search returns the installed application and enables Launch/Uninstall; SHA-256 `b06e081ee4de614796800ff5f183461281da0bf0c4bd07861f491a618217f08c`.
+7. [High-DPI desktop](evidence/checkpoint4-final/07-hidpi-200-percent.png) — fresh 3840×2160 framebuffer at 200% scale; floating taskbar remains legible and proportionate; SHA-256 `59da004bfcdaa31e8efc10232173c6a91163735dad9ee3832bf218b497235e1a`.
 
-The remaining catalogue and desktop journeys are still being recaptured from this exact ISO; screenshots from earlier ISO generations are intentionally not treated as current evidence.
+The remaining provider-operation, recovery, retained-desktop, and 200% journeys are still being recaptured from this exact ISO; screenshots from earlier ISO generations are intentionally not treated as current evidence.
 
 ## Validation
 
@@ -36,7 +39,7 @@ Checkpoint 4 is not PM-approved. Do not begin Phase 6. Continue the single fresh
 
 ## Known defects
 
-- P3: full final2-ISO interaction journey and 200% inspection evidence remain to be captured in this guest.
+- P3: provider-operation progress/installed/failure/recovery states, the AI-agent launch path, and retained desktop interactions remain to be captured from final2 before PM approval.
 
 ## PM handoff request
 
