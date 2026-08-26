@@ -18,14 +18,14 @@ Proper Apps now presents bounded operation progress and a restrained technical-d
 
 ## Authoritative final-ISO evidence
 
-All evidence in `docs/evidence/checkpoint4-final/` must be captured from the ISO and disposable guest identified above. The terminal captures below are final3; the earlier Proper Apps captures remain clearly identified for recapture and are not yet claimed as final3 evidence. Current capture:
+All evidence in `docs/evidence/checkpoint4-final/` must be captured from the ISO and disposable guest identified above. Items 1–6 and 14–16 are final3 captures; operation captures 8–13 still require final3 recapture before this package can be called consolidated.
 
-1. [Fresh 1920×1080 Proper desktop](evidence/checkpoint4-final/01-desktop.png) — wallpaper and floating taskbar visible; SHA-256 `b517798b6570aec78b09998f2ff510c0fbad231bade477d958e60cb355e14d84`.
-2. [Proper Apps catalogue home](evidence/checkpoint4-final/02-proper-apps-home.png) — recognizable catalogue icons, detail hierarchy, and primary/secondary actions; SHA-256 `1ae74c9c4176c4b7cea20233273b25546ef7cc0c7fcc331472bbe7ccf1b122fd`.
-3. [Advanced control focused](evidence/checkpoint4-final/03-advanced.png) — pointer/QMP focus state inspected; SHA-256 `7c0e18bf476b28a16f933a4f8b24b20354caebf5512d7e63e5bd1d5f0d0b857a`.
-4. [Category control open](evidence/checkpoint4-final/04-categories-open.png) — category menu visibly exposes Web, Development, AI, and Utilities; SHA-256 `b8cfd883fc718d4a29aa48bcb77ad2b5ae18dfc95f6f47f6e0991caeedf3c3d1`.
-5. [Filtered category view](evidence/checkpoint4-final/05-category-filtered.png) — Web category narrows the catalogue to Google Chrome; SHA-256 `9660a58cd939a62a397767cf8856061cc3af3a93a0f20c305f6fa9ebc0e6343e`.
-6. [Search results](evidence/checkpoint4-final/06-search-results.png) — `btop` search returns the installed application and enables Launch/Uninstall; SHA-256 `b06e081ee4de614796800ff5f183461281da0bf0c4bd07861f491a618217f08c`.
+1. [Fresh 1920×1080 Proper desktop](evidence/checkpoint4-final/01-desktop.png) — final3 wallpaper and floating taskbar visible; SHA-256 `d38e1dc8afa20a308f9a5b661deed16c2cf5e73ed12b342feb8e7ff547e8538c`.
+2. [Proper Apps catalogue home](evidence/checkpoint4-final/02-proper-apps-home.png) — final3 catalogue icons, detail hierarchy, and primary/secondary actions; SHA-256 `dda0885c81a4550874f46a2dc30628917ae01597bf3bdc46fcbc5cbb3ac9d79e`.
+3. [Advanced source control](evidence/checkpoint4-final/03-advanced.png) — final3 source disclosure state inspected; SHA-256 `294bf97316c570c418e1336f56251fb790c2e84eebfbf2915232a79348718f14`.
+4. [Category control open](evidence/checkpoint4-final/04-categories-open.png) — final3 category menu exposes Web, Development, AI, and Utilities; SHA-256 `86b6fc833cc770b6d1a9466ac3cfad90b63e0d6e9e1920d769f8ab03304509d7`.
+5. [Filtered category view](evidence/checkpoint4-final/05-category-filtered.png) — final3 Web category narrows the catalogue to Google Chrome; SHA-256 `cc1d59de0856ef96d2c53b385d16b2a5b856ba158dc0a46582f4959ddc6afed2`.
+6. [Search results](evidence/checkpoint4-final/06-search-results.png) — final3 `btop` search returns the installed application and enables Launch/Uninstall; SHA-256 `76f5cf5daf9c4c97615c8f863ee5ac22bb4d9c9db5e460dda872fc67456ab377`.
 7. [High-DPI desktop](evidence/checkpoint4-final/07-hidpi-200-percent.png) — fresh 3840×2160 framebuffer at 200% scale; floating taskbar remains legible and proportionate; SHA-256 `59da004bfcdaa31e8efc10232173c6a91163735dad9ee3832bf218b497235e1a`.
 8. [Install progress](evidence/checkpoint4-final/08-install-progress.png) — Chrome vendor operation visibly reports `Working… step 1 of 1`; SHA-256 `350d5e9e382ee5df38a4af6c21353365ccddfcd063b6183bf83a4e8ba576ba41`.
 9. [Installed state](evidence/checkpoint4-final/09-installed-state.png) — Chrome detail shows Installed and exposes Launch and Uninstall / recover; SHA-256 `447ec7c72a62cf333402b6e2acdbd7938365702c7edc320c176a405b7fc0491d`.
@@ -49,7 +49,7 @@ Checkpoint 4 is not PM-approved. Do not begin Phase 6. Continue the single fresh
 
 ## Known defects
 
-- P2: all Proper Apps captures must be recaptured from final3 after the terminal-only rebuild so the package has one authoritative ISO. The final3 guest verified the widened retained dropdown and a readable `btop` session; AI-agent launch and other retained desktop interactions remain open.
+- P2: final3 operation captures 8–13 and the 200% inspection still need recapture so the package has one authoritative ISO. The final3 guest verified the widened retained dropdown and a readable `btop` session; AI-agent launch and other retained desktop interactions remain open.
 
 ## PM handoff request
 
