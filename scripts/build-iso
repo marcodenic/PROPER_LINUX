@@ -43,7 +43,9 @@ mkdir -p "$build_source_dir"
 if [[ "${PROPER_BASELINE:-0}" == 1 ]]; then
   kiwi_file=/source/Fedora.kiwi
 else
-  PROPER_OUTPUT_DIR="$output_root" "$project_root/scripts/build-rpms"
+  if [[ ! -d "$output_root/repo/repodata" ]]; then
+    PROPER_OUTPUT_DIR="$output_root" "$project_root/scripts/build-rpms"
+  fi
   cp -a "$project_root/image/descriptions/proper.xml" "$build_source_dir/proper.xml"
   # Fedora's upstream hook ends with `exit 0`.  Insert our live-session hook
   # before that terminator so KIWI actually executes it while composing the
