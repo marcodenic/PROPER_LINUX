@@ -1,6 +1,6 @@
 # Checkpoint 4 evidence index
 
-All numbered captures in this directory are from the final2 ISO recorded in `docs/PHASE4-5-STATUS.md`.
+All numbered captures in this directory are from the final3 ISO recorded in `docs/PHASE4-5-STATUS.md`.
 
 ## Verified
 
@@ -14,4 +14,4 @@ All numbered captures in this directory are from the final2 ISO recorded in `doc
 - A successful AI-agent installation and launch through Ghostty.
 - Retained Ghostty, btop, Dolphin “Open Terminal Here”, and Vicinae action journeys.
 
-These items remain explicitly open; no earlier-ISO screenshots are treated as final2 evidence.
+These items remain explicitly open; all numbered screenshots now refer to the final3 ISO.
