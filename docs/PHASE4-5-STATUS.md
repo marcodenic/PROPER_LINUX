@@ -36,6 +36,9 @@ All evidence in `docs/evidence/checkpoint4-final/` is captured from the ISO and 
 14. [Final3 dropdown Ghostty](evidence/checkpoint4-final/14-dropdown-ghostty.png) — widened retained terminal surface; SHA-256 `4241cc4ad2c38cd4c99ec1883f4fcf30c7f0a0b0a718f7b08a455544067004f4`.
 15. [Final3 restored dropdown](evidence/checkpoint4-final/15-dropdown-restored.png) — retained terminal restored after toggle; SHA-256 `f30a89ec25b61e8d69f630df3924f220c4313c0d86f7dcaa73f5ccf07ed598d6`.
 16. [Final3 btop](evidence/checkpoint4-final/16-btop.png) — btop fills the widened terminal without the prior minimum-size warning; SHA-256 `37c3b6142996e49f30f65fa1e8f294a27c8b4b8acd8f06122af56d5c8874191f`.
+17. [AI-agent launch](evidence/checkpoint4-final/17-ai-agent-launch.png) — installed Codex launches in Ghostty and reaches its first-run authentication screen; SHA-256 `dbed9d3064c1c7f0deb65272dbee264b61ba4299d15a23bec8f6ab14528ce27d`.
+18. [Dolphin Open Terminal Here](evidence/checkpoint4-final/18-dolphin-open-terminal.png) — Dolphin’s Actions path opens a properly styled Ghostty terminal in the selected directory; SHA-256 `c01531e3f326a1e936ef9e237a46e09954311f2d060d4a3bff0261f27294a45c`.
+19. [Vicinae launcher](evidence/checkpoint4-final/19-vicinae-launch.png) — the promoted launcher opens with favorites and command actions visible; SHA-256 `98f7dd1905be9d17bbb5f9860cb37d813bd0f9e34a34d3fc6629a6d6e5db8d59`.
 
 The provider-operation, recovery, source, and 200% journeys are now consolidated against this exact ISO; retained-desktop journeys remain open.
 
@@ -45,11 +48,11 @@ Passed: `scripts/check-box`; `scripts/validate-catalogue`; `git diff --check`; `
 
 ## Acceptance state
 
-Checkpoint 4 is not PM-approved. Do not begin Phase 6. Continue the single fresh guest journey and capture catalogue home, categories, search, details, progress, installed/launch/recovery/failure states, advanced details, and the retained desktop interactions from this exact ISO. Perform a focused 200% inspection before requesting approval.
+Checkpoint 4 is not PM-approved. Do not begin Phase 6. The exact-ISO package now includes catalogue, operation, AI-agent, Dolphin, Vicinae, retained Ghostty/btop, and focused 200% evidence. Perform PM visual review before requesting approval.
 
 ## Known defects
 
-- P2: AI-agent launch and retained Dolphin/Vicinae journeys remain directly unevidenced. The widened retained dropdown and readable `btop` session are verified.
+- P2: A Vicinae search-and-launch action and one combined Ghostty/btop retained-session capture remain open for PM review. AI-agent launch and Dolphin “Open Terminal Here” are directly evidenced.
 
 ## PM handoff request
 
