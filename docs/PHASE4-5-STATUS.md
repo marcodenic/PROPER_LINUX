@@ -20,6 +20,9 @@ Proper Apps now presents bounded operation progress and a restrained technical-d
 All evidence in `docs/evidence/checkpoint4-final/` must be captured from the ISO and disposable guest identified above. Current capture:
 
 1. [Fresh 1920×1080 Proper desktop](evidence/checkpoint4-final/01-desktop.png) — wallpaper and floating taskbar visible; SHA-256 `e2431100369282f8016574a39905abf4a555d1f457917c1266eb315dbe18ee89`.
+2. [Proper Apps catalogue home](evidence/checkpoint4-final/02-proper-apps-home.png) — recognizable catalogue icons, detail hierarchy, and primary/secondary actions; SHA-256 `3780a593e03bdaaafddcfe409376ebe11fbdb186474e02cbd882ac50713b9e85`.
+3. [Advanced control focused](evidence/checkpoint4-final/03-advanced.png) — pointer/QMP focus state inspected; SHA-256 `316903462357204b1a59e52d1b19474a471948b079897f2a41a0defafd6db41e`.
+4. [Category control state](evidence/checkpoint4-final/04-categories-open.png) — category control received the verified click but the popup was not visibly open; SHA-256 `f099fba5bf584ce1e0b9c245f5e709e9f1a7e6e5627dc19e085f8126c1f92441`.
 
 The remaining catalogue and desktop journeys are still being recaptured from this exact ISO; screenshots from earlier ISO generations are intentionally not treated as current evidence.
 
