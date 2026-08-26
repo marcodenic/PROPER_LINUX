@@ -28,6 +28,7 @@ Fresh integrated-ISO boot evidence:
 
 - Desktop: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/checkpoint4-1787714419/desktop.png`
 - Desktop SHA-256: `e596905dde724e8c711bd50dbbde1bc6c0693e867047d2d65b753fbb9b88afaa`
+- Fresh post-promotion desktop: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/recovery-1787716000/hmp.png`
 
 Fresh graphical input evidence using relative VNC mode:
 
@@ -35,7 +36,9 @@ Fresh graphical input evidence using relative VNC mode:
 - Unique marker typed into the visible terminal: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/relative-1787714591/marker.png`
 - Marker screenshot SHA-256: `fcf87b314c71c4fbc694d3e84a66adfd60542be82b67f9df13c1b18b5cb1b56a`
 
-These prove a working graphical control path for the demonstrated actions.
+The fresh post-promotion capture proves the new ISO boots to the branded
+desktop. The earlier captures prove a working graphical control path for the
+demonstrated actions.
 They do not prove the complete Phase 4 journey; relative coordinates must not
 be treated as absolute coordinates between sessions.
 
