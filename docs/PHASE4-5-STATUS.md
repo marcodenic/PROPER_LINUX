@@ -2,6 +2,35 @@
 
 ## Fresh ISO verification attempt
 
+## Continuation evidence — 2026-08-26
+
+The VM-control investigation continued through localhost VNC/RFB, QMP input,
+QEMU HMP input, noVNC/websockify, and the host GTK window. Framebuffer capture
+is reliable, but pointer delivery is not yet acceptance-grade: QEMU's Wayland
+GTK surface ignores host XTest events, the in-app browser cannot reach the
+host's loopback namespace, and direct QMP/RFB pointer events produced no
+verified guest state change. The exact disposable VMs and proxy processes were
+stopped after each test. These paths are diagnostic evidence only; no graphical
+journey is marked passed from them.
+
+The VM harness now has a selectable localhost-only VNC backend in
+`scripts/run-vm` and a bounded QMP helper in `scripts/vm-input.py`. Harness
+commits are `791a2d8` and `b80d154`.
+
+Proper Apps source was corrected so launch uses a detached process rather than
+the install progress path, successful operations refresh installed detection,
+and Fedora/Flatpak recovery uses provider-specific removal commands. Catalogue
+validation passes with `scripts/validate-catalogue`. The focused RPM rebuild
+passed in the Fedora 44 builder:
+
+- RPM: `/home/code/Documents/GitHub/proper-linux-build/rpms/proper-apps-focus-1787713228/proper-apps-0.1-2.fc44.x86_64.rpm`
+- SHA-256: `4991821f73ebf8a48ce8bb484ca119c12ef91369b3812df856fe25adcf9280b8`
+- Source commit: `2c965d8`
+- Build result: `qmake6`, `make -j32`, RPM packaging, and `rpm -qpi`/`rpm -qlp` all passed
+
+This RPM is not ISO-integrated and has not yet been visually verified in a
+guest. Phase 4 and PM checkpoint 4 remain open.
+
 The supplied completed ISO was verified before testing:
 
 - ISO: `/home/code/Documents/GitHub/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
