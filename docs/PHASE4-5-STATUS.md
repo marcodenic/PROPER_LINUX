@@ -5,17 +5,17 @@
 The current source state has been promoted through a full ISO rebuild.
 
 - Branch: `codex/complete-phase-4-and-5`
-- ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
-- ISO SHA-256: `a09a6c20ab23d56b79f975c0987c6ea4f584013fbf73af2281435f792077facc`
-- Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
+- ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build-icons/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
+- ISO SHA-256: `6470b8410607790e73e558e703572b2ab71f200459dd2ee94470e2719fcf2aaf`
+- Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build-icons/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
 - Manifest checks: `proper-apps-0.1-2.fc44.x86_64`, `proper-terminal-1.2.3-5.fc44.x86_64`, and no LibreOffice package.
 
 The focused Proper Apps RPM build passed with qmake6, make, rpmbuild, and RPM
 metadata/file-list inspection. It is an intermediate build, not the release
 ISO artifact:
 
-- RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build/rpms/proper-apps/RPMS/x86_64/proper-apps-0.1-2.fc44.x86_64.rpm`
-- RPM SHA-256: `c33aebdeee9a37536ff49d5c031ab8c8ab401040bbbca0bd85126470d90a5f43`
+- RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build-icons/rpms/proper-apps/RPMS/x86_64/proper-apps-0.1-2.fc44.x86_64.rpm`
+- RPM SHA-256: `c1dd255a4ac9156745a39f3c166661add88bbf72e139df6307b6d3dc4e36fbbf`
 
 ## VM-control evidence
 
@@ -54,6 +54,7 @@ Additional fresh Phase 4/5 journey evidence from the same promoted ISO guest:
 - Latest exact-ISO Fedora verification terminal: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/fedora-latest-1787732000/rpm-latest-result.png`; visible `rpm -q btop` output confirms `btop-1.4.7-1.fc44.x86_64`.
 - Fresh exact-ISO Flatpak success/recovery guest: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/flatpak-16g-1787750000/`. `flatpak-final.png` shows `State: Installed` with enabled Launch and Uninstall / recover actions (SHA-256 `6f6027b43947d6c9070f228d607c1e13b20582e92945f97ab7e779f295370df6`); `direct-launch.png` visibly shows the launched GNOME Calculator (SHA-256 `7b4f88757c25417c222e617e12b2b9f44dc172a469870d79857d4819f1b0e2f9`); `recovery-working.png` shows the returned `State: Available` (SHA-256 `77462cd4f657e3ff0089e5fb68a986621c11e1587d8dff669f9488683bfc9d8b`).
 - Fresh exact-ISO vendor path in the same disposable guest: `vendor-result.png` shows Google Chrome `State: Installed` (SHA-256 `adda47c8ef18f38460b45672135515b2bb65988e360d2a2a5745283fef766d4d`); `vendor-launch.png` shows Chrome's first-run terms window (SHA-256 `9392853cb95b4788cd86e880c3d051c20ece2aec5c3864b29b0a7fcece13d040`).
+- Fresh boot of the icon-enabled exact ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build-icons/vm/icons-1787760000/icons-home.png` visibly renders recognizable theme icons for all seven catalogue rows (SHA-256 `a71760c55c57faf7048222368cfa073e4372d2019cc4cfc144fc8a8f82c7fdf2`).
 - Codex agent path remains incomplete: the install attempt exhausted live writable space and the retry hit a partial npm directory (`codex-npm-retry.png`, SHA-256 `617f117264b1c8d4367bad64cc3eed641321a54a4d70e291a01992010d0954eb`); `codex-launch3.png` records the resulting Ghostty executable-not-found state (SHA-256 `5c0d18a77f23058072b519621b78f26ea3553de3778146dfec6c3bb253eb3cff`).
 - After freeing the disposable guest’s vendor/runtime payloads, the official npm install completed and `/usr/local/bin/codex` was verified; `codex-direct-final.png` shows the Codex welcome/authentication screen inside Ghostty (SHA-256 `69d3584a8c277fab3ff921d637a6afa3568e4ba0c79e6f6612210f3b2fe3a619`). The Ghostty launch log is captured in `codex-app-final.png` (SHA-256 `874e0bb47eacf67fb9c9aa62e2efbe603ad1b99158a5dffa7047d264d8d367a1`).
 - Fresh exact-ISO Flatpak provider attempt: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/flatpak-success-1787747000/gnome-working.png` shows the two-step transaction; `gnome-result.png` shows the understandable provider failure state. Terminal verification shows Flathub is present as a user remote. A confirmed Flatpak success remains open, so this attempt is not treated as success evidence.
@@ -94,6 +95,8 @@ Proper Apps launch is separate from installation progress; successful
 operations refresh installed detection; recovery uses provider-specific
 Flatpak or Fedora removal commands, with an explanatory vendor fallback; and
 recovery is enabled only after installed detection succeeds.
+Catalogue rows use stable Fedora theme icons selected by product identity so
+the catalogue remains recognizable without bundling proprietary artwork.
 `scripts/validate-catalogue` passes.
 
 ## Acceptance matrix
@@ -108,7 +111,7 @@ recovery is enabled only after installed detection succeeds.
 | Dolphin “Open terminal here” | Passed; fresh screenshot above |
 | Vicinae actions use Ghostty | Partially passed; Vicinae search/open Proper Apps; Ghostty action evidence remains open |
 | Fresh-user defaults and upgrade persistence | Open for current release-ISO evidence |
-| Catalogue home/category/search/detail | Passed for home/detail/search/category; empty state passed in final fresh ISO UI capture |
+| Catalogue home/category/search/detail | Passed for home/detail/search/category; empty state and recognizable product icons passed in fresh exact-ISO captures |
 | Install progress and installed state | Passed; exact-ISO progress and installed-state screenshots above |
 | Launch and provider-specific recovery | Passed for Fedora btop and Flatpak GNOME Calculator; exact-ISO launch and recovery screenshots above |
 | Intentional failure and advanced source details | Advanced source details and intentional empty state passed; fresh Flatpak provider failure captured |
@@ -120,7 +123,6 @@ QMP command success, or historical screenshots.
 
 ## Remaining defects before PM approval
 
-- P2: catalogue entries still use text-only rows rather than recognizable product icons.
 - P2: fresh-user defaults and changed Ghostty setting persistence across package upgrade still need a fresh release-ISO capture.
 - P2: Vicinae Ghostty action and a polished vendor-specific recovery affordance remain only partially demonstrated.
 - P3: the generic provider failure message does not include captured provider stderr, making root-cause diagnosis less direct.
