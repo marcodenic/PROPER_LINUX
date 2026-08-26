@@ -45,6 +45,21 @@ vm_scale="${PROPER_VM_SCALE:-$profile_scale}"
 vm_refresh="${PROPER_VM_REFRESH:-60}"
 vm_display_delay="${PROPER_VM_DISPLAY_DELAY:-35}"
 vm_auto_display="${PROPER_VM_AUTO_DISPLAY:-1}"
+vm_backend="${PROPER_VM_BACKEND:-gtk}"
+vm_vnc_display="${PROPER_VM_VNC_DISPLAY:-}"
+case "$vm_backend" in
+  gtk) display_args=(-display gtk,gl=off,zoom-to-fit=on,keep-aspect-ratio=on) ;;
+  vnc)
+    # QEMU's display number is global on the host; derive a stable default from
+    # the disk name, while allowing callers to select another unused display.
+    if [[ -z "$vm_vnc_display" ]]; then
+      vm_vnc_display=$((90 + $(cksum <<<"$disk_path" | awk '{print $1 % 10}')))
+    fi
+    [[ "$vm_vnc_display" =~ ^[0-9]+$ ]] || { printf 'PROPER_VM_VNC_DISPLAY must be a QEMU VNC display number (port 5900+N).\n' >&2; exit 1; }
+    display_args=(-display "vnc=127.0.0.1:${vm_vnc_display}")
+    ;;
+  *) printf 'Unknown VM backend: %s (use gtk or vnc).\n' "$vm_backend" >&2; exit 1 ;;
+esac
 aux_drive_args=()
 if [[ -n "${PROPER_VM_AUX_ISO:-}" ]]; then
   [[ -f "$PROPER_VM_AUX_ISO" ]] || { printf 'Auxiliary VM ISO not found: %s\n' "$PROPER_VM_AUX_ISO" >&2; exit 1; }
@@ -87,7 +102,7 @@ if [[ -e "$monitor_socket" || -e "$qmp_socket" ]]; then
   done
 fi
 
-qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m 8192 -device "virtio-vga,xres=$vm_width,yres=$vm_height" -device qemu-xhci -device usb-tablet -display gtk,gl=off,zoom-to-fit=on,keep-aspect-ratio=on -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive file="$disk_path",if=virtio,format=qcow2 "${aux_drive_args[@]}" -cdrom "$iso_path" -boot order=d -nic user,model=virtio-net-pci &
+qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m 8192 -device "virtio-vga,xres=$vm_width,yres=$vm_height" -device qemu-xhci -device usb-tablet "${display_args[@]}" -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive file="$disk_path",if=virtio,format=qcow2 "${aux_drive_args[@]}" -cdrom "$iso_path" -boot order=d -nic user,model=virtio-net-pci &
 qemu_pid=$!
 display_helper_pid=
 
@@ -103,7 +118,7 @@ if [[ "$vm_auto_display" == 1 ]]; then
   "$project_root/scripts/set-vm-display" "$qmp_socket" "$monitor_socket" \
     "$vm_width" "$vm_height" "$vm_scale" "$vm_refresh" "$vm_display_delay" &
   display_helper_pid=$!
-  printf 'VM display profile %s: %sx%s at %s%% scale (automatic verification pending).\n' \
+  printf 'VM backend %s, display profile %s: %sx%s at %s%% scale (automatic verification pending).\n' "$vm_backend" \
     "$vm_profile" "$vm_width" "$vm_height" "$(awk "BEGIN { print $vm_scale * 100 }")"
 else
   printf 'Automatic VM display selection disabled. Apply it with:\n'
