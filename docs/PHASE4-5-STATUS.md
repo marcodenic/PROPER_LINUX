@@ -18,7 +18,7 @@ Proper Apps now presents bounded operation progress and a restrained technical-d
 
 ## Authoritative final-ISO evidence
 
-All evidence in `docs/evidence/checkpoint4-final/` is captured from the ISO and disposable guests identified above. Items 1–16 are final3 captures.
+All evidence in `docs/evidence/checkpoint4-final/` is captured from the ISO and disposable guests identified above. Items 1–19 are final3 captures.
 
 1. [Fresh 1920×1080 Proper desktop](evidence/checkpoint4-final/01-desktop.png) — final3 wallpaper and floating taskbar visible; SHA-256 `d38e1dc8afa20a308f9a5b661deed16c2cf5e73ed12b342feb8e7ff547e8538c`.
 2. [Proper Apps catalogue home](evidence/checkpoint4-final/02-proper-apps-home.png) — final3 catalogue icons, detail hierarchy, and primary/secondary actions; SHA-256 `dda0885c81a4550874f46a2dc30628917ae01597bf3bdc46fcbc5cbb3ac9d79e`.
