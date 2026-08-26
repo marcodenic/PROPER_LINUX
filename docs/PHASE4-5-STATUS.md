@@ -28,6 +28,8 @@ All evidence in `docs/evidence/checkpoint4-final/` must be captured from the ISO
 7. [High-DPI desktop](evidence/checkpoint4-final/07-hidpi-200-percent.png) — fresh 3840×2160 framebuffer at 200% scale; floating taskbar remains legible and proportionate; SHA-256 `59da004bfcdaa31e8efc10232173c6a91163735dad9ee3832bf218b497235e1a`.
 8. [Install progress](evidence/checkpoint4-final/08-install-progress.png) — Chrome vendor operation visibly reports `Working… step 1 of 1`; SHA-256 `350d5e9e382ee5df38a4af6c21353365ccddfcd063b6183bf83a4e8ba576ba41`.
 9. [Installed state](evidence/checkpoint4-final/09-installed-state.png) — Chrome detail shows Installed and exposes Launch and Uninstall / recover; SHA-256 `447ec7c72a62cf333402b6e2acdbd7938365702c7edc320c176a405b7fc0491d`.
+10. [Vendor recovery](evidence/checkpoint4-final/10-recovery.png) — recovery explains official-vendor removal and credential handling; SHA-256 `f3070005e1a224bef24ca8ebb868df81f5bf039a33d13caa7b6ba51fa66b43a5`.
+11. [Expanded source details](evidence/checkpoint4-final/11-advanced-source.png) — expanded panel exposes provider, maintenance status, licence, and architecture; SHA-256 `201ed4d0bdadef4d576cb07bf8e169842a3702f41b2e416e2d87e2f11cc7bac4`.
 
 The remaining provider-operation, recovery, retained-desktop, and 200% journeys are still being recaptured from this exact ISO; screenshots from earlier ISO generations are intentionally not treated as current evidence.
 
@@ -41,7 +43,7 @@ Checkpoint 4 is not PM-approved. Do not begin Phase 6. Continue the single fresh
 
 ## Known defects
 
-- P3: provider failure/technical and recovery states, the AI-agent launch path, and retained desktop interactions remain to be captured from final2 before PM approval. The final2 guest did verify Chrome vendor progress and installed-state affordances.
+- P3: provider failure/technical state, the AI-agent launch path, and retained desktop interactions remain to be captured from final2 before PM approval. The final2 guest also verified Chrome vendor progress, installed-state affordances, recovery guidance, and expanded source details.
 
 ## PM handoff request
 
