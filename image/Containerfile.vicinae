@@ -1,0 +1,2 @@
+FROM quay.io/fedora/fedora@sha256:a669925a10c2716481d60a46fc93cbbe4cfb9aade058b2ba28cf3f0de0345de2
+RUN dnf -y install rpm-build cmake ninja-build gcc-c++ git openssl-devel libsecret-devel layer-shell-qt-devel xcb-util-keysyms-devel libqalculate-devel qt6-qtbase-devel qt6-qtbase-private-devel qt6-qtdeclarative-devel qt6-qtwayland-devel qt6-qttools-devel qt6-qtsvg-devel qt6-qt5compat-devel qt6-qtshadertools-devel kf6-syntax-highlighting-devel libxkbcommon-devel wayland-devel pkgconf-pkg-config nodejs npm python3 && dnf clean all
