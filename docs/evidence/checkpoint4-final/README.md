@@ -7,11 +7,10 @@ All numbered captures in this directory are from the final2 ISO recorded in `doc
 - Catalogue home, category menu, Web filtering, search results, selected-app detail, and installed-state actions.
 - Chrome official-vendor install progress, installed state, vendor recovery guidance, and expanded source details; plus the fresh 1920×1080 desktop.
 - 3840×2160 framebuffer at 200% scale, with a legible floating taskbar.
-- Provider implementation contract: bounded stderr, process-start handling, exit-status handling, plain-language recovery, and expandable technical output.
+- Provider implementation contract: bounded stderr, process-start handling, exit-status handling, plain-language recovery, and expandable technical output; the offline Codex failure and technical panel are captured in items 12–13.
 
 ## Still required before PM approval
 
-- A captured provider failure with the normal recovery message and expanded technical details.
 - A successful AI-agent installation and launch through Ghostty.
 - Retained Ghostty, btop, Dolphin “Open Terminal Here”, and Vicinae action journeys.
 

@@ -30,6 +30,8 @@ All evidence in `docs/evidence/checkpoint4-final/` must be captured from the ISO
 9. [Installed state](evidence/checkpoint4-final/09-installed-state.png) — Chrome detail shows Installed and exposes Launch and Uninstall / recover; SHA-256 `447ec7c72a62cf333402b6e2acdbd7938365702c7edc320c176a405b7fc0491d`.
 10. [Vendor recovery](evidence/checkpoint4-final/10-recovery.png) — recovery explains official-vendor removal and credential handling; SHA-256 `f3070005e1a224bef24ca8ebb868df81f5bf039a33d13caa7b6ba51fa66b43a5`.
 11. [Expanded source details](evidence/checkpoint4-final/11-advanced-source.png) — expanded panel exposes provider, maintenance status, licence, and architecture; SHA-256 `201ed4d0bdadef4d576cb07bf8e169842a3702f41b2e416e2d87e2f11cc7bac4`.
+12. [Provider failure](evidence/checkpoint4-final/12-provider-failure.png) — offline Codex vendor installation gives plain-language status and recovery guidance; SHA-256 `3a90aa6f96cc5bc0a5bee32e08d79195903d2d667a4accfc7d045420118d4bc2`.
+13. [Technical failure details](evidence/checkpoint4-final/13-technical-failure.png) — expandable panel shows failed provider step, exit status, process, and bounded stderr; SHA-256 `9994913dd9bb1f159ec7061fd5cb8f43e58d7653fe0ba93dbfaba32d14d5eb4d`.
 
 The remaining provider-operation, recovery, retained-desktop, and 200% journeys are still being recaptured from this exact ISO; screenshots from earlier ISO generations are intentionally not treated as current evidence.
 
@@ -43,7 +45,7 @@ Checkpoint 4 is not PM-approved. Do not begin Phase 6. Continue the single fresh
 
 ## Known defects
 
-- P3: provider failure/technical state, the AI-agent launch path, and retained desktop interactions remain to be captured from final2 before PM approval. The final2 guest also verified Chrome vendor progress, installed-state affordances, recovery guidance, and expanded source details.
+- P3: the AI-agent launch path and retained desktop interactions remain to be captured from final2 before PM approval. The final2 guest also verified provider failure/technical output, Chrome vendor progress, installed-state affordances, recovery guidance, and expanded source details.
 
 ## PM handoff request
 
