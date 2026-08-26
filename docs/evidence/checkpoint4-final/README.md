@@ -14,6 +14,6 @@ All numbered captures in this directory are from the final3 ISO recorded in `doc
 
 ## Still required before PM approval
 
-- A Vicinae search-and-launch action from the open launcher surface.
+- A Vicinae search-and-launch action from the open launcher surface. In the latest final3 guest, the launcher opens, but closes when the search field is clicked or receives the first search key; this is a reproducible P2 defect, not accepted as evidence.
 
 This item remains explicitly open; all numbered screenshots now refer to the final3 ISO. The retained Ghostty dropdown, restored state, and readable btop session are individually captured in items 14–16.

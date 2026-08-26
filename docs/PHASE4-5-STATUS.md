@@ -52,7 +52,7 @@ Checkpoint 4 is not PM-approved. Do not begin Phase 6. The exact-ISO package now
 
 ## Known defects
 
-- P2: A Vicinae search-and-launch action remains directly unevidenced. AI-agent launch, Dolphin “Open Terminal Here,” and the retained Ghostty/btop states are directly evidenced.
+- P2: In the latest final3 guest, Vicinae opens but closes when its search field is clicked or receives the first search key, so a search-and-launch action remains unevidenced. AI-agent launch, Dolphin “Open Terminal Here,” and the retained Ghostty/btop states are directly evidenced.
 
 ## PM handoff request
 
