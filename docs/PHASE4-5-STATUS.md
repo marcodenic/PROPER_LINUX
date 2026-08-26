@@ -55,6 +55,7 @@ Additional fresh Phase 4/5 journey evidence from the same promoted ISO guest:
 - Fresh exact-ISO Flatpak success/recovery guest: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/flatpak-16g-1787750000/`. `flatpak-final.png` shows `State: Installed` with enabled Launch and Uninstall / recover actions (SHA-256 `6f6027b43947d6c9070f228d607c1e13b20582e92945f97ab7e779f295370df6`); `direct-launch.png` visibly shows the launched GNOME Calculator (SHA-256 `7b4f88757c25417c222e617e12b2b9f44dc172a469870d79857d4819f1b0e2f9`); `recovery-working.png` shows the returned `State: Available` (SHA-256 `77462cd4f657e3ff0089e5fb68a986621c11e1587d8dff669f9488683bfc9d8b`).
 - Fresh exact-ISO vendor path in the same disposable guest: `vendor-result.png` shows Google Chrome `State: Installed` (SHA-256 `adda47c8ef18f38460b45672135515b2bb65988e360d2a2a5745283fef766d4d`); `vendor-launch.png` shows Chrome's first-run terms window (SHA-256 `9392853cb95b4788cd86e880c3d051c20ece2aec5c3864b29b0a7fcece13d040`).
 - Codex agent path remains incomplete: the install attempt exhausted live writable space and the retry hit a partial npm directory (`codex-npm-retry.png`, SHA-256 `617f117264b1c8d4367bad64cc3eed641321a54a4d70e291a01992010d0954eb`); `codex-launch3.png` records the resulting Ghostty executable-not-found state (SHA-256 `5c0d18a77f23058072b519621b78f26ea3553de3778146dfec6c3bb253eb3cff`).
+- After freeing the disposable guest’s vendor/runtime payloads, the official npm install completed and `/usr/local/bin/codex` was verified; `codex-direct-final.png` shows the Codex welcome/authentication screen inside Ghostty (SHA-256 `69d3584a8c277fab3ff921d637a6afa3568e4ba0c79e6f6612210f3b2fe3a619`). The Ghostty launch log is captured in `codex-app-final.png` (SHA-256 `874e0bb47eacf67fb9c9aa62e2efbe603ad1b99158a5dffa7047d264d8d367a1`).
 - Fresh exact-ISO Flatpak provider attempt: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/flatpak-success-1787747000/gnome-working.png` shows the two-step transaction; `gnome-result.png` shows the understandable provider failure state. Terminal verification shows Flathub is present as a user remote. A confirmed Flatpak success remains open, so this attempt is not treated as success evidence.
 
 - True QMP `Meta+J` hide/reopen: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/meta-hidden.png` and `meta-reopened.png` (SHA-256 `fdffb3a2aa441f63c36d5a09c6f238273a43da2a7bbd57fe8353683360b3a844`, `d5dfd94bea6375e2d8f032a769b47e6bb9d2bc843b3b72d3b122f2b682ffb405`)
@@ -110,12 +111,19 @@ recovery is enabled only after installed detection succeeds.
 | Catalogue home/category/search/detail | Passed for home/detail/search/category; empty state passed in final fresh ISO UI capture |
 | Install progress and installed state | Passed; exact-ISO progress and installed-state screenshots above |
 | Launch and provider-specific recovery | Passed for Fedora btop and Flatpak GNOME Calculator; exact-ISO launch and recovery screenshots above |
-| Intentional failure and advanced source details | Advanced source details and intentional empty state passed; fresh Flatpak provider failure captured; vendor/agent failure evidence still open |
-| Fedora, Flatpak, vendor, and agent paths | Fedora, Flatpak, and vendor passed; Codex agent path remains open |
+| Intentional failure and advanced source details | Advanced source details and intentional empty state passed; fresh Flatpak provider failure captured |
+| Fedora, Flatpak, vendor, and agent paths | Fedora, Flatpak, vendor, and Codex agent paths passed |
 | PM checkpoint 4 | Not approved |
 
 No completion claim is based solely on source inspection, package metadata,
 QMP command success, or historical screenshots.
+
+## Remaining defects before PM approval
+
+- P2: catalogue entries still use text-only rows rather than recognizable product icons.
+- P2: fresh-user defaults and changed Ghostty setting persistence across package upgrade still need a fresh release-ISO capture.
+- P2: Vicinae Ghostty action and a polished vendor-specific recovery affordance remain only partially demonstrated.
+- P3: the generic provider failure message does not include captured provider stderr, making root-cause diagnosis less direct.
 
 ## Remaining work
 
