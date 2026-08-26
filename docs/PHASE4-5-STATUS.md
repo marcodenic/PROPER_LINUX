@@ -36,6 +36,14 @@ Fresh graphical input evidence using relative VNC mode:
 - Unique marker typed into the visible terminal: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/relative-1787714591/marker.png`
 - Marker screenshot SHA-256: `fcf87b314c71c4fbc694d3e84a66adfd60542be82b67f9df13c1b18b5cb1b56a`
 
+Fresh graphical input evidence using the tablet VNC path on the promoted ISO:
+
+- Terminal opened by absolute tablet click: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/tablet-1787716500/click.png`
+- Marker/session evidence: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/tablet-1787716500/reopened.png`
+- Hide/reopen evidence: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/tablet-1787716500/hidden.png` and `reopened.png`
+- Rendered btop: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/tablet-1787716500/btop-final.png`
+- Marker/session screenshot SHA-256: `d993623a9af04dca9a309f1fae806fa5547b3c81e1e032dad2f542bb687fad95`
+
 The fresh post-promotion capture proves the new ISO boots to the branded
 desktop. The earlier captures prove a working graphical control path for the
 demonstrated actions.
@@ -54,10 +62,10 @@ Flatpak or Fedora removal commands, with an explanatory vendor fallback.
 | Criterion | Evidence state |
 |---|---|
 | ISO boots to Proper desktop | Passed; fresh screenshot above |
-| Pointer control and visible typing | Passed for the demonstrated relative-VNC path |
-| Retained dropdown Ghostty session | Open; not freshly reverified on this ISO |
+| Pointer control and visible typing | Passed; fresh tablet-VNC evidence above |
+| Retained dropdown Ghostty session | Passed; fresh hide/reopen evidence above |
 | Dropdown hide/reopen and Meta+J | Open |
-| btop renders | Open for current release-ISO journey |
+| btop renders | Passed; fresh maximized screenshot above |
 | Dolphin “Open terminal here” | Open |
 | Vicinae actions use Ghostty | Open |
 | Fresh-user defaults and upgrade persistence | Open for current release-ISO evidence |
