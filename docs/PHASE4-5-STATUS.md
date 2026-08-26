@@ -6,7 +6,7 @@ The current source state has been promoted through a full ISO rebuild.
 
 - Branch: `codex/complete-phase-4-and-5`
 - ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
-- ISO SHA-256: `9f0ed9df1fc39f8ea26be2da77856f322deace22f3f90c7cc58f5fc518dd0903`
+- ISO SHA-256: `a09a6c20ab23d56b79f975c0987c6ea4f584013fbf73af2281435f792077facc`
 - Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
 - Manifest checks: `proper-apps-0.1-2.fc44.x86_64`, `proper-terminal-1.2.3-5.fc44.x86_64`, and no LibreOffice package.
 
@@ -15,7 +15,7 @@ metadata/file-list inspection. It is an intermediate build, not the release
 ISO artifact:
 
 - RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build/rpms/proper-apps/RPMS/x86_64/proper-apps-0.1-2.fc44.x86_64.rpm`
-- RPM SHA-256: `31e3637a0669933ce9d062a34246eb3168045a737c6ad7e6cb7f3ed99f01d6b4`
+- RPM SHA-256: `c33aebdeee9a37536ff49d5c031ab8c8ab401040bbbca0bd85126470d90a5f43`
 
 ## VM-control evidence
 
@@ -49,6 +49,7 @@ Additional fresh Phase 4/5 journey evidence from the same promoted ISO guest:
 - Latest exact-ISO Fedora install progress: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/fedora-latest-1787732000/install-working-final.png` (SHA-256 `69ed7d62e18186fb7d117b7a398c1a7012c27e1ec306de015b30c7c8d6228a92`)
 - Fresh exact-ISO btop state/launch/recovery cycle: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/fedora-postfix-1787735000/btop-active.png` shows `State: Installed` (SHA-256 `8e741b7f4c46971daeec8ab3c3ad0ab961297713b98ea7013d088b1bafa973ce`); `btop-launch.png` shows Ghostty launch (SHA-256 `348de918773d84473bc02c0ca9b1f260fc65cd9a933195e35c0d649404d0a9e4`); `recovery-working.png` shows recovery in progress (SHA-256 `ec9b510a49ec6404d8342ef756a7754bf6fa7fc335563dbcff23a8342c469d1f`); `recovery-complete.png` shows the returned Available state (SHA-256 `7630f243aff259fe4618d8d170b6e7f62d821e9a1b4da523aac7e9753bbd1bf9`).
 - Latest exact-ISO Fedora verification terminal: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/fedora-latest-1787732000/rpm-latest-result.png`; visible `rpm -q btop` output confirms `btop-1.4.7-1.fc44.x86_64`.
+- Fresh exact-ISO Flatpak provider attempt: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/flatpak-success-1787747000/gnome-working.png` shows the two-step transaction; `gnome-result.png` shows the understandable provider failure state. Terminal verification shows Flathub is present as a user remote. A confirmed Flatpak success remains open, so this attempt is not treated as success evidence.
 
 - True QMP `Meta+J` hide/reopen: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/meta-hidden.png` and `meta-reopened.png` (SHA-256 `fdffb3a2aa441f63c36d5a09c6f238273a43da2a7bbd57fe8353683360b3a844`, `d5dfd94bea6375e2d8f032a769b47e6bb9d2bc843b3b72d3b122f2b682ffb405`)
 - Dolphin “Open Terminal Here”: `/home/code/.codex/worktrees/7b43/proper-linux-build/vm/meta-1787717000/dolphin-terminal.png` (SHA-256 `202c7faffcd424ff14eba6f7001ca5ff6f6f46e16fc849b8e6f28ca22f5ef1b7`)
@@ -103,8 +104,8 @@ recovery is enabled only after installed detection succeeds.
 | Catalogue home/category/search/detail | Passed for home/detail/search/category; empty state passed in final fresh ISO UI capture |
 | Install progress and installed state | Passed; exact-ISO progress and installed-state screenshots above |
 | Launch and provider-specific recovery | Passed for Fedora btop; exact-ISO launch and recovery screenshots above |
-| Intentional failure and advanced source details | Advanced source details and intentional empty state passed; intentional provider failure remains open |
-| Fedora, Flatpak, vendor, and agent paths | Open |
+| Intentional failure and advanced source details | Advanced source details and intentional empty state passed; fresh Flatpak provider failure captured; vendor/agent failure evidence still open |
+| Fedora, Flatpak, vendor, and agent paths | Fedora passed; Flatpak success, vendor success, and Codex agent path remain open |
 | PM checkpoint 4 | Not approved |
 
 No completion claim is based solely on source inspection, package metadata,
