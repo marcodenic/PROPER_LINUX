@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=inode/directory;
+Actions=open-proper-terminal;
+
+[Desktop Action open-proper-terminal]
+Name=Open terminal here
+Icon=utilities-terminal
+Exec=ghostty --working-directory %f

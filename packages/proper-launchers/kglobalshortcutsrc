@@ -1,0 +1,13 @@
+[kdeconnect]
+
+[kwin]
+Quick Tile Window to the Left=Meta+Left,Meta+Left,Quick Tile Window to the Left
+Quick Tile Window to the Right=Meta+Right,Meta+Right,Quick Tile Window to the Right
+Quick Tile Window to the Top=Meta+Up,Meta+Up,Quick Tile Window to the Top
+Quick Tile Window to the Bottom=Meta+Down,Meta+Down,Quick Tile Window to the Bottom
+
+[services][proper-vicinae-shortcut.desktop]
+_launch=Meta+Space
+
+[krunner]
+run command=Alt+F2,Alt+F2,Run command

@@ -128,7 +128,21 @@ Version 0.1 must include:
 
 ## Hardware position
 
-Proper Linux version 0.1 inherits Fedora KDE's supported x86-64 hardware range. It should avoid needless overhead and remain usable wherever current Fedora KDE is appropriate, from older supported laptops to high-end workstations. It does not make stronger hardware promises than Fedora and does not treat server hardware as a separate product.
+Proper Linux version 0.1 inherits Fedora KDE's general x86-64 compatibility,
+but its product validation target is narrower: mainstream laptops and desktops
+sold in roughly the previous four years, plus current new hardware supported by
+the selected Fedora release. Older machines may work and should not be
+needlessly excluded, but rejuvenating old hardware is not a version 0.1 product
+goal and is not allowed to constrain the approved visual experience.
+
+Apple Silicon Macs are ARM64 systems that require the Fedora Asahi platform
+stack and a separate image path. They are not supported by the x86-64 version
+0.1 image. Intel Macs may boot standard Fedora media depending on model, but
+Proper Linux does not claim them as validated hardware; T1/T2-era models can
+require non-upstream kernels, firmware or model-specific integration.
+
+Proper Linux does not make stronger general hardware promises than Fedora and
+does not treat server hardware as a separate product.
 
 ## Success definition
 

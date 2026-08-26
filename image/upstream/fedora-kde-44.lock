@@ -1,0 +1,12 @@
+# Fedora KDE Live image definition lock
+#
+# This file is committed only after scripts/pin-fedora-base resolves the Fedora
+# 44 branch to an immutable commit. A moving branch is not an acceptable input.
+UPSTREAM_NAME="fedora-kiwi-descriptions"
+UPSTREAM_URL="https://forge.fedoraproject.org/releng/kiwi-descriptions.git"
+UPSTREAM_REF="f44"
+UPSTREAM_COMMIT="dfc49a5a10f69941179fdadd96aa6a5984f7c677"
+IMAGE_TYPE="iso"
+IMAGE_PROFILE="KDE-Desktop-Live"
+LICENSE="GPL-3.0-or-later"
+UPDATE_METHOD="Resolve f44 once with scripts/pin-fedora-base; review and commit later lock updates explicitly."

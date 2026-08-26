@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -eu
+
+if [[ "${USER:-}" != liveuser ]]; then
+    exit 0
+fi
+
+# livesys may create the installer launcher after this autostart entry runs.
+# Keep the cleanup narrowly scoped to the live session and bounded in time;
+# installed users never run this helper.
+(
+    for _ in {1..30}; do
+        # Fedora's livesys creates the canonical liveinst.desktop filename;
+        # the translated display name is only what Plasma shows.
+        rm -f "$HOME/Desktop/liveinst.desktop" "$HOME/Desktop/Install to Hard Drive.desktop"
+        sleep 1
+    done
+) &
+config_dir="$HOME/.config"
+install -Dpm 0644 /etc/skel/.config/kdeglobals "$config_dir/kdeglobals"
+install -Dpm 0644 /etc/skel/.config/plasma-org.kde.plasma.desktop-appletsrc "$config_dir/plasma-org.kde.plasma.desktop-appletsrc"
+install -Dpm 0644 /etc/skel/.config/plasmashellrc "$config_dir/plasmashellrc"
+install -Dpm 0644 /etc/skel/.config/kglobalshortcutsrc "$config_dir/kglobalshortcutsrc"
+install -Dpm 0644 /etc/skel/.config/vicinae/vicinae.toml "$config_dir/vicinae/vicinae.toml"
+
+# The live user is created by livesys after image composition, so the
+# accelerator daemon can already be running when the session defaults land.
+# Reload it now so the shipped Meta+Space shortcut is active immediately.
+systemctl --user try-restart plasma-kglobalaccel.service 2>/dev/null || true
+
+# livesys creates liveuser after the image is composed. Do not restart
+# plasmashell from autostart: Plasma may still be constructing its shell and
+# a second instance can race it. Installed users receive these files before
+# their first session through /etc/skel and system defaults.

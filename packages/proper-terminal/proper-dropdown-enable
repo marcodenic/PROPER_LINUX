@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+set -eu
+
+# KWin scripts are installed per user.  Register the system package on first
+# login, enable it, then ask the running compositor to reload its scripts.
+script=/usr/share/kwin/scripts/proper-dropdown
+kpackagetool6 --type KWin/Script --upgrade "$script" >/dev/null 2>&1 || \
+  kpackagetool6 --type KWin/Script --install "$script" >/dev/null
+kwriteconfig6 --file kwinrc --group Plugins --key proper-dropdownEnabled true
+qdbus-qt6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
+# Reconfigure does not load a newly installed script on every Plasma 6 build;
+# explicitly load and start it when the scripting service exposes these calls.
+qdbus-qt6 org.kde.KWin /Scripting org.kde.kwin.Scripting.loadScript \
+  "$script" proper-dropdown >/dev/null 2>&1 || true
+qdbus-qt6 org.kde.KWin /Scripting org.kde.kwin.Scripting.start >/dev/null 2>&1 || true

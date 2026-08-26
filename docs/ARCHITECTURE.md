@@ -41,6 +41,17 @@ Do not begin new work around legacy `livecd-creator` or an Arch `archiso` profil
 
 KIWI needs image-building privileges, loop devices, and filesystem tooling. Containerising the build is useful for repeatable dependencies, but it does not remove those host requirements.
 
+## Development feedback loops
+
+Visible work uses three increasingly expensive loops: direct iteration in a
+dedicated development VM account, RPM installation into that VM, and complete
+ISO composition. The ISO loop is reserved for image integration, arrival and
+checkpoint validation rather than routine styling changes.
+
+The complete promotion and verification procedure is in
+`docs/UI_ITERATION.md`. Regardless of which loop is used, committed packages
+and image configuration remain the source of truth.
+
 ## Planned repository layout
 
 ```text

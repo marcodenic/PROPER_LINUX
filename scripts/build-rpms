@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Build the versioned Proper RPMs and expose them as a small local RPM-MD repo.
+set -Eeuo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+output_root="${PROPER_OUTPUT_DIR:-"$project_root/../proper-linux-build"}"
+rpm_root="$output_root/rpms"
+repo_root="$output_root/repo"
+source_cache="$output_root/sources"
+
+download_verified() {
+  local url="$1" dest="$2" expected="$3"
+  mkdir -p "$(dirname "$dest")"
+  [[ -s "$dest" ]] || curl -L --fail --silent --show-error "$url" -o "$dest"
+  [[ "$(sha256sum "$dest" | awk '{print $1}')" == "$expected" ]] || { printf 'Checksum mismatch: %s\n' "$dest" >&2; exit 1; }
+}
+
+for binary in rpmbuild curl; do
+  command -v "$binary" >/dev/null 2>&1 || { printf 'Required command missing: %s\n' "$binary" >&2; exit 1; }
+done
+
+rm -rf "$rpm_root" "$repo_root"
+mkdir -p "$rpm_root" "$repo_root"
+
+for package in proper-release proper-look-and-feel proper-defaults proper-launchers proper-terminal proper-apps; do
+  package_root="$project_root/packages/$package"
+  spec="$package_root/$package.spec"
+  mkdir -p "$rpm_root/$package"
+  if [[ "$package" == proper-terminal ]]; then
+    download_verified https://release.files.ghostty.org/1.2.3/ghostty-1.2.3.tar.gz "$source_cache/ghostty-1.2.3.tar.gz" 559770fe9773161e93e3dd9177d916e27037d7f548edcf6186eabc571c0e520b
+    download_verified https://ziglang.org/download/0.14.1/zig-x86_64-linux-0.14.1.tar.xz "$source_cache/zig-x86_64-linux-0.14.1.tar.xz" 24aeeec8af16c381934a6cd7d95c807a8cb2cf7df9fa40d359aa884195c4716c
+    [[ -s "$source_cache/ghostty-1.2.3.tar.gz.minisig" ]] || curl -L --fail --silent --show-error https://release.files.ghostty.org/1.2.3/ghostty-1.2.3.tar.gz.minisig -o "$source_cache/ghostty-1.2.3.tar.gz.minisig"
+    [[ -s "$source_cache/zig-x86_64-linux-0.14.1.tar.xz.minisig" ]] || curl -L --fail --silent --show-error https://ziglang.org/download/0.14.1/zig-x86_64-linux-0.14.1.tar.xz.minisig -o "$source_cache/zig-x86_64-linux-0.14.1.tar.xz.minisig"
+    cp "$source_cache"/ghostty-1.2.3.tar.gz* "$package_root/"
+    cp "$source_cache"/zig-x86_64-linux-0.14.1.tar.xz* "$package_root/"
+    [[ -s "$output_root/ghostty-themes.tgz" ]] || curl -L --fail --silent --show-error https://github.com/mbadolato/iTerm2-Color-Schemes/releases/download/release-20260525-155808-7335c0a/ghostty-themes.tgz -o "$output_root/ghostty-themes.tgz"
+    podman build --quiet --tag proper-ghostty-builder-full --file "$project_root/image/Containerfile.ghostty" "$project_root/image" >/dev/null
+    podman run --rm --volume "$package_root:/src:Z" --volume "$rpm_root/$package:/out:Z" proper-ghostty-builder-full bash -lc "cd /src && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /src' proper-terminal.spec && find /out -type f -name '*.rpm' -exec cp {} /out/ \\;"
+  elif [[ "$package" == proper-apps ]]; then
+    podman build --quiet --tag proper-apps-builder --file "$project_root/image/Containerfile.ghostty" "$project_root/image" >/dev/null
+    podman run --rm --volume "$project_root:/repo:Z" --volume "$rpm_root/$package:/out:Z" proper-apps-builder bash -lc "cd /repo/packages/proper-apps && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /repo/packages/proper-apps' proper-apps.spec"
+  else
+    rpmbuild -bb --define "_tmppath /tmp" --define "_topdir $rpm_root/$package" --define "_sourcedir $package_root" "$spec"
+  fi
+done
+
+while IFS= read -r -d '' rpm; do
+  install -m 0644 "$rpm" "$repo_root/$(basename "$rpm")"
+done < <(find "$rpm_root" -type f -name '*.rpm' -print0)
+if command -v createrepo_c >/dev/null 2>&1; then
+  createrepo_c --quiet "$repo_root"
+elif command -v podman >/dev/null 2>&1; then
+  builder_image="localhost/proper-linux-kiwi-builder:fedora44"
+  podman build --tag "$builder_image" --file "$project_root/image/Containerfile" "$project_root/image"
+  podman run --rm --volume "$repo_root:/repo:Z" "$builder_image" createrepo_c --quiet /repo
+else
+  printf 'Required command missing: createrepo_c (and no Podman fallback is available)\n' >&2
+  exit 1
+fi
+printf 'Built local Proper repository: %s\n' "$repo_root"

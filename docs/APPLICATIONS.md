@@ -23,6 +23,16 @@ Proper Apps is a curated directory and installation front end. It is not a new p
 ### Intentionally excluded
 
 - LibreOffice, Calligra, OnlyOffice, or another office suite
+- KDE PIM and its storage stack: KMail, Kontact, KOrganizer, KAddressBook,
+  Akregator, Akonadi, and the MariaDB backend pulled in for Akonadi
+- Preinstalled games, including KMines, KPat, and KMahjongg
+- NeoChat or another preinstalled communication client
+- Plasma Welcome and the Fedora welcome layer
+- Fedora Media Writer on the installed system
+- Elisa and Dragon Player; do not ship duplicate default media players
+- KolourPaint
+- Skanpage
+- QRca
 - Multiple preinstalled browsers
 - Large IDEs and SDK collections
 - Communication clients
@@ -33,6 +43,15 @@ Proper Apps is a curated directory and installation front end. It is not a new p
 - Duplicate terminals, app launchers, software centres, or media applications without a clear fallback role
 
 The upstream Fedora KDE package set must be reviewed rather than assumed lean. Remove unneeded defaults through the image description, not with a post-install cleanup script.
+
+Kamoso and KDE's KRDC/KRFB remote-desktop tools are intentional exceptions and
+remain in the default image. Do not remove them as part of general KDE
+application pruning.
+
+The upstream wallpaper collection requires manual PM curation. The product
+manager will select the small subset worth retaining; the resulting selection
+must then be encoded as versioned image/package content rather than depending
+on manual deletion from an installed user account.
 
 ## Priority catalogue
 

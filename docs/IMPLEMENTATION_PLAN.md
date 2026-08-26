@@ -6,6 +6,8 @@ The Linux BOX host is the build and VM environment. Work proceeds autonomously i
 
 Each phase ends with a concrete artifact or an interaction running in the installed VM. Planning files and package builds alone do not complete a phase.
 
+Visible work follows `docs/UI_ITERATION.md`: use the running development VM for rapid design changes, promote accepted changes into their owning RPM, and reserve full ISO rebuilds for image integration and checkpoint validation.
+
 ## Phase 0 — BOX readiness and baseline
 
 ### Objective
@@ -187,7 +189,14 @@ Produce the complete installable Proper Linux 0.1 candidate.
 
 ### Work
 
-- Remove unwanted upstream default applications, including office suites.
+- Remove unwanted upstream default applications through the image definition:
+  office suites; the KDE PIM/Akonadi/MariaDB stack; KMines, KPat, and
+  KMahjongg; NeoChat; Plasma/Fedora Welcome; Fedora Media Writer; Elisa;
+  Dragon Player; KolourPaint; Skanpage; and QRca.
+- Retain Kamoso and KDE's KRDC/KRFB remote-desktop tools.
+- **PM task:** curate Fedora/KDE's upstream wallpapers and identify the small
+  subset to retain. Promote that approved selection into versioned image or
+  package content; do not ship a manually edited home directory.
 - Confirm every Proper package is installed through the image definition rather than manual VM changes.
 - Run an ISO build from a clean checkout/cache state where practical.
 - Boot the live ISO, install it to a blank VM, remove installation media, and boot the installed system.

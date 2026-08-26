@@ -22,6 +22,17 @@ Fedora KDE 44 is the initial base. It supplies KDE Plasma 6, a live ISO, graphic
 
 Fedora states that KIWI builds most current variants and that package-based live media has moved to KIWI. Proper Linux should pin and extend Fedora's KDE live description rather than start from legacy `livecd-tools` instructions.
 
+### Phase 0 baseline pin
+
+- **Checked:** 2026-08-24
+- **Source:** https://forge.fedoraproject.org/releng/kiwi-descriptions.git
+- **Fedora 44 commit:** dfc49a5a10f69941179fdadd96aa6a5984f7c677
+- **Profile:** KDE-Desktop-Live with KIWI iso output
+- **Licence:** GPL-3.0-or-later
+- **Update method:** resolve the f44 branch only through scripts/pin-fedora-base, review the resulting immutable revision, and commit the lock update before rebuilding.
+
+Fedora's old fedora-kiwi-descriptions path currently redirects to the canonical releng/kiwi-descriptions Forge repository. The build lock uses the canonical path.
+
 ## Fedora derivative and branding
 
 - Fedora Remix overview: <https://fedoraproject.org/wiki/Remix>
@@ -59,6 +70,54 @@ The desktop and login wallpapers are conceptually separate. Proper Linux must sh
 - Terminal: <https://omarchy.org/manual/terminal/>
 
 Omarchy's valuable ideas are decisive curation, cohesive theming, developer-tool selection, shortcut vocabulary, update presentation, and agent access. Proper Linux deliberately rejects its mandatory tiling and keyboard-dominant operating model.
+
+### Current product and hardware comparison
+
+- Manual/product model: <https://omarchy.org/manual/>
+- Theme system: <https://omarchy.org/manual/making-your-own-theme/>
+- Mac support: <https://github.com/basecamp/omarchy/blob/quattro/manual/44-mac-support.md>
+
+Omarchy currently describes itself as an omakase Arch distribution built on
+Hyprland and Quickshell. Its theme palette generates coordinated configuration
+for its shell, terminals, `btop`, editors and selected graphical applications.
+This is a strong reference for Proper's design-token and live-iteration model.
+
+Omarchy now documents built-in Intel Mac support, including a patched kernel
+and supporting configuration for T2 machines. Its official documentation says
+M-series Apple Silicon Macs are not directly supported. Community ports exist,
+but they are not evidence of upstream Omarchy support.
+
+## Apple hardware
+
+### Apple Silicon
+
+- Fedora Asahi Remix and device support: <https://asahilinux.org/fedora/>
+- Detailed feature support: <https://asahilinux.org/docs/platform/feature-support/overview/>
+- Fedora Asahi SIG: <https://fedoraproject.org/wiki/SIGs/Asahi>
+
+Apple M-series systems are ARM64 machines and do not boot the Proper Linux
+version 0.1 x86-64 ISO. Fedora Asahi Remix 44 currently supports the M1 and M2
+families through Apple-specific boot integration, a 16K-page kernel, Mesa and
+hardware-enablement packages. This is the technically credible base for a
+future Proper Apple Silicon edition, but it would be a separate image profile,
+package-validation target and release commitment.
+
+M3 and M4 work remains visible in Asahi's support tables but is not part of the
+current Fedora Asahi M1/M2 support claim. Do not infer support from the presence
+of an upstream device entry.
+
+### Intel Macs
+
+- T2 Linux project: <https://t2linux.org/>
+- T2 Fedora installation notes: <https://wiki.t2linux.org/distributions/fedora/installation/>
+
+Standard Fedora x86-64 media can boot some Intel Macs, especially pre-T2
+models, but working installation and complete laptop support are model-specific.
+Broadcom wireless, audio, cameras, suspend, Touch Bar, keyboard and trackpad
+support have all required special handling on different generations. T2 models
+generally require the external T2 Linux kernel and integration packages for a
+complete experience. Proper Linux 0.1 should treat Intel Mac operation as
+unvalidated incidental compatibility rather than a product promise.
 
 ## Launchers
 
@@ -132,7 +191,20 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
 - Package and redistribution status for Vicinae and Ghostty on Fedora 44
 - Like-for-like Dolphin, Nautilus, and COSMIC Files evaluation under Proper Plasma defaults
 - PLM installer-to-first-login display-layout transfer
+- Fedora 44 PLM observation on BOX (2026-08-25): `/usr/lib/plasmalogin/defaults.conf` is the distro default actually read by the greeter; a `plasmalogin.conf.d` fragment was present but had no effect. The Proper package now owns a source copy and applies it in `%posttrans` without conflicting with Fedora's package ownership.
 - Legal redistribution paths for proprietary catalogue applications
 - Best maintained GitHub Desktop Linux port and how clearly to label it
 - Current official installation methods for Codex, Claude Code, OpenCode, VS Code Insiders, Chrome, and Docker on Fedora
 - Final font, icon, and artwork licences
+
+## Phase 4 source audit — 2026-08-25
+
+- Ghostty upstream: <https://github.com/ghostty-org/ghostty>; official source release: <https://release.files.ghostty.org/1.2.3/ghostty-1.2.3.tar.gz>.
+- Upstream packaging guidance says to use the project source tarball rather than GitHub's generated archive. Ghostty is MIT licensed. Fedora 44's configured repositories were queried on the BOX and did not return a `ghostty` package, so `proper-terminal` builds the pinned source with the official Zig 0.14.1 binary release plus Fedora's `gtk4-devel`, `libadwaita-devel`, and related build dependencies. Zig is build-only, verified with the official minisign signature; SHA-256 is `24aeeec8af16c381934a6cd7d95c807a8cb2cf7df9fa40d359aa884195c4716c`. The resulting Ghostty RPM payload includes the executable, desktop metadata, shell integration, themes, terminfo, D-Bus service and KIO service menu.
+- Proper terminal runtime configuration is versioned in `packages/proper-terminal/ghostty.conf`; update checks must record the release URL, checksum, licence and build dependency changes before promotion.
+- Build result: official Ghostty 1.2.3 source checksum `559770fe9773161e93e3dd9177d916e27037d7f548edcf6186eabc571c0e520b`; the pinned `proper-terminal` RPM checksum is `4a2d48289bc9b4a095ca1aaeeba1c3b14e3d561311c102fa6fdf744e38d7fe75`. Update by auditing the official release tarball, its minisign signature, the declared Zig requirement and the generated runtime payload before rebuilding.
+
+## Phase 5 provider audit — 2026-08-25
+
+- `apps/catalogue-v1.json` is schema version 1 and records provider, status, licence, architecture, install and launch metadata.
+- Fedora RPM, Flathub, and official vendor paths are represented. Proprietary binaries are not redistributed. GitHub Desktop is labelled community-maintained. Codex deliberately opens the official installation/authentication flow without storing credentials.

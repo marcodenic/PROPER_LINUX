@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Open Vicinae
+Exec=/usr/bin/proper-launcher
+NoDisplay=true
+StartupNotify=false
+Type=Application
+X-KDE-GlobalAccel-CommandShortcut=true

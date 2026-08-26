@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+state="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/proper-dropdown-terminal"
+pidfile="$state.pid"
+mkdir -p "${state%/*}"
+if [[ -s "$pidfile" ]] && kill -0 "$(cat "$pidfile")" 2>/dev/null; then
+    if command -v qdbus-qt6 >/dev/null 2>&1; then
+      if qdbus-qt6 org.kde.kglobalaccel /component/kwin invokeShortcut ProperDropdownToggle >/dev/null 2>&1; then
+        exit 0
+      fi
+      qdbus-qt6 org.kde.kglobalaccel5 /component/kwin invokeShortcut ProperDropdownToggle >/dev/null 2>&1 && exit 0
+    fi
+fi
+ghostty --class=ProperDropdown --title="Proper Terminal" &
+echo $! >"$pidfile"

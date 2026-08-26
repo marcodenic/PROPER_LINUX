@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+"""Validate the catalogue against the repository's JSON Schema subset."""
+import json, re, sys
+from pathlib import Path
+from urllib.parse import urlparse
+
+root = Path(__file__).resolve().parents[1]
+schema = json.loads((root / "apps/catalogue-v1.schema.json").read_text())
+data = json.loads((root / "apps/catalogue-v1.json").read_text())
+
+def fail(path, message):
+    raise ValueError(f"{path}: {message}")
+
+def validate(value, rule, path="$"):
+    kind = rule.get("type")
+    if kind == "object":
+        if not isinstance(value, dict): fail(path, "expected object")
+        for key in rule.get("required", []):
+            if key not in value: fail(path, f"missing required property {key}")
+        for key, child in rule.get("properties", {}).items():
+            if key in value: validate(value[key], child, f"{path}.{key}")
+    elif kind == "array":
+        if not isinstance(value, list): fail(path, "expected array")
+        for index, item in enumerate(value): validate(item, rule.get("items", {}), f"{path}[{index}]")
+    elif kind == "string":
+        if not isinstance(value, str): fail(path, "expected string")
+        if "pattern" in rule and not re.fullmatch(rule["pattern"], value): fail(path, "does not match pattern")
+        if rule.get("format") == "uri" and not urlparse(value).scheme: fail(path, "expected URI")
+    elif kind == "boolean" and not isinstance(value, bool):
+        fail(path, "expected boolean")
+    elif kind == "integer" and (not isinstance(value, int) or isinstance(value, bool)):
+        fail(path, "expected integer")
+    if "const" in rule and value != rule["const"]: fail(path, f"must equal {rule['const']!r}")
+    if "enum" in rule and value not in rule["enum"]: fail(path, "value is not permitted")
+
+try:
+    validate(data, schema)
+    encoded = json.dumps(data)
+    if "sudo" in encoded or "shell=True" in encoded: fail("$", "forbidden command execution marker")
+except (ValueError, json.JSONDecodeError) as error:
+    print(f"catalogue invalid: {error}", file=sys.stderr)
+    raise SystemExit(1)
+print(f"catalogue valid: {len(data['entries'])} entries")

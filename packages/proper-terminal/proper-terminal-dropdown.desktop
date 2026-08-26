@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Dropdown Terminal
+Comment=Show or hide the retained Proper Ghostty session
+Exec=proper-terminal-toggle
+Icon=utilities-terminal
+Categories=System;TerminalEmulator;

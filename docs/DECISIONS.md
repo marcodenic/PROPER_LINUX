@@ -161,3 +161,47 @@ Status values:
 - **Date:** 2026-08-24
 - **Decision:** Begin with a simplified and styled Dolphin configuration presented as “Files.” Compare it directly with current Nautilus and COSMIC Files in the Proper Plasma VM before locking the default.
 - **Reason:** Dolphin has the strongest Plasma integration and mature file operations, but stock Dolphin's visual density may not meet the product standard. Nautilus is cleaner but deliberately less capable and visually tied to GNOME; COSMIC Files is attractive and Fedora-packaged but brings its own toolkit/theme and less mature integration. The installed comparison should decide.
+
+## D023 — Validate recent mainstream x86-64 hardware first
+
+- **Status:** Accepted; refines D017
+- **Date:** 2026-08-25
+- **Decision:** Retain Fedora's general x86-64 compatibility, but concentrate Proper Linux product validation on mainstream laptops and desktops from roughly the previous four years and on current Fedora-supported hardware. Do not make old-hardware rejuvenation, Intel Mac enablement or Apple Silicon support a version 0.1 requirement.
+- **Reason:** Proper Linux should not add needless overhead, but its visual and interaction goals should not be constrained by a promise to optimise for obsolete machines. Apple Silicon requires the separate Fedora Asahi platform stack rather than the version 0.1 x86-64 image.
+
+## D024 — Use three UI feedback loops
+
+- **Status:** Accepted
+- **Date:** 2026-08-25
+- **Decision:** Prototype visual work in a dedicated development VM session, promote approved work into the owning RPM, and rebuild the complete ISO for integration and checkpoint validation.
+- **Reason:** Rebuilding an operating-system image for every styling adjustment makes design iteration needlessly slow, while leaving changes only in a prepared user account makes the product unreproducible.
+
+## D025 — Dolphin is the default Files application
+
+- **Status:** Accepted at PM checkpoint 2
+- **Date:** 2026-08-25
+- **Decision:** Ship Dolphin as the default file manager, presented in the launcher as “Files,” with Proper's restrained defaults.
+- **Reason:** The like-for-like checkpoint comparison confirmed Dolphin's mature Plasma integration and complete ordinary file operations outweigh the cleaner but less integrated alternatives.
+
+## D026 — Pin Vicinae 0.24.0 in Proper Linux
+
+- **Status:** Accepted for Phase 3
+- **Date:** 2026-08-25
+- **Decision:** Package the upstream `vicinaehq/vicinae` v0.24.0 x86_64 Linux tarball as `proper-launchers`.
+- **Source:** https://github.com/vicinaehq/vicinae/releases/tag/v0.24.0 (official release asset `vicinae-linux-x86_64-v0.24.0.tar.gz`).
+- **Licence:** GPL-3.0-or-later for Vicinae; Proper integration files remain under the project's applicable package licence.
+- **Update method:** Manually audit the upstream release page, update the pinned Source0 tag and checksum in the package audit, rebuild the RPM, verify it in the development VM, then include it in the next ISO integration build.
+
+## D027 — Phase 4/5 implementation sources
+
+- **Status:** Implemented pending PM checkpoint 4
+- **Date:** 2026-08-25
+- **Decision:** Use the official Ghostty 1.2.3 source tarball, built with the pinned official Zig 0.14.1 binary toolchain, and MIT licence. Use a small versioned Proper Apps catalogue that delegates to Fedora, Flatpak, and official vendor installation paths; GitHub Desktop is explicitly community-maintained.
+- **Reason:** Fedora 44's configured repositories do not provide Ghostty, while upstream provides a maintained source release and packaging guidance. Proper Apps must remain a catalogue and not become a second package manager.
+- **Update method:** Audit the upstream release/source checksum and Fedora build dependencies for each Ghostty update; validate catalogue provider metadata and installation flow in the disposable VM before changing the manifest.
+
+## D028 — PM checkpoint 3 approval recorded
+
+- **Status:** Approved by PM handoff
+- **Date:** 2026-08-25
+- **Decision:** Treat Phase 3 launcher/window behaviour and the verified ISO `b6e4bb0098d77ac29c79cc28352bfb1bb2328cb1b5615dd5f7b21cdff83c82dc` as approved baseline; do not redo Phase 3 beyond focused regression checks.

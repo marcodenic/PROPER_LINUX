@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -eu
+systemctl --user start vicinae.service
+exec vicinae toggle

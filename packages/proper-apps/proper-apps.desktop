@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Proper Apps
+Comment=Curated software catalogue
+Exec=proper-apps
+Icon=system-software-install
+Categories=System;PackageManager;

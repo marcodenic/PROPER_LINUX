@@ -1,0 +1,12 @@
+[KDE]
+LookAndFeelPackage=ProperHorizon
+
+[General]
+ColorScheme=Proper
+SingleClick=false
+
+[General]
+TerminalApplication=ghostty
+
+[Icons]
+Theme=breeze

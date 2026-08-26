@@ -1,0 +1,24 @@
+<image>
+	<!-- The build helper stages the RPM-MD repository here. It is never a
+	     runtime repository on the installed system. -->
+	<repository type="rpm-md" alias="proper-local">
+		<source path="file:///source/repo"/>
+	</repository>
+
+	<packages type="image">
+		<package name="proper-release"/>
+		<package name="proper-look-and-feel"/>
+		<package name="proper-defaults"/>
+		<package name="proper-launchers"/>
+		<package name="proper-terminal"/>
+		<package name="proper-apps"/>
+		<!-- Vicinae links against Qt's private QML ABI; Fedora publishes the
+		     matching ABI provider in the declarative development package. -->
+		<package name="qt6-qtdeclarative-devel"/>
+	</packages>
+	<!-- Keep the default image lean; office applications belong in the
+	     future catalogue, not the installed Proper desktop. -->
+	<packages type="image" patternType="plusRecommended" profiles="KDE-Desktop,KDE-Mobile">
+		<ignore name="libreoffice*"/>
+	</packages>
+</image>

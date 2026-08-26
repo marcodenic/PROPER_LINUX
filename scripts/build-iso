@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# Build the pinned, unmodified Fedora KDE 44 live ISO with KIWI.
+set -Eeuo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$project_root/image/upstream/fedora-kde-44.lock"
+output_root="${PROPER_OUTPUT_DIR:-"$project_root/../proper-linux-build"}"
+cache_root="${PROPER_CACHE_DIR:-"$output_root/cache"}"
+source_dir="$cache_root/$UPSTREAM_NAME"
+if [[ "${PROPER_BASELINE:-0}" == 1 ]]; then
+  iso_dir="$output_root/iso/fedora-kde-44-$UPSTREAM_COMMIT"
+else
+  iso_dir="$output_root/iso/proper-linux-0.1-${UPSTREAM_COMMIT:0:12}"
+fi
+build_source_dir="$iso_dir/source"
+
+for binary in git sha256sum; do
+  command -v "$binary" >/dev/null 2>&1 || { printf 'Required command missing: %s\n' "$binary" >&2; exit 1; }
+done
+[[ -n "$UPSTREAM_COMMIT" ]] || { printf 'Fedora input is not pinned. Run scripts/pin-fedora-base, review the lock, then rerun.\n' >&2; exit 1; }
+[[ "$UPSTREAM_COMMIT" =~ ^[0-9a-f]{40}$ ]] || { printf 'Invalid UPSTREAM_COMMIT in image/upstream/fedora-kde-44.lock\n' >&2; exit 1; }
+
+mkdir -p "$cache_root" "$iso_dir"
+if [[ ! -d "$source_dir/.git" ]]; then
+  git clone "$UPSTREAM_URL" "$source_dir"
+fi
+git -C "$source_dir" fetch --quiet origin "$UPSTREAM_COMMIT"
+git -C "$source_dir" checkout --detach --quiet "$UPSTREAM_COMMIT"
+
+rm -rf "$build_source_dir"
+mkdir -p "$build_source_dir"
+  cp -a "$source_dir/." "$build_source_dir/"
+  # Fedora's KDE profile explicitly pulls the LibreOffice collection. Proper
+  # keeps the base image lean and offers office software through the future
+  # catalogue, so apply this narrow profile-local exclusion to the pinned
+  # upstream description during composition.
+  sed -i '/<namedCollection name="libreoffice"\/>/d; /<package name="libreoffice-/d; /<package name="plasma-welcome-fedora"\/>/d' \
+    "$build_source_dir/components/desktops/kde.xml"
+  sed -i '/<package name="plasma-welcome-fedora"\/>/d' \
+    "$build_source_dir/teams/kde.xml"
+  sed -i '/<ignore name="initial-setup"\/>/a\		<ignore name="plasma-welcome"/>' \
+    "$build_source_dir/components/desktops/kde.xml"
+if [[ "${PROPER_BASELINE:-0}" == 1 ]]; then
+  kiwi_file=/source/Fedora.kiwi
+else
+  "$project_root/scripts/build-rpms"
+  cp -a "$project_root/image/descriptions/proper.xml" "$build_source_dir/proper.xml"
+  # Fedora's upstream hook ends with `exit 0`.  Insert our live-session hook
+  # before that terminator so KIWI actually executes it while composing the
+  # image rather than leaving it as unreachable text.
+  sed -i '${/^exit 0$/d;}' "$build_source_dir/config.sh"
+  cat "$project_root/image/descriptions/proper-live-config.sh" >> "$build_source_dir/config.sh"
+  printf '\nexit 0\n' >> "$build_source_dir/config.sh"
+  cp -a "$output_root/repo" "$build_source_dir/repo"
+  # Fedora's label generator parses Fedora.kiwi directly, so preserve it as
+  # the top-level document and append only the Proper overlay.
+  sed -i 's#</image>#\t<include from="this://./proper.xml"/>\n</image>#' "$build_source_dir/Fedora.kiwi"
+  kiwi_file=/source/Fedora.kiwi
+fi
+
+# KIWI refuses to reuse an incomplete root from a failed build. This directory
+# is generated beneath the selected ISO output and contains no source files.
+# A rootless container owns some image-root files in its user namespace.
+if [[ -d "$iso_dir/image-build" ]]; then
+  if [[ "$(id -u)" -eq 0 ]]; then
+    rm -rf "$iso_dir/image-build"
+  elif command -v podman >/dev/null 2>&1; then
+    podman unshare rm -rf "$iso_dir/image-build"
+  else
+    printf 'Cannot remove generated KIWI state without root or Podman: %s\n' "$iso_dir/image-build" >&2
+    exit 1
+  fi
+fi
+
+using_container=0
+if command -v kiwi-ng >/dev/null 2>&1 && [[ "$(id -u)" -eq 0 ]]; then
+  runner=()
+elif command -v kiwi-ng >/dev/null 2>&1 && command -v sudo >/dev/null 2>&1 && sudo -n true >/dev/null 2>&1; then
+  runner=(sudo)
+elif command -v podman >/dev/null 2>&1; then
+  using_container=1
+  builder_image="localhost/proper-linux-kiwi-builder:fedora44"
+  mkdir -p "$iso_dir/tmp"
+  podman build --tag "$builder_image" --file "$project_root/image/Containerfile" "$project_root/image"
+  podman run --rm --privileged --volume "$build_source_dir:/source:Z" --volume "$iso_dir:/output:Z" --volume "$iso_dir/tmp:/var/tmp:Z" "$builder_image" /source/kiwi-build --kiwi-file="$kiwi_file" --image-type="$IMAGE_TYPE" --image-profile="$IMAGE_PROFILE" --output-dir=/output/image 2>&1 | tee "$iso_dir/kiwi-build.log"
+  runner=()
+else
+  printf 'KIWI requires root/sudo or a functional Podman runtime.\n' >&2
+  exit 1
+fi
+
+if (( using_container == 0 )); then
+  local_kiwi_file="${kiwi_file#/source}"
+  "${runner[@]}" "$build_source_dir/kiwi-build" --kiwi-file="$build_source_dir$local_kiwi_file" --image-type="$IMAGE_TYPE" --image-profile="$IMAGE_PROFILE" --output-dir="$iso_dir"
+fi
+
+mapfile -t images < <(find "$iso_dir" -maxdepth 3 -type f -name '*.iso' -print)
+(( ${#images[@]} == 1 )) || { printf 'Expected exactly one ISO in %s; found %d.\n' "$iso_dir" "${#images[@]}" >&2; exit 1; }
+sha256sum "${images[0]}" >"${images[0]}.sha256"
+printf 'Built %s\nChecksum: %s.sha256\n' "${images[0]}" "${images[0]}"

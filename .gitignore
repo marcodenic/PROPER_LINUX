@@ -7,6 +7,7 @@
 /build/
 /out/
 /artifacts/
+/proper-linux-build/
 *.iso
 *.img
 *.raw
@@ -28,3 +29,9 @@
 *.key
 *.pem
 !*.pub
+packages/proper-terminal/ghostty-*.tar.gz
+packages/proper-terminal/zig-*.tar.xz
+packages/proper-terminal/zig-*.minisig
+packages/proper-launchers/vicinae-*.tar.gz
+socket,json,sys,time
+.build/

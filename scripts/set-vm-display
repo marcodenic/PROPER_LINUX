@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+# Apply and verify a Plasma display mode through QMP keyboard input.
+#
+# QEMU's virtio-vga xres/yres properties advertise a preferred mode but do not
+# guarantee that Plasma selects it.  This helper opens KRunner in the disposable
+# VM session, applies the requested KScreen mode, and verifies the real QEMU
+# framebuffer dimensions through the HMP screendump command.
+set -Eeuo pipefail
+
+qmp_socket="${1:?Usage: scripts/set-vm-display QMP_SOCKET MONITOR_SOCKET WIDTH HEIGHT SCALE [REFRESH] [DELAY]}"
+monitor_socket="${2:?Monitor socket is required.}"
+display_width="${3:?Display width is required.}"
+display_height="${4:?Display height is required.}"
+display_scale="${5:?Display scale is required.}"
+display_refresh="${6:-60}"
+initial_delay="${7:-0}"
+
+[[ "$display_width" =~ ^[0-9]+$ && "$display_height" =~ ^[0-9]+$ ]] || {
+  printf 'Display dimensions must be positive integers.\n' >&2
+  exit 1
+}
+[[ "$display_scale" =~ ^[0-9]+([.][0-9]+)?$ ]] || {
+  printf 'Display scale must be a positive number.\n' >&2
+  exit 1
+}
+[[ "$display_refresh" =~ ^[0-9]+([.][0-9]+)?$ ]] || {
+  printf 'Display refresh must be a positive number.\n' >&2
+  exit 1
+}
+[[ "$initial_delay" =~ ^[0-9]+$ ]] || {
+  printf 'Display delay must be a non-negative integer.\n' >&2
+  exit 1
+}
+command -v socat >/dev/null || { printf 'socat is required for VM display control.\n' >&2; exit 1; }
+
+for _ in {1..240}; do
+  [[ -S "$qmp_socket" && -S "$monitor_socket" ]] && break
+  sleep 0.5
+done
+[[ -S "$qmp_socket" && -S "$monitor_socket" ]] || {
+  printf 'VM control sockets did not appear: %s %s\n' "$qmp_socket" "$monitor_socket" >&2
+  exit 1
+}
+
+sleep "$initial_delay"
+
+temporary_dir="$(mktemp -d --tmpdir proper-vm-display.XXXXXX)"
+trap 'rm -rf -- "$temporary_dir"' EXIT
+
+emit_key_event() {
+  local qcode="$1"
+  local shifted="${2:-false}"
+
+  if [[ "$shifted" == true ]]; then
+    printf '%s\n' "{\"execute\":\"input-send-event\",\"arguments\":{\"events\":[{\"type\":\"key\",\"data\":{\"down\":true,\"key\":{\"type\":\"qcode\",\"data\":\"shift\"}}},{\"type\":\"key\",\"data\":{\"down\":true,\"key\":{\"type\":\"qcode\",\"data\":\"$qcode\"}}},{\"type\":\"key\",\"data\":{\"down\":false,\"key\":{\"type\":\"qcode\",\"data\":\"$qcode\"}}},{\"type\":\"key\",\"data\":{\"down\":false,\"key\":{\"type\":\"qcode\",\"data\":\"shift\"}}}]}}"
+  else
+    printf '%s\n' "{\"execute\":\"input-send-event\",\"arguments\":{\"events\":[{\"type\":\"key\",\"data\":{\"down\":true,\"key\":{\"type\":\"qcode\",\"data\":\"$qcode\"}}},{\"type\":\"key\",\"data\":{\"down\":false,\"key\":{\"type\":\"qcode\",\"data\":\"$qcode\"}}}]}}"
+  fi
+}
+
+emit_character() {
+  local character="$1"
+
+  case "$character" in
+    ' ') emit_key_event spc ;;
+    '-') emit_key_event minus ;;
+    '.') emit_key_event dot ;;
+    '@') emit_key_event 2 true ;;
+    [a-z0-9]) emit_key_event "$character" ;;
+    *)
+      printf 'Unsupported character in VM display command: %q\n' "$character" >&2
+      return 1
+      ;;
+  esac
+}
+
+apply_display_mode() {
+  local command_text
+  local index
+  local character
+
+  command_text="kscreen-doctor output.1.mode.${display_width}x${display_height}@${display_refresh} output.1.scale.${display_scale}"
+
+  {
+    printf '%s\n' '{"execute":"qmp_capabilities"}'
+    sleep 0.2
+    printf '%s\n' '{"execute":"input-send-event","arguments":{"events":[{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"alt"}}},{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"f2"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"f2"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"alt"}}}]}}'
+    sleep 1
+    for ((index = 0; index < ${#command_text}; index++)); do
+      character="${command_text:index:1}"
+      emit_character "$character"
+      sleep 0.04
+    done
+    emit_key_event ret
+  } | socat - UNIX-CONNECT:"$qmp_socket" >/dev/null
+}
+
+framebuffer_matches() {
+  local dump_path="$temporary_dir/framebuffer.ppm"
+  local actual_width
+  local actual_height
+
+  rm -f -- "$dump_path"
+  printf 'screendump %s\n' "$dump_path" | socat - UNIX-CONNECT:"$monitor_socket" >/dev/null
+  [[ -s "$dump_path" ]] || return 1
+  read -r actual_width actual_height < <(sed -n '2p' "$dump_path")
+  [[ "$actual_width" == "$display_width" && "$actual_height" == "$display_height" ]]
+}
+
+for attempt in 1 2; do
+  apply_display_mode
+  sleep 5
+  if framebuffer_matches; then
+    printf 'Applied and verified VM display: %sx%s at %s%% scale.\n' \
+      "$display_width" "$display_height" "$(awk "BEGIN { print $display_scale * 100 }")"
+    exit 0
+  fi
+
+  if [[ "$attempt" == 1 ]]; then
+    printf 'VM display was not ready; making one delayed retry.\n' >&2
+    sleep 10
+  fi
+done
+
+printf 'Failed to verify VM framebuffer %sx%s. Inspect Plasma/KScreen before retrying.\n' \
+  "$display_width" "$display_height" >&2
+exit 1

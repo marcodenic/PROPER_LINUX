@@ -21,7 +21,7 @@ The first engineering objective is a Fedora KDE-based live ISO that installs int
 - Vicinae as the single mouse-accessible, Raycast-style application launcher and command surface
 - Floating windows with mouse snapping and `Meta`+arrow quick tiling
 - Useful Omarchy-inspired shortcuts as optional accelerators
-- Ghostty as the default terminal, with a taskbar-accessible dropdown mode
+- Ghostty 1.2.3 as the default terminal, with a taskbar-accessible dropdown mode
 - `btop` installed by default
 - A deliberately simplified and styled file-manager experience
 - Lean base installation
@@ -40,6 +40,8 @@ The first engineering objective is a Fedora KDE-based live ISO that installs int
 - [Application catalogue](docs/APPLICATIONS.md)
 - [Decision log](docs/DECISIONS.md)
 - [Research and upstream references](docs/RESEARCH.md)
+- [UX strategy and competitive position](docs/UX_STRATEGY.md)
+- [UI iteration workflow](docs/UI_ITERATION.md)
 - [BOX continuation guide](docs/BOX_KICKOFF.md)
 
 ## Product rule

@@ -1,0 +1,5 @@
+Qt_6_PRIVATE_API {
+    global:
+        _ZN11QQmlPrivate18AOTCompiledContext4markEP7QObjectPN3QV49MarkStackE;
+        _ZN11QQmlPrivate18AOTCompiledContext4markERK8QVariantPN3QV49MarkStackE;
+};

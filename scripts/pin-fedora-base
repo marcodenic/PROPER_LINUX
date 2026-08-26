@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Resolve Fedora's release branch once and write an immutable image-input lock.
+set -Eeuo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+lock_path="$project_root/image/upstream/fedora-kde-44.lock"
+source "$lock_path"
+cache_root="${PROPER_CACHE_DIR:-"$project_root/../proper-linux-build/cache"}"
+source_dir="$cache_root/$UPSTREAM_NAME"
+
+mkdir -p "$cache_root"
+if [[ ! -d "$source_dir/.git" ]]; then
+  git clone --filter=blob:none --no-checkout "$UPSTREAM_URL" "$source_dir"
+fi
+git -C "$source_dir" fetch --force origin "$UPSTREAM_REF"
+commit="$(git -C "$source_dir" rev-parse FETCH_HEAD)"
+
+if [[ ! "$commit" =~ ^[0-9a-f]{40}$ ]]; then
+  printf 'Unable to resolve an immutable Fedora image-description commit.\n' >&2
+  exit 1
+fi
+
+sed -i -E 's/^UPSTREAM_COMMIT=.*/UPSTREAM_COMMIT="'$commit'"/' "$lock_path"
+printf 'Pinned Fedora 44 KDE image description: %s\n' "$commit"

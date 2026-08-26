@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+# Boot a Proper/Fedora live ISO in a local UEFI QEMU/KVM window.
+#
+# The HMP socket is retained for observation (including screendump), while the
+# QMP socket is the supported input/control path for graphical acceptance.
+# The default HiDPI profile uses a 3840x2160 framebuffer at 200% scaling,
+# producing a 1920x1080 logical desktop.  Set PROPER_VM_PROFILE=fullhd for a
+# 1920x1080 framebuffer at 100% scaling.
+set -Eeuo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+iso_path="${1:?Usage: scripts/run-vm /absolute/path/to/image.iso [vm-disk.qcow2]}"
+disk_path="${2:-"$project_root/../proper-linux-build/vm/proper-linux.qcow2"}"
+firmware_code="${OVMF_CODE:-/usr/share/edk2/ovmf/OVMF_CODE.fd}"
+firmware_vars_template="${OVMF_VARS:-/usr/share/edk2/ovmf/OVMF_VARS.fd}"
+vm_dir="$(dirname "$disk_path")"
+firmware_vars="$vm_dir/OVMF_VARS.fd"
+monitor_socket="$vm_dir/$(basename "${disk_path%.*}").monitor.sock"
+qmp_socket="$vm_dir/$(basename "${disk_path%.*}").qmp.sock"
+vm_profile="${PROPER_VM_PROFILE:-hidpi}"
+case "$vm_profile" in
+  hidpi|retina|macbook)
+    profile_width=3840
+    profile_height=2160
+    profile_scale=2
+    ;;
+  fullhd|1080p)
+    profile_width=1920
+    profile_height=1080
+    profile_scale=1
+    ;;
+  custom)
+    profile_width="${PROPER_VM_WIDTH:?PROPER_VM_WIDTH is required for the custom profile.}"
+    profile_height="${PROPER_VM_HEIGHT:?PROPER_VM_HEIGHT is required for the custom profile.}"
+    profile_scale="${PROPER_VM_SCALE:?PROPER_VM_SCALE is required for the custom profile.}"
+    ;;
+  *)
+    printf 'Unknown VM display profile: %s (use hidpi, fullhd, or custom).\n' "$vm_profile" >&2
+    exit 1
+    ;;
+esac
+vm_width="${PROPER_VM_WIDTH:-$profile_width}"
+vm_height="${PROPER_VM_HEIGHT:-$profile_height}"
+vm_scale="${PROPER_VM_SCALE:-$profile_scale}"
+vm_refresh="${PROPER_VM_REFRESH:-60}"
+vm_display_delay="${PROPER_VM_DISPLAY_DELAY:-35}"
+vm_auto_display="${PROPER_VM_AUTO_DISPLAY:-1}"
+aux_drive_args=()
+if [[ -n "${PROPER_VM_AUX_ISO:-}" ]]; then
+  [[ -f "$PROPER_VM_AUX_ISO" ]] || { printf 'Auxiliary VM ISO not found: %s\n' "$PROPER_VM_AUX_ISO" >&2; exit 1; }
+  aux_drive_args=(-drive "file=$PROPER_VM_AUX_ISO,media=cdrom,if=none,format=raw,readonly=on,id=proper_aux" -device ide-cd,drive=proper_aux)
+elif [[ -n "${PROPER_VM_AUX_DISK:-}" ]]; then
+  [[ -f "$PROPER_VM_AUX_DISK" ]] || { printf 'Auxiliary VM disk not found: %s\n' "$PROPER_VM_AUX_DISK" >&2; exit 1; }
+  aux_drive_args=(-drive "file=$PROPER_VM_AUX_DISK,if=virtio,format=raw,readonly=on")
+fi
+
+[[ -f "$iso_path" ]] || { printf 'ISO not found: %s\n' "$iso_path" >&2; exit 1; }
+[[ "$vm_width" =~ ^[0-9]+$ && "$vm_height" =~ ^[0-9]+$ ]] || { printf 'VM dimensions must be positive integers.\n' >&2; exit 1; }
+[[ "$vm_scale" =~ ^[0-9]+([.][0-9]+)?$ ]] || { printf 'VM scale must be a positive number.\n' >&2; exit 1; }
+[[ "$vm_refresh" =~ ^[0-9]+([.][0-9]+)?$ ]] || { printf 'VM refresh must be a positive number.\n' >&2; exit 1; }
+[[ "$vm_display_delay" =~ ^[0-9]+$ ]] || { printf 'VM display delay must be a non-negative integer.\n' >&2; exit 1; }
+[[ "$vm_auto_display" == 0 || "$vm_auto_display" == 1 ]] || { printf 'PROPER_VM_AUTO_DISPLAY must be 0 or 1.\n' >&2; exit 1; }
+[[ -c /dev/kvm && -r /dev/kvm && -w /dev/kvm ]] || { printf '/dev/kvm is unavailable; graphical acceptance requires host KVM access.\n' >&2; exit 1; }
+command -v qemu-system-x86_64 >/dev/null || { printf 'qemu-system-x86_64 is not installed.\n' >&2; exit 1; }
+[[ -f "$firmware_code" && -f "$firmware_vars_template" ]] || { printf 'OVMF firmware not found; set OVMF_CODE and OVMF_VARS if Fedora uses another path.\n' >&2; exit 1; }
+
+# Refuse to start a second VM using this disk.  Match the fully resolved disk
+# path in the command line so an unrelated QEMU process cannot be mistaken
+# for this acceptance VM.
+disk_realpath="$(realpath -e "$disk_path" 2>/dev/null || realpath -m "$disk_path")"
+while read -r pid args; do
+  [[ -n "${pid:-}" && "$pid" != "$$" ]] || continue
+  if grep -Fq -- "$disk_realpath" <<<"$args"; then
+    printf 'A Proper Linux VM is already running for disk %s (PID %s).\n' "$disk_realpath" "$pid" >&2
+    printf 'Reuse its QMP socket: %s\n' "$qmp_socket" >&2
+    exit 1
+  fi
+done < <(ps -eo pid=,args= | grep '[q]emu-system-x86_64' || true)
+
+mkdir -p "$vm_dir"
+[[ -f "$firmware_vars" ]] || cp "$firmware_vars_template" "$firmware_vars"
+[[ -f "$disk_path" ]] || qemu-img create -f qcow2 "$disk_path" 64G
+if [[ -e "$monitor_socket" || -e "$qmp_socket" ]]; then
+  for socket in "$monitor_socket" "$qmp_socket"; do
+    [[ ! -e "$socket" ]] || [[ -S "$socket" ]] || { printf 'Refusing to overwrite non-socket path: %s\n' "$socket" >&2; exit 1; }
+    [[ ! -e "$socket" ]] || { printf 'Stale VM socket must be removed after verifying the old VM is gone: %s\n' "$socket" >&2; exit 1; }
+  done
+fi
+
+qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m 8192 -device "virtio-vga,xres=$vm_width,yres=$vm_height" -device qemu-xhci -device usb-tablet -display gtk,gl=off,zoom-to-fit=on,keep-aspect-ratio=on -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive file="$disk_path",if=virtio,format=qcow2 "${aux_drive_args[@]}" -cdrom "$iso_path" -boot order=d -nic user,model=virtio-net-pci &
+qemu_pid=$!
+display_helper_pid=
+
+cleanup_display_helper() {
+  if [[ -n "${display_helper_pid:-}" ]] && kill -0 "$display_helper_pid" 2>/dev/null; then
+    kill "$display_helper_pid" 2>/dev/null || true
+    wait "$display_helper_pid" 2>/dev/null || true
+  fi
+}
+trap cleanup_display_helper EXIT
+
+if [[ "$vm_auto_display" == 1 ]]; then
+  "$project_root/scripts/set-vm-display" "$qmp_socket" "$monitor_socket" \
+    "$vm_width" "$vm_height" "$vm_scale" "$vm_refresh" "$vm_display_delay" &
+  display_helper_pid=$!
+  printf 'VM display profile %s: %sx%s at %s%% scale (automatic verification pending).\n' \
+    "$vm_profile" "$vm_width" "$vm_height" "$(awk "BEGIN { print $vm_scale * 100 }")"
+else
+  printf 'Automatic VM display selection disabled. Apply it with:\n'
+  printf '  scripts/set-vm-display %q %q %q %q %q %q\n' \
+    "$qmp_socket" "$monitor_socket" "$vm_width" "$vm_height" "$vm_scale" "$vm_refresh"
+fi
+
+wait "$qemu_pid"

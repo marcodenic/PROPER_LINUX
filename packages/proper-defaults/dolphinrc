@@ -1,0 +1,14 @@
+[PlacesPanel]
+IconSize=32
+ShowAll=false
+
+[General]
+BrowseThroughArchives=false
+ShowToolTips=true
+
+[MainWindow]
+MenuBar=Disabled
+ToolBar=Enabled
+StatusBar=Enabled
+[ContextMenu]
+ShowOpenTerminalHere=true
