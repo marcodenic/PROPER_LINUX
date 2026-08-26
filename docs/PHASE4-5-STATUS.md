@@ -3,14 +3,14 @@
 ## Current integration artifact
 
 - Branch: `codex/complete-phase-4-and-5`
-- ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build-final3/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
-- ISO SHA-256: `a416ec1b59b8cd4699305135f308b51c3ec94685337b053bdf1a2a9f8939bb71`
-- Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build-final3/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
-- Proper Apps RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build-final3/rpms/proper-apps/RPMS/x86_64/proper-apps-0.1-3.fc44.x86_64.rpm`
-- Proper Terminal RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build-final3/rpms/proper-terminal/RPMS/x86_64/proper-terminal-1.2.3-6.fc44.x86_64.rpm`
-- Proper Terminal RPM SHA-256: `8c5786da3285796bf06c17025d6f9d8a1575f6a9d841ebc30b2f9edc0e6a032a`
+- ISO: `/home/code/.codex/worktrees/7b43/proper-linux-build-source-v1/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.iso`
+- ISO SHA-256: `31d8dab4c7d7b1001526268b2b2dd29ff67decfb252b0941101b79a94167c50d`
+- Package manifest: `/home/code/.codex/worktrees/7b43/proper-linux-build-source-v1/iso/proper-linux-0.1-dfc49a5a10f6/image-build/Fedora.x86_64-44.packages`
+- Proper Launchers RPM: `proper-launchers-0.1-3.fc44.x86_64`; SHA-256 `2eba5e5c71222a462beebe2b3928c772f2fe70b82840874d6cdd485587495d6d`
+- Proper Apps RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build-source-v1/repo/proper-apps-0.1-3.fc44.x86_64.rpm`
+- Proper Terminal RPM: `/home/code/.codex/worktrees/7b43/proper-linux-build-source-v1/repo/proper-terminal-1.2.3-6.fc44.x86_64.rpm`
 
-The manifest contains `proper-apps-0.1-3.fc44.x86_64` and `proper-terminal-1.2.3-6.fc44.x86_64`; no LibreOffice package is present. The ISO was composed from the same rebuilt local RPM repository and passed KIWI image creation and media verification.
+The manifest contains `proper-launchers-0.1-3.fc44.x86_64`, `proper-apps-0.1-3.fc44.x86_64`, and `proper-terminal-1.2.3-6.fc44.x86_64`; no LibreOffice package is present. The ISO was composed from the source-built local RPM repository and passed KIWI image creation and media verification.
 
 ## Implementation in this revision
 
@@ -40,11 +40,17 @@ All evidence in `docs/evidence/checkpoint4-final/` is captured from the ISO and 
 18. [Dolphin Open Terminal Here](evidence/checkpoint4-final/18-dolphin-open-terminal.png) — Dolphin’s Actions path opens a properly styled Ghostty terminal in the selected directory; SHA-256 `c01531e3f326a1e936ef9e237a46e09954311f2d060d4a3bff0261f27294a45c`.
 19. [Vicinae launcher](evidence/checkpoint4-final/19-vicinae-launch.png) — the promoted launcher opens with favorites and command actions visible; SHA-256 `98f7dd1905be9d17bbb5f9860cb37d813bd0f9e34a34d3fc6629a6d6e5db8d59`.
 
+20. [Source-build ISO desktop](evidence/checkpoint4-source-v1/01-desktop.png) — fresh UEFI/KVM boot from the source-built ISO; SHA-256 `a76b0e995f7fc3a2f75ed68235f99bb574608137040021df6c68a84c5a3e2d5f`.
+21. [Source-build Vicinae home](evidence/checkpoint4-source-v1/02-vicinae-home.png) — launcher home state on the exact new ISO; SHA-256 `242e133965358b9e4352e7eb2e01f1dafc305ab5fb4dea0db6a9de146aa91c4c`.
+22. [Source-build typed result](evidence/checkpoint4-source-v1/03-vicinae-typed-dolphin.png) — click-to-focus and `dolphin` query remain live; SHA-256 `b87fc7525b32cc3a06ae93032262a179ff92e5757d3a31792069bd420e6aef7b`.
+23. [Source-build secondary actions](evidence/checkpoint4-source-v1/04-vicinae-actions.png) — secondary action panel opens for the selected result; SHA-256 `e0c3986329474f6cdfdacd3947d416ce3e3c1c19a3f26f8af7c326718e5d3dcd`.
+24. [Source-build launched application](evidence/checkpoint4-source-v1/05-dolphin-launched.png) — selected application launches successfully; SHA-256 `3451ca342971ac12bee3aba9a34f6aec1f9504375c50f2ef6f7fcf02d8c54ad1`.
+
 The provider-operation, recovery, source, and 200% journeys are now consolidated against this exact ISO; retained-desktop journeys remain open.
 
 ## Validation
 
-Passed: `scripts/check-box`; `scripts/validate-catalogue`; `git diff --check`; `bash -n scripts/build-rpms scripts/build-iso scripts/run-vm`; full `PROPER_OUTPUT_DIR=/home/code/.codex/worktrees/7b43/proper-linux-build-final scripts/build-iso`; ISO checksum; package-manifest inspection; and fresh UEFI/KVM boot at 1920×1080/100%.
+Passed: `scripts/check-box`; `scripts/validate-catalogue`; `git diff --check`; `bash -n scripts/build-rpms scripts/build-iso scripts/run-vm`; source-built RPM; ISO checksum; package-manifest inspection; fresh UEFI/KVM boot at 1920×1080/100%; click-to-focus/type, secondary actions, launch, 20-cycle stress, and Alt+F2 KRunner check.
 
 ## Acceptance state
 
@@ -52,7 +58,7 @@ Checkpoint 4 is not PM-approved. Do not begin Phase 6. The exact-ISO package now
 
 ## Known defects
 
-- P2: In the latest final3 guest, Vicinae opens but closes when its search field is clicked or receives the first search key, so a search-and-launch action remains unevidenced. AI-agent launch, Dolphin “Open Terminal Here,” and the retained Ghostty/btop states are directly evidenced.
+- The final3 prebuilt-binary interaction defect is retained as the immutable comparison baseline; the source-built candidate no longer reproduces it in the fresh ISO guest.
 
 ## PM handoff request
 

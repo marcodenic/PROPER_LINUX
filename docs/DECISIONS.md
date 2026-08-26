@@ -205,3 +205,12 @@ Status values:
 - **Status:** Approved by PM handoff
 - **Date:** 2026-08-25
 - **Decision:** Treat Phase 3 launcher/window behaviour and the verified ISO `b6e4bb0098d77ac29c79cc28352bfb1bb2328cb1b5615dd5f7b21cdff83c82dc` as approved baseline; do not redo Phase 3 beyond focused regression checks.
+
+## D029 — Build Vicinae from source against Fedora Qt
+
+- **Status:** Implemented pending PM checkpoint 4
+- **Date:** 2026-08-26
+- **Decision:** Replace the prebuilt Vicinae v0.24.0 binary and private-Qt relabeling workaround with the official Vicinae source archive at commit `01cd7cb4936d9cb14272091623da85e7c880f0dc`, built against Fedora 44's Qt 6.11.1. The archive SHA-256 is `ee4e80d6e69193820b294a43a008794d8761cda9914256c32aed3be091f5c0e3`.
+- **Reason:** The immutable final3 baseline reproduced a launcher exit when the search field was clicked or first typed into. A source build removes the incompatible private-Qt ABI shim; the exact source-built RPM and fresh ISO pass the focused interaction regression.
+- **Additional fetched build dependencies:** Upstream CMake FetchContent retrieves Glaze v7.2.0 at commit `b518eec7a22e56ffa238b072c07f47efa7cea97f` (MIT, <https://github.com/stephenberry/glaze>) and QtKeychain v0.14.0 at commit `e63da2868465db18eb35a312b2635c26fdc46923` (BSD-3-Clause, <https://github.com/frankosterfeld/qtkeychain>); these are build-only and must be re-audited and checksum-recorded on each Vicinae source update.
+- **Update method:** Audit the official Vicinae source commit, archive checksum, upstream dependency tags/commits and licences; rebuild in the pinned Fedora builder, install the RPM in a disposable guest, then rebuild and boot the exact ISO before promotion.

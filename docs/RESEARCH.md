@@ -208,3 +208,9 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
 
 - `apps/catalogue-v1.json` is schema version 1 and records provider, status, licence, architecture, install and launch metadata.
 - Fedora RPM, Flathub, and official vendor paths are represented. Proprietary binaries are not redistributed. GitHub Desktop is labelled community-maintained. Codex deliberately opens the official installation/authentication flow without storing credentials.
+
+## Vicinae source-build audit — 2026-08-26
+
+- The official Vicinae v0.24.0 source archive is pinned to commit `01cd7cb4936d9cb14272091623da85e7c880f0dc`, SHA-256 `ee4e80d6e69193820b294a43a008794d8761cda9914256c32aed3be091f5c0e3`, and GPL-3.0-or-later. It is built against Fedora 44 Qt 6.11.1; no private-Qt symbol relabeling or prebuilt executable is used.
+- The build's upstream CMake dependencies were recorded from the successful build: Glaze v7.2.0, commit `b518eec7a22e56ffa238b072c07f47efa7cea97f`, MIT; and QtKeychain v0.14.0, commit `e63da2868465db18eb35a312b2635c26fdc46923`, BSD-3-Clause. Sources are <https://github.com/stephenberry/glaze> and <https://github.com/frankosterfeld/qtkeychain>. They are build-only FetchContent dependencies; updates require re-auditing their exact commits, licences and checksums.
+- The resulting `proper-launchers-0.1-3.fc44.x86_64.rpm` is SHA-256 `2eba5e5c71222a462beebe2b3928c772f2fe70b82840874d6cdd485587495d6d`. The exact fresh ISO is SHA-256 `31d8dab4c7d7b1001526268b2b2dd29ff67decfb252b0941101b79a94167c50d`.
