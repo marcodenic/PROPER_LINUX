@@ -32,6 +32,13 @@ def main() -> int:
     click.add_argument("y", type=int)
     click.add_argument("--width", type=int, default=1920)
     click.add_argument("--height", type=int, default=1080)
+    move = sub.add_parser("move")
+    move.add_argument("x", type=int)
+    move.add_argument("y", type=int)
+    move.add_argument("--width", type=int, default=1920)
+    move.add_argument("--height", type=int, default=1080)
+    button = sub.add_parser("button")
+    button.add_argument("name", choices=("left", "right", "middle"), default="left")
     args = parser.parse_args()
 
     if args.action == "key":
@@ -48,15 +55,17 @@ def main() -> int:
             {"type": "key", "data": {"down": False, "key": {"type": "qcode", "data": qcode}}}
             for qcode in reversed(args.qcodes)
         ]
-    else:
+    elif args.action in ("click", "move"):
         if not (0 <= args.x < args.width and 0 <= args.y < args.height):
             parser.error("click coordinates must be inside the framebuffer")
-        events = [
-            {"type": "abs", "data": {"axis": "x", "value": round(args.x * 32767 / (args.width - 1))}},
-            {"type": "abs", "data": {"axis": "y", "value": round(args.y * 32767 / (args.height - 1))}},
-            {"type": "btn", "data": {"button": "left", "down": True}},
-            {"type": "btn", "data": {"button": "left", "down": False}},
-        ]
+        events = [{"type": "abs", "data": {"axis": "x", "value": round(args.x * 32767 / (args.width - 1))}},
+                  {"type": "abs", "data": {"axis": "y", "value": round(args.y * 32767 / (args.height - 1))}}]
+        if args.action == "click":
+            events += [{"type": "btn", "data": {"button": "left", "down": True}},
+                       {"type": "btn", "data": {"button": "left", "down": False}}]
+    elif args.action == "button":
+        events = [{"type": "btn", "data": {"button": args.name, "down": True}},
+                  {"type": "btn", "data": {"button": args.name, "down": False}}]
 
     try:
         with socket.socket(socket.AF_UNIX) as sock:
