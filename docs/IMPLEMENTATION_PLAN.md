@@ -136,20 +136,20 @@ Make the terminal and essential technical workflow feel intentionally designed.
 - Package or select a maintained Ghostty source for Fedora.
 - Apply the approved font, colours, padding, cursor, and shell presentation.
 - Make Ghostty the default terminal.
-- Add a taskbar action that toggles a retained dropdown/slide-out Ghostty session using KWin rules or a small integration helper.
+- Add an ordinary Ghostty launcher to the taskbar.
 - Integrate “Open terminal here” into Dolphin.
 - Install and theme `btop` appropriately.
 - Ensure Git and expected baseline developer utilities are present without turning the image into a large SDK bundle.
 
 ### Deliverables
 
-- normal and dropdown Ghostty workflows
+- normal Ghostty workflow
 - Dolphin integration
 - `btop` in the image
 
 ### Exit criteria
 
-- Clicking the taskbar terminal affordance shows and hides the same terminal session.
+- Clicking the taskbar terminal affordance opens Ghostty normally.
 - Ghostty is used by launcher actions and file-manager terminal actions.
 
 ## Phase 5 — Proper Apps and agent access
@@ -181,11 +181,13 @@ Provide one clear installation surface for the applications the primary customer
 
 Show the catalogue home, search, application detail, one-click install, installed state, failure state, and an agent being launched. Package terminology must not dominate the normal flow.
 
-## Phase 6 — Integrated version 0.1 image
+## Phase 6 — Integrated review system
 
 ### Objective
 
-Produce the complete installable Proper Linux 0.1 candidate.
+Produce an installed, usable review system, resolve the highest-priority
+integration defects, and collect product-manager feedback before final release
+hardening.
 
 ### Work
 
@@ -194,9 +196,128 @@ Produce the complete installable Proper Linux 0.1 candidate.
   KMahjongg; NeoChat; Plasma/Fedora Welcome; Fedora Media Writer; Elisa;
   Dragon Player; KolourPaint; Skanpage; and QRca.
 - Retain Kamoso and KDE's KRDC/KRFB remote-desktop tools.
-- **PM task:** curate Fedora/KDE's upstream wallpapers and identify the small
-  subset to retain. Promote that approved selection into versioned image or
-  package content; do not ship a manually edited home directory.
+- Present the installed review VM at a normal 1920x1080 desktop size.
+- Resolve visible taskbar, dark-appearance, wallpaper, Vicinae, and terminal
+  integration defects in the development VM, then promote accepted work into
+  versioned package sources.
+- Record new product scope discovered through the installed-system review.
+
+### Exit criteria
+
+- The installed review VM is usable with Vicinae, Dolphin, Ghostty, Proper
+  Apps, and an installed browser.
+- The product manager approves the Phase 7–11 plan.
+
+## Phase 7 — Curation and browser
+
+### Objective
+
+Reduce the default image to the primary customer's actual requirements and
+make Chromium the promoted browser without disrupting Fedora's installer.
+
+### Work
+
+- Package only the PM-approved upstream wallpapers (`Path`, `Volna`, and
+  `summer_1am`) alongside Proper Blue Hour and Proper Horizon, including their
+  upstream licences and attribution.
+- Exclude `plasma-workspace-wallpapers` after the approved assets are owned by
+  a Proper package.
+- Install Chromium and make it the XDG, Plasma, and Vicinae browser default.
+- Retain Firefox when the Fedora graphical installer requires it; do not
+  promote it over Chromium.
+- Exclude the weak AWS Python/S3 dependency stack.
+- Move Podman/Skopeo/Toolbox and additional HPLIP/Gutenprint compatibility
+  drivers to Proper Apps while retaining core printing.
+- Rebuild and record both installed-size and compressed-ISO changes.
+
+### Exit criteria
+
+- The live and installed systems browse normally through Chromium.
+- The graphical installer, Fedora updates, core printing, and hardware support
+  remain intact.
+
+## Phase 8 — Proper arrival and personalisation
+
+### Objective
+
+Make login, lock, wallpaper selection, and the first visible moments of the
+system feel deliberately designed.
+
+### Work
+
+- Explicitly synchronise the default desktop, lock-screen, and PLM wallpaper.
+- Replace the stock lock-screen composition through a supported Plasma Global
+  Theme surface, avoiding whole-screen blur that destroys the artwork.
+- Prototype and review multiple restrained PLM compositions with improved
+  time, user, authentication, session, and power-action hierarchy.
+- Prefer a supported PLM theme or configuration package; do not fork the login
+  manager when a maintained extension point is sufficient.
+- Add a visual wallpaper gallery with previews for the curated collection.
+- Keep Proper Dark as the primary appearance and an ordinary light option.
+  Additional colour palettes are not a version 0.1 release blocker.
+
+### PM arrival review
+
+Show the login and lock alternatives, wallpaper switching, and persistence
+after logout and reboot.
+
+## Phase 9 — Proper Apps 2
+
+### Objective
+
+Turn Proper Apps into an attractive, broad, curated software directory without
+preinstalling the optional applications it presents.
+
+### Work
+
+- Replace the list-first home screen with a responsive icon grid, Recommended,
+  Installed, and All views, category filters, search, and clear install state.
+- Audit the useful general-purpose application selection in the current
+  Omarchy manual and map each entry to a maintained Fedora RPM, verified
+  Flatpak, official vendor source, supported CLI installer, or web app.
+- Exclude Omarchy shell internals and any entry without a safe Fedora path.
+- Add optional container and printer-compatibility capability entries.
+- Add user-created web apps with a name, URL, icon, launcher, and removal path.
+- Preserve understandable progress, recovery, and advanced source/licence
+  disclosure for every provider.
+
+### PM catalogue review
+
+Browse, search, install, launch, and remove representative entries entirely
+with the pointer at 1920x1080 and 200% scaling.
+
+## Phase 10 — Window organisation and desktop utilities
+
+### Objective
+
+Make side-by-side work, discovery, and useful desktop actions exceptionally
+fast without making tiling or shortcut memorisation mandatory.
+
+### Work
+
+- Polish pointer and `Meta`+arrow halves, quadrants, maximise, and restore.
+- Evaluate supported two-thirds/one-third layouts and a visible layout chooser.
+- Add a searchable, pointer-accessible shortcut reference.
+- Add Vicinae actions for appearance, wallpaper, night light, screenshots,
+  updates, power, Bluetooth, display settings, and diagnostics.
+- Surface Plasma's clipboard history and Spectacle capture through the promoted
+  launcher path.
+- Add region OCR only through an auditable, optional or lightweight provider.
+
+### PM workflow review
+
+Demonstrate the window layouts and every promoted utility with both pointer and
+keyboard paths.
+
+## Phase 11 — Final Proper Linux 0.1 candidate
+
+### Objective
+
+Produce and validate the exact release candidate after the approved expansion
+phases.
+
+### Work
+
 - Confirm every Proper package is installed through the image definition rather than manual VM changes.
 - Run an ISO build from a clean checkout/cache state where practical.
 - Boot the live ISO, install it to a blank VM, remove installation media, and boot the installed system.

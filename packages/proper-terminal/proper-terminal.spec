@@ -1,19 +1,13 @@
 Name: proper-terminal
 Version: 1.2.3
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Ghostty terminal and Proper developer essentials
 License: MIT
 URL: https://ghostty.org/
 Source0: https://release.files.ghostty.org/1.2.3/ghostty-1.2.3.tar.gz
 Source1: ghostty.conf
-Source2: proper-terminal-toggle
-Source3: proper-terminal.desktop
-Source7: proper-terminal-dropdown.desktop
-Source8: proper-terminal-dolphin.desktop
-Source9: proper-dropdown-main.js
-Source10: proper-dropdown-metadata.json
-Source11: proper-dropdown-enable
-Source12: proper-dropdown-enable.desktop
+Source2: proper-terminal.desktop
+Source3: proper-terminal-dolphin.desktop
 Source4: https://ziglang.org/download/0.14.1/zig-x86_64-linux-0.14.1.tar.xz
 Source5: https://ziglang.org/download/0.14.1/zig-x86_64-linux-0.14.1.tar.xz.minisig
 Source6: https://release.files.ghostty.org/1.2.3/ghostty-1.2.3.tar.gz.minisig
@@ -32,11 +26,10 @@ Requires: ripgrep
 Requires: fd-find
 Requires: fzf
 Requires: wl-clipboard
-Requires: qt6-qttools
 BuildArch: x86_64
 %global debug_package %{nil}
 %description
-Pinned upstream Ghostty with Proper's terminal defaults and retained dropdown launcher.
+Pinned upstream Ghostty with Proper's terminal defaults and Dolphin integration.
 %prep
 %setup -q -n ghostty-%{version}
 minisign -Vm %{SOURCE4} -x %{SOURCE5} -P RWSGOq2NVecA2UPNdBUZykf1CCb147pkmdtYxgb3Ti+JO/wCYvhbAb/U
@@ -58,24 +51,18 @@ DESTDIR="$PWD/ghostty-root" "$zig_bin" build --prefix /usr --system "$ZIG_GLOBAL
 cp -a ghostty-root/usr/. %{buildroot}%{_prefix}/
 install -Dpm 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/skel/.config/ghostty/config
 install -Dpm 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/xdg/ghostty/config
-install -Dpm 0755 %{SOURCE2} %{buildroot}%{_bindir}/proper-terminal-toggle
-install -Dpm 0644 %{SOURCE3} %{buildroot}%{_datadir}/applications/proper-terminal.desktop
-install -Dpm 0644 %{SOURCE7} %{buildroot}%{_datadir}/applications/proper-terminal-dropdown.desktop
-install -Dpm 0644 %{SOURCE8} %{buildroot}%{_datadir}/kio/servicemenus/proper-terminal-dolphin.desktop
-install -Dpm 0644 %{SOURCE9} %{buildroot}%{_datadir}/kwin/scripts/proper-dropdown/contents/code/main.js
-install -Dpm 0644 %{SOURCE10} %{buildroot}%{_datadir}/kwin/scripts/proper-dropdown/metadata.json
-install -Dpm 0755 %{SOURCE11} %{buildroot}%{_bindir}/proper-dropdown-enable
-install -Dpm 0644 %{SOURCE12} %{buildroot}%{_sysconfdir}/xdg/autostart/proper-dropdown-enable.desktop
+install -Dpm 0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/proper-terminal.desktop
+install -Dpm 0644 %{SOURCE3} %{buildroot}%{_datadir}/kio/servicemenus/proper-terminal-dolphin.desktop
 %files
 %{_bindir}/ghostty
 %{_datadir}/
-%{_bindir}/proper-terminal-toggle
-%{_bindir}/proper-dropdown-enable
-%{_sysconfdir}/xdg/autostart/proper-dropdown-enable.desktop
 %{_userunitdir}/app-com.mitchellh.ghostty.service
 %config(noreplace) %{_sysconfdir}/skel/.config/ghostty/config
 %config(noreplace) %{_sysconfdir}/xdg/ghostty/config
 %changelog
+* Sun Aug 30 2026 Proper Linux <proper@example.invalid> - 1.2.3-7
+- Remove the retained dropdown prototype and keep ordinary Ghostty launching
+
 * Wed Aug 26 2026 Proper Linux <maintainers@properlinux.example> - 1.2.3-6
 - Give the retained dropdown enough columns and rows for btop and normal shell use.
 

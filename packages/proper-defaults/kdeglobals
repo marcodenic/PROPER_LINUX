@@ -1,12 +1,11 @@
 [KDE]
-LookAndFeelPackage=ProperHorizon
+LookAndFeelPackage=com.properlinux.dark.desktop
+widgetStyle=Breeze
 
 [General]
-ColorScheme=Proper
+ColorScheme=BreezeDark
 SingleClick=false
-
-[General]
 TerminalApplication=ghostty
 
 [Icons]
-Theme=breeze
+Theme=breeze-dark

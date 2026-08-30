@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Proper Dropdown Terminal integration
-Exec=/usr/bin/proper-dropdown-enable
-OnlyShowIn=KDE;
-X-KDE-autostart-phase=1
-X-KDE-autostart-after=panel

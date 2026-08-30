@@ -10,7 +10,9 @@ Proper Apps is a curated directory and installation front end. It is not a new p
 
 ### Intentionally included
 
-- Firefox or Fedora's maintained default browser as a safe initial browser
+- Chromium as the promoted default browser
+- Firefox retained when required by Fedora's live installer or as an
+  unpromoted fallback
 - Dolphin file manager
 - Ghostty terminal
 - `btop`
@@ -33,7 +35,7 @@ Proper Apps is a curated directory and installation front end. It is not a new p
 - KolourPaint
 - Skanpage
 - QRca
-- Multiple preinstalled browsers
+- Multiple promoted default browsers
 - Large IDEs and SDK collections
 - Communication clients
 - Gaming libraries and launchers
@@ -48,10 +50,16 @@ Kamoso and KDE's KRDC/KRFB remote-desktop tools are intentional exceptions and
 remain in the default image. Do not remove them as part of general KDE
 application pruning.
 
-The upstream wallpaper collection requires manual PM curation. The product
-manager will select the small subset worth retaining; the resulting selection
-must then be encoded as versioned image/package content rather than depending
-on manual deletion from an installed user account.
+The upstream wallpaper collection was curated by the product manager on
+2026-08-31. Retain `Path`, `Volna`, and `summer_1am` alongside Proper Blue Hour
+and Proper Horizon. Copy the approved upstream assets, metadata, licences, and
+attribution into versioned Proper package content, then exclude the complete
+upstream wallpaper bundle. The review folder is not a build input.
+
+Podman, Skopeo, Toolbox, and the additional HPLIP/Gutenprint compatibility
+drivers are optional catalogue capabilities rather than default-image
+requirements. Keep core Fedora printing support in the image. Exclude the
+weakly pulled AWS Python/S3 support from the default image.
 
 ## Priority catalogue
 
@@ -64,16 +72,19 @@ These entries serve the primary customer's actual workflow and must be implement
 | Visual Studio Code Insiders | Editor | Install from Microsoft's supported repository/package and preserve its update path. |
 | Codex | Coding agent | Use OpenAI's current supported installation and authentication path. |
 | Docker tooling | Containers | Offer Docker Engine/Desktop as appropriate for Fedora and explain conflicts with existing container tooling only when relevant. Do not silently replace Fedora components. |
+| Podman tooling | Containers | Offer Podman, Skopeo, and Toolbox as an optional Fedora-maintained capability set. |
+| Printer compatibility | System support | Offer the additional HPLIP/Gutenprint driver set without removing core printing from the base image. |
 
 ## Secondary catalogue
 
 The initial catalogue may include the following after source and licence review.
 
-### Web
+### Browsers
 
-- Chromium
+- Google Chrome
+- Microsoft Edge
 - Brave
-- Firefox variants only if they solve a clear need
+- Firefox and Zen
 
 ### Communication
 

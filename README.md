@@ -8,7 +8,8 @@ The project takes inspiration from Omarchy's strong curation, aesthetics, shortc
 
 ## Status
 
-Proper Linux is in product-definition and prototype planning. There is not yet an installable release.
+Proper Linux is in active pre-release development. An installed QEMU/KVM review
+system exists, but there is not yet a public release candidate.
 
 The first engineering objective is a Fedora KDE-based live ISO that installs into a QEMU/KVM virtual machine and presents the approved Proper Linux login and desktop experience.
 
@@ -21,7 +22,7 @@ The first engineering objective is a Fedora KDE-based live ISO that installs int
 - Vicinae as the single mouse-accessible, Raycast-style application launcher and command surface
 - Floating windows with mouse snapping and `Meta`+arrow quick tiling
 - Useful Omarchy-inspired shortcuts as optional accelerators
-- Ghostty 1.2.3 as the default terminal, with a taskbar-accessible dropdown mode
+- Ghostty 1.2.3 as the default terminal, with an ordinary taskbar launcher
 - `btop` installed by default
 - A deliberately simplified and styled file-manager experience
 - Lean base installation

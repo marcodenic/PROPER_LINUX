@@ -132,7 +132,7 @@ Every version 0.1 candidate must satisfy all of these:
 7. Launch Chrome or another installed browser.
 8. Browse applications and use Vicinae.
 9. Arrange several windows by mouse and keyboard.
-10. Toggle the dropdown Ghostty terminal.
+10. Launch Ghostty from the taskbar.
 11. Run `btop`.
 12. Install one priority application through Proper Apps.
 13. Check for updates through Fedora's normal UI.

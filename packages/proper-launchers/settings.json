@@ -1,0 +1,20 @@
+{
+  "$schema": "https://vicinae.com/schemas/config.json",
+  "telemetry": { "system_info": false },
+  "close_on_focus_loss": false,
+  "search_files_in_root": false,
+  "theme": {
+    "light": { "name": "vicinae-light", "icon_theme": "auto" },
+    "dark": { "name": "vicinae-dark", "icon_theme": "auto" }
+  },
+  "launcher_window": {
+    "material": "auto",
+    "layer_shell": { "enabled": true, "keyboard_interactivity": "exclusive", "layer": "top" }
+  },
+  "favorites": [
+    "applications:org.kde.dolphin",
+    "applications:com.mitchellh.ghostty",
+    "files:search",
+    "shortcuts:root"
+  ]
+}

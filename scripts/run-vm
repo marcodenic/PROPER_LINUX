@@ -5,9 +5,9 @@
 # QMP socket is the supported input/control path for graphical acceptance.
 # Set PROPER_VM_POINTER=relative when using VNC/RFB clients that emit relative
 # mouse events; the default tablet mode provides QEMU's absolute pointer.
-# The default HiDPI profile uses a 3840x2160 framebuffer at 200% scaling,
-# producing a 1920x1080 logical desktop.  Set PROPER_VM_PROFILE=fullhd for a
-# 1920x1080 framebuffer at 100% scaling.
+# The default review profile uses a normal 1920x1080 framebuffer at 100%
+# scaling so the VM opens at a familiar desktop size. Set
+# PROPER_VM_PROFILE=hidpi for a 3840x2160 framebuffer at 200% scaling.
 set -Eeuo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -19,7 +19,7 @@ vm_dir="$(dirname "$disk_path")"
 firmware_vars="$vm_dir/OVMF_VARS.fd"
 monitor_socket="$vm_dir/$(basename "${disk_path%.*}").monitor.sock"
 qmp_socket="$vm_dir/$(basename "${disk_path%.*}").qmp.sock"
-vm_profile="${PROPER_VM_PROFILE:-hidpi}"
+vm_profile="${PROPER_VM_PROFILE:-fullhd}"
 case "$vm_profile" in
   hidpi|retina|macbook)
     profile_width=3840

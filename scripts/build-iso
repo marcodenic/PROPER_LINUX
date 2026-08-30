@@ -36,9 +36,15 @@ mkdir -p "$build_source_dir"
   # upstream description during composition.
   sed -i '/<namedCollection name="libreoffice"\/>/d; /<package name="libreoffice-/d; /<package name="plasma-welcome-fedora"\/>/d' \
     "$build_source_dir/components/desktops/kde.xml"
+  sed -i '/<package name="mediawriter"\/>/d' \
+    "$build_source_dir/components/desktops/common.xml"
   sed -i '/<package name="plasma-welcome-fedora"\/>/d' \
     "$build_source_dir/teams/kde.xml"
   sed -i '/<ignore name="initial-setup"\/>/a\		<ignore name="plasma-welcome"/>' \
+    "$build_source_dir/components/desktops/kde.xml"
+  # Retain Fedora's graphical initial-setup for the installed first boot so
+  # a real user account is created instead of carrying the temporary liveuser.
+  sed -i '/<ignore name="initial-setup"\/>/d; /<ignore name="plasma-welcome"\/>/d' \
     "$build_source_dir/components/desktops/kde.xml"
 if [[ "${PROPER_BASELINE:-0}" == 1 ]]; then
   kiwi_file=/source/Fedora.kiwi

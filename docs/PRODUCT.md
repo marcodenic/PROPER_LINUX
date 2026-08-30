@@ -86,7 +86,7 @@ Vicinae answers both “open an application” and “find or do something” wi
 
 ### 5. A first-class terminal and agent workflow
 
-Ghostty is the default terminal and looks finished on first launch. A taskbar action toggles a convenient dropdown or slide-out terminal. `btop` is available immediately. Codex, Claude Code, OpenCode, and other agents are easy to install, authenticate, and launch.
+Ghostty is the default terminal and looks finished on first launch. A taskbar action opens an ordinary Ghostty window. `btop` is available immediately. Codex, Claude Code, OpenCode, and other agents are easy to install, authenticate, and launch.
 
 ### 6. One obvious path to software
 
@@ -154,7 +154,7 @@ Version 0.1 succeeds when the product manager can:
 4. log in to the approved Proper Linux desktop;
 5. use the taskbar, browse apps, search with Vicinae, and arrange windows entirely with the mouse;
 6. perform the same window operations efficiently with shortcuts;
-7. toggle a polished Ghostty terminal and run `btop`;
+7. launch a polished Ghostty terminal and run `btop`;
 8. install a curated application without understanding its package source; and
 9. update the system using Fedora's normal mechanism.
 

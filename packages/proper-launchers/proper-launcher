@@ -1,4 +1,56 @@
 #!/usr/bin/env bash
 set -eu
-systemctl --user start vicinae.service
-exec vicinae toggle
+
+report_failure() {
+    local message="Vicinae did not become ready. Try again, or check the Vicinae service in System Monitor."
+
+    logger --tag proper-launcher "$message"
+    if command -v notify-send >/dev/null 2>&1; then
+        timeout 3s notify-send \
+            --app-name="Proper Launcher" \
+            --urgency=normal \
+            "Launcher unavailable" \
+            "$message" >/dev/null 2>&1 || true
+    fi
+}
+
+open_vicinae() {
+    local output status
+
+    # Vicinae 0.24 can leave its IPC client waiting for a reply after it has
+    # handled an `open` request, and reports "Already opened" as an error even
+    # though that is the state we want. Bound the client and accept both cases.
+    if output=$(timeout --kill-after=0.2s 1s vicinae open 2>&1); then
+        return 0
+    else
+        status=$?
+    fi
+    [[ $status -eq 124 || $status -eq 137 || $output == *"Already opened"* ]]
+}
+
+ping_vicinae() {
+    timeout --kill-after=0.1s 0.5s vicinae ping >/dev/null 2>&1
+}
+
+# Opening is idempotent, unlike toggle: a second click while Vicinae is still
+# starting must never close the launcher the first click was trying to show.
+if ping_vicinae && open_vicinae; then
+    exit 0
+fi
+
+# The user service normally starts with Plasma. This also recovers cleanly if
+# it has stopped or entered a failed state since login.
+systemctl --user reset-failed vicinae.service >/dev/null 2>&1 || true
+systemctl --user start --no-block vicinae.service >/dev/null 2>&1 || true
+
+# Give the IPC server up to five seconds to bind its socket before opening it.
+deadline=$((SECONDS + 5))
+while (( SECONDS < deadline )); do
+    if ping_vicinae && open_vicinae; then
+        exit 0
+    fi
+    sleep 0.1
+done
+
+report_failure
+exit 1

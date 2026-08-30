@@ -19,9 +19,10 @@ fi
 config_dir="$HOME/.config"
 install -Dpm 0644 /etc/skel/.config/kdeglobals "$config_dir/kdeglobals"
 install -Dpm 0644 /etc/skel/.config/plasma-org.kde.plasma.desktop-appletsrc "$config_dir/plasma-org.kde.plasma.desktop-appletsrc"
+install -Dpm 0644 /etc/skel/.config/plasmarc "$config_dir/plasmarc"
 install -Dpm 0644 /etc/skel/.config/plasmashellrc "$config_dir/plasmashellrc"
 install -Dpm 0644 /etc/skel/.config/kglobalshortcutsrc "$config_dir/kglobalshortcutsrc"
-install -Dpm 0644 /etc/skel/.config/vicinae/vicinae.toml "$config_dir/vicinae/vicinae.toml"
+install -Dpm 0644 /etc/skel/.config/vicinae/settings.json "$config_dir/vicinae/settings.json"
 
 # The live user is created by livesys after image composition, so the
 # accelerator daemon can already be running when the session defaults land.

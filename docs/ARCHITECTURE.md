@@ -152,7 +152,7 @@ Owns:
 - Ghostty package/source selection
 - default Ghostty configuration
 - shell presentation that does not replace the user's shell unnecessarily
-- dropdown terminal launcher and KWin rules
+- ordinary taskbar launcher
 - Dolphin “Open terminal here” integration
 - `btop`
 
@@ -180,7 +180,7 @@ Prototype with the native Plasma panel in floating, fit-content form plus suppor
 
 - central pinned/running applications;
 - a Proper/Vicinae launcher;
-- a toggleable Ghostty action;
+- an ordinary pinned Ghostty launcher;
 - system tray and clock; and
 - correct floating/translucent appearance.
 

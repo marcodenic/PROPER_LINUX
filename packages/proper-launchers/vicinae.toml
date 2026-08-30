@@ -1,9 +1,0 @@
-# Proper Linux Vicinae defaults. User changes are preserved by %config(noreplace).
-[providers]
-enabled = ["applications", "files", "clipboard"]
-
-[theme]
-name = "system"
-
-[favorites]
-items = ["applications", "files", "terminal", "proper-shortcuts"]

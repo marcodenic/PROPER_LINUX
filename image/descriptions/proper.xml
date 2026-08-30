@@ -12,13 +12,37 @@
 		<package name="proper-launchers"/>
 		<package name="proper-terminal"/>
 		<package name="proper-apps"/>
-		<!-- Vicinae links against Qt's private QML ABI; Fedora publishes the
-		     matching ABI provider in the declarative development package. -->
-		<package name="qt6-qtdeclarative-devel"/>
+		<package name="initial-setup-gui-wayland-plasma"/>
+		<package name="kamoso"/>
+		<package name="krdc"/>
+		<package name="krfb"/>
 	</packages>
 	<!-- Keep the default image lean; office applications belong in the
 	     future catalogue, not the installed Proper desktop. -->
 	<packages type="image" patternType="plusRecommended" profiles="KDE-Desktop,KDE-Mobile">
+		<!-- Explicit Phase 6 curation: these applications and dependency stacks
+		     must not enter the installed image through Fedora recommendations. -->
 		<ignore name="libreoffice*"/>
+		<ignore name="kdepim*"/>
+		<ignore name="akonadi*"/>
+		<ignore name="mariadb*"/>
+		<ignore name="korganizer*"/>
+		<ignore name="kmail*"/>
+		<ignore name="kleopatra*"/>
+		<ignore name="akregator*"/>
+		<ignore name="kaddressbook*"/>
+		<ignore name="kontact*"/>
+		<ignore name="kmines"/>
+		<ignore name="kpat"/>
+		<ignore name="kmahjongg"/>
+		<ignore name="neochat"/>
+		<ignore name="plasma-welcome*"/>
+		<ignore name="fedora-media-writer*"/>
+		<ignore name="mediawriter*"/>
+		<ignore name="elisa*"/>
+		<ignore name="dragonplayer*"/>
+		<ignore name="kolourpaint*"/>
+		<ignore name="skanpage*"/>
+		<ignore name="qrca*"/>
 	</packages>
 </image>

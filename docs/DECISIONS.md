@@ -225,3 +225,108 @@ Status values:
 - **Reason:** The product manager explicitly approved the Phase 4/5 handoff;
   remaining work is final-image curation, installation, persistence, display
   compatibility, and the complete installed checkpoint-5 journey.
+
+## D031 — Proper Blue Hour is the interim default wallpaper
+
+- **Status:** Accepted for the next Phase 6 candidate
+- **Date:** 2026-08-30
+- **Decision:** Use the product-manager-selected `Proper Blue Hour` mountain,
+  lake, and city artwork as the default live, installed, lock-screen, and Plasma
+  Login Manager wallpaper. Keep `Proper Horizon` installed as an alternate.
+- **Reason:** The blue-hour composition provides the requested calm,
+  awe-inspiring arrival while supporting the planned dark translucent desktop
+  chrome and clear login typography.
+
+## D032 — Proper Dark is the default desktop appearance
+
+- **Status:** Accepted for the next Phase 6 candidate
+- **Date:** 2026-08-30
+- **Decision:** Default new and live sessions to the `Proper Dark` global
+  look-and-feel, Breeze Dark colours and icons, Breeze Dark's adaptive
+  translucent Plasma shell, and KWin background blur. Keep light appearance
+  available as an ordinary user choice.
+- **Reason:** The product manager rejected the white fallback panel and asked
+  for a dark-by-default system with a dark translucent floating panel and real
+  background blur. Reusing Plasma's supported adaptive theme surfaces avoids a
+  fragile fork while delivering that appearance.
+
+## D033 — All Vicinae launch surfaces use Proper's readiness-aware opener
+
+- **Status:** Accepted for the next Phase 6 candidate
+- **Date:** 2026-08-30
+- **Decision:** Replace Vicinae's upstream application entry after installation
+  so the taskbar, application menu, and shortcut all run `proper-launcher`.
+  The wrapper starts or recovers the user service, waits for IPC readiness,
+  sends an idempotent `open`, and reports a genuine failure visibly.
+- **Reason:** Vicinae's upstream desktop entry starts `server --replace` without
+  opening its window, while an immediate `toggle` races service startup. Both
+  paths made a normal pointer click appear broken even when the binary itself
+  was healthy.
+
+## D034 — Remove the dropdown-terminal prototype from version 0.1
+
+- **Status:** Accepted; supersedes the prototype portion of D011
+- **Date:** 2026-08-30
+- **Decision:** Keep Ghostty as the default terminal and keep `btop`, but replace
+  the retained dropdown prototype with an ordinary pinned Ghostty launcher.
+- **Reason:** The product manager does not need the feature, and the prototype's
+  normal-window presentation, duplicate task identity, and KWin integration add
+  complexity without improving the current desktop.
+
+## D035 — Extend version 0.1 through focused expansion phases
+
+- **Status:** Accepted
+- **Date:** 2026-08-31
+- **Decision:** Treat Phase 6 as the installed review-system milestone. Add
+  dedicated curation/browser, arrival/personalisation, Proper Apps 2, and
+  window/utility phases before producing the Phase 11 release candidate. Move
+  PM checkpoint 5 to the end of Phase 11.
+- **Reason:** Installed-system review proved the core desktop while identifying
+  material product work that should be designed and reviewed independently,
+  rather than hidden inside a final ISO punch list.
+
+## D036 — Chromium is the promoted default browser
+
+- **Status:** Accepted
+- **Date:** 2026-08-31
+- **Decision:** Install and promote Fedora Chromium as Proper's default browser.
+  Firefox may remain installed when required by Fedora's graphical live
+  installer or as an unpromoted fallback.
+- **Reason:** Chromium matches the primary customer's preference and supports
+  the planned web-app workflow. Retaining Firefox is acceptable when removing
+  it would complicate or weaken the upstream installer path.
+
+## D037 — Curate wallpapers and move optional stacks out of the base image
+
+- **Status:** Accepted
+- **Date:** 2026-08-31
+- **Decision:** Retain Path, Volna, summer_1am, Proper Horizon, and Proper Blue
+  Hour. Exclude the complete upstream wallpaper bundle after packaging the
+  selected upstream assets with provenance. Exclude the AWS Python/S3 stack,
+  and offer Podman/Skopeo/Toolbox and additional HPLIP/Gutenprint compatibility
+  through Proper Apps instead of the default image.
+- **Reason:** Proper Linux is curated around the primary customer's actual use.
+  Optional software remains easy to install without consuming every default
+  installation.
+
+## D038 — Login and lock layouts are now explicit product surfaces
+
+- **Status:** Accepted; refines D010
+- **Date:** 2026-08-31
+- **Decision:** Create Proper lock and Plasma Login Manager compositions using
+  supported theme/configuration mechanisms. Keep the selected wallpaper
+  recognisable, avoid destructive whole-screen blur, and improve the hierarchy
+  of time, authentication, account, session, and power controls.
+- **Reason:** The installed review exposed concrete visual problems in both
+  layouts. This is no longer customisation merely for novelty.
+
+## D039 — Proper Apps 2 is a broad optional catalogue
+
+- **Status:** Accepted
+- **Date:** 2026-08-31
+- **Decision:** Redesign Proper Apps around an icon-grid catalogue and expand it
+  to the useful general-purpose application selection inspired by Omarchy.
+  Optional catalogue entries are not preinstalled, and every entry requires a
+  maintained, auditable Fedora-appropriate provider and removal path.
+- **Reason:** A rich, approachable catalogue and a lean installed image are
+  complementary rather than conflicting goals.

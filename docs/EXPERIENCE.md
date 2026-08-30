@@ -142,8 +142,7 @@ Retain Plasma's existing overview and workspace capability, but do not spend ver
 - Ghostty is the default terminal.
 - First launch uses an approved font, palette, padding, cursor, and shell presentation.
 - It opens as a normal window through ordinary application launching.
-- A taskbar terminal affordance toggles a dropdown or slide-out Ghostty window.
-- The dropdown retains its session while hidden.
+- A taskbar terminal affordance opens an ordinary Ghostty window.
 - Dolphin exposes “Open terminal here” using Ghostty.
 - `btop` is installed and visually compatible with the default terminal palette.
 
