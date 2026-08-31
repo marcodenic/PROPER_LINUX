@@ -1,6 +1,6 @@
 # Proper Linux research and upstream references
 
-Last reviewed: 2026-08-24.
+Last reviewed: 2026-08-31.
 
 This is a working technical reference, not a substitute for checking current upstream documentation during implementation. Pin exact revisions when code enters the build.
 
@@ -283,3 +283,35 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
   Theme or maintaining a forked applet for version 0.1.
 - The exact evidence set and its hardware limits are recorded under
   `docs/evidence/phase9-shell-surfaces`.
+
+## Phase 11 workflow and OCR audit — 2026-08-31
+
+- KWin's supported scripting package format and workspace API provide the
+  smallest upstream boundary for reversible window arrangement. Proper installs
+  one script under `/usr/share/kwin/scripts`, enables it through packaged KWin
+  configuration, and exposes registered actions through KGlobalAccel. Sources:
+  <https://develop.kde.org/docs/plasma/kwin/> and
+  <https://develop.kde.org/docs/plasma/kwin/api/>.
+- Vicinae's documented script-command directories and metadata directives are
+  used for the promoted desktop actions. Proper installs 15 small scripts under
+  `/usr/share/vicinae/scripts`; each delegates to a whitelisted user-session
+  helper rather than duplicating privileged logic. Source:
+  <https://docs.vicinae.com/scripts/getting-started>.
+- The local OCR path uses Fedora repository packages only:
+  `tesseract-5.5.3-1.fc44` (Apache-2.0),
+  `tesseract-langpack-eng-4.1.0-12.fc44` (Apache-2.0),
+  `leptonica-1.87.0-4.fc44` (Leptonica), and
+  `wl-clipboard-2.2.1^git20251124.e808203-2.fc44`
+  (GPL-3.0-or-later). Their source RPMs are Fedora's corresponding signed
+  source packages and updates follow the normal Fedora repository path; no
+  external binary or model is pinned into Proper Linux.
+- The exact Phase 11 Proper RPMs are
+  `proper-defaults-0.1-14.fc44.noarch` (SHA-256
+  `25f455b2c950b77a925e7828022a82111a64c06b7a86a0268cecb4e3821d2431`)
+  and `proper-launchers-0.1-8.fc44.x86_64` (SHA-256
+  `bb9aedf49fb13d2910b9f24bcd1d8432923df8df600fa980200f3ed55985cc65`).
+  Both passed RPM digest and payload inspection. They were installed into the
+  Fedora 44 reference VM, where arrange, restore, new-window floating
+  behaviour, pointer and Vicinae discovery, the shortcut-reference filter,
+  Tesseract extraction, and a Wayland clipboard round trip passed. The
+  evidence is recorded under `docs/evidence/phase11-workflows`.

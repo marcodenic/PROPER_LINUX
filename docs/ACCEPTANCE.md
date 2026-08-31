@@ -152,6 +152,35 @@ preserved in `docs/evidence/phase9-shell-surfaces`.
 - The PM approves which surfaces remain Breeze-derived and which receive
   Proper-owned visual assets or targeted implementation work.
 
+## PM workflow review
+
+Status: implementation and installed-VM evidence ready; awaiting PM workflow
+review. Evidence is preserved in `docs/evidence/phase11-workflows`.
+
+### Evidence
+
+- Three ordinary windows floating before arrangement, arranged into a selected
+  layout, and restored to their captured floating geometry
+- A new window remaining floating after an arrangement has been applied
+- The pointer-accessible layout chooser and searchable Vicinae actions
+- The pointer-accessible, searchable shortcut reference
+- A local region-OCR result copied through the ordinary Wayland clipboard
+
+### Pass criteria
+
+- Floating remains the default and newly opened windows are not auto-arranged.
+- Arrangement affects only eligible ordinary windows on the current workspace
+  and output; dialogs, pop-ups, fullscreen windows, and special surfaces are
+  excluded.
+- Restore returns the captured geometry and maximised state of arranged
+  windows.
+- Halves, quadrants, maximise, restore, the native tile editor, and the Proper
+  layouts all have ordinary pointer paths as well as shortcuts.
+- Promoted desktop utilities are discoverable through Vicinae without knowing
+  their command names.
+- Region OCR runs locally on demand, uses no network service or privileged
+  daemon, and cleans up its temporary capture.
+
 ## PM checkpoint 5 — Final installed system
 
 ### Journey

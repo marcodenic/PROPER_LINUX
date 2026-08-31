@@ -453,3 +453,17 @@ Status values:
 - **Reason:** This gives the PM the requested instant tiled/floating workflow
   without continuous auto-reflow, mandatory tiling, or a replacement window
   manager. Pointer, Vicinae, and keyboard paths remain peers.
+
+## D048 — Keep region OCR local, on demand, and unprivileged
+
+- **Status:** Accepted for Phase 11 implementation
+- **Date:** 2026-08-31
+- **Decision:** Implement “Copy text from screen” as a direct user-session
+  action: Spectacle captures a selected region, Fedora's Tesseract English data
+  recognises it locally, and `wl-clipboard` copies the result. Remove the
+  temporary capture on exit. Do not add a resident OCR service, cloud provider,
+  or privileged AI daemon.
+- **Reason:** The workflow is useful and auditable while preserving the version
+  0.1 security boundary. Its packages come from Fedora's signed repositories,
+  update with the normal mutable system, and can be replaced later without
+  changing the launcher contract.
