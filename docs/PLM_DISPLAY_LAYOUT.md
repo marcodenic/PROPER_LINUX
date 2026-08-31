@@ -1,4 +1,4 @@
-# Plasma Login Manager display layout — prototype
+# Plasma Login Manager display layout
 
 Proper Linux uses Fedora KDE 44's Plasma Login Manager (PLM), not SDDM.
 
@@ -7,23 +7,29 @@ than a copied reference home directory. Fedora's `livesys` service creates its
 temporary live account from `/etc/skel`, so the same fragment also gives the
 live desktop its shipped wallpaper without modifying an existing user.
 
-PLM deliberately keeps greeter display settings separate from an ordinary user
-profile: it runs as the `plasmalogin` system user. The supported configuration
-is `/etc/plasmalogin.conf`, and its System Settings module exposes the greeter
-appearance and display settings. Fedora 44 ships distro defaults in
-`/usr/lib/plasmalogin/defaults.conf`; that is the supported image-time default
-file for the wallpaper. Proper replaces that small Fedora default with its
-equivalent Proper wallpaper default, while leaving `/etc/plasmalogin.conf`
-available for administrator overrides. Fedora 44 does not consume the
-previously assumed `plasmalogin.conf.d` fragment path for this setting.
+PLM deliberately keeps greeter settings separate from an ordinary user profile:
+it runs as the `plasmalogin` system user. Fedora 44 ships distro defaults in
+`/usr/lib/plasmalogin/defaults.conf`. A 6.7.4 source audit also confirms the
+normal configuration cascade loads `/etc/plasmalogin.conf` and sorted fragments
+under `/etc/plasmalogin.conf.d`; a changed wallpaper applies when the greeter
+process is next started, not to an already-running wallpaper process.
 
-The upstream Fedora installer does not currently export the live session's
-chosen monitor layout as a PLM greeter layout in its KIWI description. For the
-prototype, the visible, supported hand-off is the **Login Screen** page in
-System Settings after the first account is created: choose the required display
-layout there and apply it to PLM. This is intentionally not a bespoke greeter
-patch.
+Proper's image default remains in the packaged distro-default file. The
+`proper-appearance` “Use everywhere” action writes a separate administrator
+fragment through an authenticated, fixed-ID helper. This keeps the supported
+override order intact and never replaces an arbitrary path supplied by a user.
 
-Before checkpoint 1, the installed VM will be tested at normal orientation and
-with a 90-degree virtual display rotation. The checkpoint evidence will show
-the PLM layout action and the resulting greeter orientation.
+PLM 6.7.4 does not provide an external composition theme. Its QML files are
+compiled into `/usr/libexec/plasma-login-greeter`, which loads `Main.qml` from a
+`qrc:` URL. Proper therefore rebuilds Fedora's exact, checksum-verified source
+RPM with one small patch: include `ProperMain.qml` in that resource module and
+select it as the entry point. Authentication, users, sessions, state, power
+actions, daemon integration, and package ownership stay upstream. This patch
+must be reviewed, rebuilt, and retested on every PLM version change.
+
+The Fedora installer does not currently export the live session's monitor
+layout to the installed PLM greeter. The visible supported hand-off remains the
+**Login Screen** page in System Settings: choose the required display layout and
+apply it to PLM. Installed validation covers normal orientation and a 90-degree
+virtual display rotation so that no user must authenticate against a sideways
+screen.

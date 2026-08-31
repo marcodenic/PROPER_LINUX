@@ -47,7 +47,19 @@ Windows 11 and current macOS establish the minimum visual ambition. Raycast esta
 - Use Plasma Login Manager from current Fedora KDE.
 - Display orientation selected during installation must be respected at the first installed login where technically possible.
 - The shipped Proper wallpaper is used consistently by the live desktop, installed desktop, lock screen, and login screen.
-- The login layout itself may remain upstream if its composition is functional and visually coherent after branding.
+- The idle lock screen shows only the recognisable wallpaper and a restrained
+  clock/date. Typing reveals a compact, unlabelled translucent password field;
+  no avatar, account label, placeholder, or submit arrow is shown.
+- A quiet three-dot control in the lower-right reveals icon actions for sleep,
+  switching user, and power without permanently occupying the wallpaper.
+- The login screen uses the same restrained visual language: centred time,
+  date, identity, and authentication; no avatar, placeholder text, permanent
+  card, or submit arrow. A quiet lower-right three-dot menu contains user,
+  session, sleep, restart, and power actions.
+- Keep Plasma Login Manager's authentication, session, accessibility, and
+  power behaviour. Proper owns only the approved composition and must rebase
+  its narrow downstream QML entry-point patch for each PLM update until KDE
+  provides a supported external composition surface.
 - No user should need to type a password while physically tilting their head to read a rotated display.
 
 ### First desktop

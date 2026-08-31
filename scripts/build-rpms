@@ -15,18 +15,31 @@ download_verified() {
   [[ "$(sha256sum "$dest" | awk '{print $1}')" == "$expected" ]] || { printf 'Checksum mismatch: %s\n' "$dest" >&2; exit 1; }
 }
 
-for binary in rpmbuild curl; do
+for binary in rpmbuild curl rpm2cpio cpio patch; do
   command -v "$binary" >/dev/null 2>&1 || { printf 'Required command missing: %s\n' "$binary" >&2; exit 1; }
 done
 
 rm -rf "$rpm_root" "$repo_root"
 mkdir -p "$rpm_root" "$repo_root"
 
-for package in proper-release proper-look-and-feel proper-defaults proper-launchers proper-terminal proper-apps; do
+for package in plasma-login-manager proper-release proper-look-and-feel proper-defaults proper-launchers proper-terminal proper-apps proper-appearance; do
   package_root="$project_root/packages/$package"
   spec="$package_root/$package.spec"
   mkdir -p "$rpm_root/$package"
-  if [[ "$package" == proper-terminal ]]; then
+  if [[ "$package" == plasma-login-manager ]]; then
+    plm_srpm="$source_cache/plasma-login-manager-6.7.4-1.fc44.src.rpm"
+    plm_sources="$(mktemp -d "$source_cache/plasma-login-manager-6.7.4-1.fc44-proper.XXXXXX")"
+    download_verified https://download.fedoraproject.org/pub/fedora/linux/updates/44/Everything/source/tree/Packages/p/plasma-login-manager-6.7.4-1.fc44.src.rpm "$plm_srpm" d8139ab3fdac94c5361cb0823e229d421d9385efb3dd26e54fd11442eed7ffa6
+    (cd "$plm_sources" && rpm2cpio "$plm_srpm" | cpio -idm --quiet)
+    install -m 0644 "$package_root/ProperMain.qml" "$plm_sources/ProperMain.qml"
+    install -m 0644 "$package_root/proper-login-layout.patch" "$plm_sources/proper-login-layout.patch"
+    (cd "$plm_sources" && patch --batch --forward -p1 < "$package_root/plasma-login-manager.spec.patch")
+    podman run --rm \
+      --volume "$plm_sources:/src:Z" \
+      --volume "$rpm_root/$package:/out:Z" \
+      quay.io/fedora/fedora:44@sha256:c095fee5833adde3e7fb9bdfc30023d34b884a327e8019d597c708cbe8d8dd13 \
+      bash -lc "dnf -y install rpm-build dnf5-plugins >/dev/null && dnf -y builddep /src/plasma-login-manager.spec >/dev/null && cd /src && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /src' plasma-login-manager.spec"
+  elif [[ "$package" == proper-terminal ]]; then
     download_verified https://release.files.ghostty.org/1.2.3/ghostty-1.2.3.tar.gz "$source_cache/ghostty-1.2.3.tar.gz" 559770fe9773161e93e3dd9177d916e27037d7f548edcf6186eabc571c0e520b
     download_verified https://ziglang.org/download/0.14.1/zig-x86_64-linux-0.14.1.tar.xz "$source_cache/zig-x86_64-linux-0.14.1.tar.xz" 24aeeec8af16c381934a6cd7d95c807a8cb2cf7df9fa40d359aa884195c4716c
     [[ -s "$source_cache/ghostty-1.2.3.tar.gz.minisig" ]] || curl -L --fail --silent --show-error https://release.files.ghostty.org/1.2.3/ghostty-1.2.3.tar.gz.minisig -o "$source_cache/ghostty-1.2.3.tar.gz.minisig"
@@ -41,9 +54,9 @@ for package in proper-release proper-look-and-feel proper-defaults proper-launch
     cp "$source_cache/vicinae-0.24.0-source.tar.gz" "$package_root/01cd7cb4936d9cb14272091623da85e7c880f0dc.tar.gz"
     podman build --quiet --tag proper-vicinae-builder --file "$project_root/image/Containerfile.vicinae" "$project_root/image" >/dev/null
     podman run --rm --volume "$package_root:/src:Z" --volume "$rpm_root/$package:/out:Z" proper-vicinae-builder bash -lc "cd /src && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /src' proper-launchers.spec"
-  elif [[ "$package" == proper-apps ]]; then
+  elif [[ "$package" == proper-apps || "$package" == proper-appearance ]]; then
     podman build --quiet --tag proper-apps-builder --file "$project_root/image/Containerfile.ghostty" "$project_root/image" >/dev/null
-    podman run --rm --volume "$project_root:/repo:Z" --volume "$rpm_root/$package:/out:Z" proper-apps-builder bash -lc "cd /repo/packages/proper-apps && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /repo/packages/proper-apps' proper-apps.spec"
+    podman run --rm --volume "$project_root:/repo:Z" --volume "$rpm_root/$package:/out:Z" proper-apps-builder bash -lc "cd /repo/packages/$package && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /repo/packages/$package' $package.spec"
   else
     rpmbuild -bb --define "_tmppath /tmp" --define "_topdir $rpm_root/$package" --define "_sourcedir $package_root" "$spec"
   fi

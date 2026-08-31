@@ -12,6 +12,7 @@
     "layer_shell": { "enabled": true, "keyboard_interactivity": "exclusive", "layer": "top" }
   },
   "favorites": [
+    "applications:chromium-browser",
     "applications:org.kde.dolphin",
     "applications:com.mitchellh.ghostty",
     "files:search",

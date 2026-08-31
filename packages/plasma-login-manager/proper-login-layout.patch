@@ -1,0 +1,25 @@
+diff --git a/src/frontend/greeter/CMakeLists.txt b/src/frontend/greeter/CMakeLists.txt
+index 1c89788..09924b7 100644
+--- a/src/frontend/greeter/CMakeLists.txt
++++ b/src/frontend/greeter/CMakeLists.txt
+@@ -34,6 +34,7 @@ ecm_add_qml_module(plasma-login-greeter URI "org.kde.plasma.login" GENERATE_PLUGIN_SOURCE)
+ ecm_target_qml_sources(plasma-login-greeter
+     SOURCES
+     qml/Main.qml
++    qml/ProperMain.qml
+     qml/Login.qml
+     qml/SessionButton.qml
+     qml/KeyboardButton.qml
+diff --git a/src/frontend/greeter/main.cpp b/src/frontend/greeter/main.cpp
+index f2d1f56..7a068b4 100644
+--- a/src/frontend/greeter/main.cpp
++++ b/src/frontend/greeter/main.cpp
+@@ -87,7 +87,7 @@ private:
+         window->installEventFilter(greeterEventFilter);
+         window->rootContext()->setContextProperty(QStringLiteral("greeterEventFilter"), greeterEventFilter);
+ 
+-        window->setSource(QUrl("qrc:/qt/qml/org/kde/plasma/login/Main.qml"));
++        window->setSource(QUrl("qrc:/qt/qml/org/kde/plasma/login/ProperMain.qml"));
+         window->show();
+     }
+ 

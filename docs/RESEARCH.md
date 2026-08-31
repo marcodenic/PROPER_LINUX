@@ -191,7 +191,7 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
 - Package and redistribution status for Vicinae and Ghostty on Fedora 44
 - Like-for-like Dolphin, Nautilus, and COSMIC Files evaluation under Proper Plasma defaults
 - PLM installer-to-first-login display-layout transfer
-- Fedora 44 PLM observation on BOX (2026-08-25): `/usr/lib/plasmalogin/defaults.conf` is the distro default actually read by the greeter; a `plasmalogin.conf.d` fragment was present but had no effect. The Proper package now owns a source copy and applies it in `%posttrans` without conflicting with Fedora's package ownership.
+- Fedora 44 PLM observation on BOX (2026-08-25): `/usr/lib/plasmalogin/defaults.conf` is the distro default actually read by the greeter. The Proper package owns a source copy and applies it in `%posttrans` without conflicting with Fedora's package ownership. A later 6.7.4 source audit confirmed that `/etc/plasmalogin.conf.d` is also loaded; a fragment affects a newly started greeter, not an already-running wallpaper process.
 - Legal redistribution paths for proprietary catalogue applications
 - Best maintained GitHub Desktop Linux port and how clearly to label it
 - Current official installation methods for Codex, Claude Code, OpenCode, VS Code Insiders, Chrome, and Docker on Fedora
@@ -214,3 +214,32 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
 - The official Vicinae v0.24.0 source archive is pinned to commit `01cd7cb4936d9cb14272091623da85e7c880f0dc`, SHA-256 `ee4e80d6e69193820b294a43a008794d8761cda9914256c32aed3be091f5c0e3`, and GPL-3.0-or-later. It is built against Fedora 44 Qt 6.11.1; no private-Qt symbol relabeling or prebuilt executable is used.
 - The build's upstream CMake dependencies were recorded from the successful build: Glaze v7.2.0, commit `b518eec7a22e56ffa238b072c07f47efa7cea97f`, MIT; and QtKeychain v0.14.0, commit `e63da2868465db18eb35a312b2635c26fdc46923`, BSD-3-Clause. Sources are <https://github.com/stephenberry/glaze> and <https://github.com/frankosterfeld/qtkeychain>. They are build-only FetchContent dependencies; updates require re-auditing their exact commits, licences and checksums.
 - The resulting `proper-launchers-0.1-3.fc44.x86_64.rpm` is SHA-256 `2eba5e5c71222a462beebe2b3928c772f2fe70b82840874d6cdd485587495d6d`. The exact fresh ISO is SHA-256 `31d8dab4c7d7b1001526268b2b2dd29ff67decfb252b0941101b79a94167c50d`.
+
+## Plasma Login Manager layout audit — 2026-08-31
+
+- Fedora 44 currently ships `plasma-login-manager` 6.7.4. Its wallpaper is a
+  supported plugin/configuration surface, and its settings loader cascades
+  `/etc/plasmalogin.conf`, `/etc/plasmalogin.conf.d`, the distro defaults file,
+  and the distro defaults directory.
+- The greeter composition is not an external theme package in this release.
+  `Main.qml`, `Login.qml`, `SessionButton.qml`, and `GreeterState.qml` are built
+  into `/usr/libexec/plasma-login-greeter` as the
+  `org.kde.plasma.login` QML module; the executable loads its main file from a
+  `qrc:` URL.
+- Therefore wallpaper synchronisation needs no fork, but an approved custom
+  login composition cannot be installed as an SDDM-style theme. The smallest
+  maintainable implementation is a narrow, versioned downstream QML patch to
+  Fedora's PLM source package, re-audited on every Plasma update. Do not replace
+  arbitrary files in `/usr` or carry an unversioned greeter binary.
+- The pinned Fedora source RPM is
+  `plasma-login-manager-6.7.4-1.fc44.src.rpm`, SHA-256
+  `d8139ab3fdac94c5361cb0823e229d421d9385efb3dd26e54fd11442eed7ffa6`.
+  Its upstream `plasma-login-manager-6.7.4.tar.xz` source is SHA-256
+  `8ba5f9a5b31b2cb09d6846c590d09891dadb9a5625426b8552577299093b67fd`.
+- The patched package built successfully in the pinned Fedora 44 build
+  container. Its `ProperMain.qml` was compiled into the greeter's QML module,
+  and the resulting `plasma-login-manager-6.7.4-1.proper1.fc44.x86_64.rpm` is
+  SHA-256
+  `fd6c8ca7fe834c6e08752f85710af67878f80e13e7385da1cf6b0668e8710262`.
+  Running that package's greeter in offscreen `--test` mode for eight seconds
+  produced no QML or runtime errors and remained alive until the test timeout.

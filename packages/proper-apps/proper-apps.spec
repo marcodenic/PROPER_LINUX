@@ -1,6 +1,6 @@
 Name: proper-apps
 Version: 0.1
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary: Proper Linux curated application catalogue
 License: GPL-3.0-or-later
 BuildRequires: qt6-qtbase-devel
@@ -21,6 +21,10 @@ install -Dpm 0644 %{_sourcedir}/../../apps/catalogue-v1.json %{buildroot}%{_data
 %{_datadir}/proper-apps/catalogue-v1.json
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-5
+- Offer optional Fedora container tools and printer compatibility stacks.
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-4
+- Add VLC as a Fedora-backed catalogue application.
 * Wed Aug 26 2026 Proper Linux <proper@example.invalid> - 0.1-2
 - Refresh installed-state presentation and maintained provider catalogue.
 * Wed Aug 26 2026 Proper Linux <proper@example.invalid> - 0.1-3

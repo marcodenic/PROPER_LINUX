@@ -330,3 +330,63 @@ Status values:
   maintained, auditable Fedora-appropriate provider and removal path.
 - **Reason:** A rich, approachable catalogue and a lean installed image are
   complementary rather than conflicting goals.
+
+## D040 — Use a minimal two-state lock screen through Plasma ShellPackage
+
+- **Status:** Accepted at PM arrival review
+- **Date:** 2026-08-31
+- **Decision:** The idle lock screen shows only the current wallpaper and a
+  restrained clock/date. The first typed character reveals a compact,
+  unlabelled translucent password field containing that character. Do not show
+  an avatar, account name, placeholder, permanent authentication card, or
+  submit arrow. A lower-right three-dot button reveals icon actions for sleep,
+  switching user, and power. Package the implementation as
+  `com.properlinux.desktop`, selected with Plasma's supported `ShellPackage`
+  setting. Use `org.kde.plasma.desktop` as Plasma's fallback package for all
+  non-lock shell content.
+- **Reason:** The product manager rejected form-heavy lock-screen compositions.
+  This preserves the artwork at rest, reveals authentication only when needed,
+  retains pointer access to system actions, and avoids replacing Fedora-owned
+  QML or maintaining a full Plasma shell fork.
+
+## D041 — Measure curation at final integration, not between Phases 7 and 8
+
+- **Status:** Accepted
+- **Date:** 2026-08-31
+- **Decision:** Do not rebuild the ISO solely to measure Phase 7. Proceed
+  directly into Phase 8 and record the installed-size and compressed-ISO delta
+  during the clean Phase 11 release-candidate build.
+- **Reason:** The image definition and package boundaries can be verified now;
+  an intermediate full rebuild would delay the approved arrival work without
+  replacing the final integration measurement.
+
+## D042 — Use a bounded Proper wallpaper gallery and explicit arrival sync
+
+- **Status:** Accepted at PM arrival review
+- **Date:** 2026-08-31
+- **Decision:** Ship `proper-appearance` as the visual gallery for the five
+  curated wallpapers. A normal selection updates the desktop and lock screen;
+  “Use everywhere” additionally writes a PLM configuration fragment through an
+  authenticated helper that accepts only packaged wallpaper IDs.
+- **Reason:** Plasma's complete wallpaper picker includes assets owned by core
+  desktop packages and does not make login synchronisation obvious. A small
+  product-level gallery exposes only the approved collection while continuing
+  to use Plasma's wallpaper API and PLM's supported configuration cascade.
+
+## D043 — Rebuild Fedora's PLM package for the approved centred composition
+
+- **Status:** Accepted at PM arrival review
+- **Date:** 2026-08-31
+- **Decision:** Build Fedora 44's exact `plasma-login-manager` 6.7.4 source RPM
+  with a narrow downstream patch that embeds and selects `ProperMain.qml`. The
+  composition uses centred time, date, identity, and authentication; omits the
+  avatar, placeholder, permanent card, and submit arrow; and puts user,
+  session, sleep, restart, and power actions behind a lower-right icon menu.
+  Keep PLM's existing models, authenticator, session management, state storage,
+  and Fedora package ownership. Verify the source checksum and rebase the patch
+  deliberately on every PLM update.
+- **Reason:** PLM 6.7.4 compiles its greeter QML into the executable and offers
+  wallpaper plugins but no SDDM-style external composition theme. The accepted
+  design therefore cannot be delivered by a supported theme package alone.
+  A small source-package patch is more auditable and updateable than replacing
+  Fedora-owned runtime files or forking the login manager.

@@ -3,6 +3,7 @@ LookAndFeelPackage=com.properlinux.dark.desktop
 widgetStyle=Breeze
 
 [General]
+BrowserApplication=chromium-browser.desktop
 ColorScheme=BreezeDark
 SingleClick=false
 TerminalApplication=ghostty

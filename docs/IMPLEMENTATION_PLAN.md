@@ -228,7 +228,8 @@ make Chromium the promoted browser without disrupting Fedora's installer.
 - Exclude the weak AWS Python/S3 dependency stack.
 - Move Podman/Skopeo/Toolbox and additional HPLIP/Gutenprint compatibility
   drivers to Proper Apps while retaining core printing.
-- Rebuild and record both installed-size and compressed-ISO changes.
+- Record installed-size and compressed-ISO changes with the final integrated
+  Phase 11 build; the PM explicitly waived an intermediate Phase 7 rebuild.
 
 ### Exit criteria
 
@@ -246,12 +247,16 @@ system feel deliberately designed.
 ### Work
 
 - Explicitly synchronise the default desktop, lock-screen, and PLM wallpaper.
-- Replace the stock lock-screen composition through a supported Plasma Global
-  Theme surface, avoiding whole-screen blur that destroys the artwork.
-- Prototype and review multiple restrained PLM compositions with improved
-  time, user, authentication, session, and power-action hierarchy.
-- Prefer a supported PLM theme or configuration package; do not fork the login
-  manager when a maintained extension point is sufficient.
+- Replace the stock lock-screen composition through Plasma's supported
+  `ShellPackage` selection. Use Plasma's fallback-package mechanism for every
+  non-lock surface so Fedora's upstream shell fixes continue to land, and avoid
+  whole-screen blur that destroys the artwork.
+- Implement the approved restrained PLM composition with centred time and
+  authentication, no avatar or submit arrow, and a lower-right icon menu for
+  user, session, sleep, restart, and power actions.
+- PLM 6.7.4 embeds its greeter QML and has no supported external composition
+  theme. Carry one auditable, version-pinned Fedora source-package patch for the
+  layout while retaining the upstream backend and all normal package ownership.
 - Add a visual wallpaper gallery with previews for the curated collection.
 - Keep Proper Dark as the primary appearance and an ordinary light option.
   Additional colour palettes are not a version 0.1 release blocker.
@@ -260,6 +265,11 @@ system feel deliberately designed.
 
 Show the login and lock alternatives, wallpaper switching, and persistence
 after logout and reboot.
+
+The PM approved the minimal lock composition and centred login direction on
+2026-08-31. Source packaging and isolated greeter validation are complete;
+installed-VM persistence remains part of this checkpoint and is not replaced
+by the design approval.
 
 ## Phase 9 — Proper Apps 2
 
@@ -325,6 +335,8 @@ phases.
 - Confirm Fedora updates still operate normally.
 - Confirm user customisations survive a Proper package update.
 - Generate ISO checksum, bill of included Proper components, and local release notes.
+- Record the installed-size and compressed-ISO effect of the Phase 7 curation
+  against the preserved Phase 6 baseline.
 - Document known defects honestly.
 
 ### Deliverables

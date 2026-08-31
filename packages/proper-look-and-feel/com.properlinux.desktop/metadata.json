@@ -1,0 +1,14 @@
+{
+  "KPackageStructure": "Plasma/Shell",
+  "KPlugin": {
+    "Id": "com.properlinux.desktop",
+    "Name": "Proper Linux Desktop",
+    "Description": "The Plasma desktop shell with the Proper Linux lock screen",
+    "Icon": "user-desktop",
+    "License": "GPL-2.0-or-later",
+    "Version": "0.1",
+    "Website": "https://github.com/proper-linux/proper-linux"
+  },
+  "X-Plasma-FallbackPackage": "org.kde.plasma.desktop",
+  "X-Plasma-APIVersion": "2"
+}

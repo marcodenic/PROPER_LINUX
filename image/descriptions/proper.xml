@@ -6,12 +6,18 @@
 	</repository>
 
 	<packages type="image">
+		<!-- Proper carries a narrow, version-pinned QML patch for the approved
+		     centred PLM composition. The package keeps Fedora's backend and must
+		     be rebased whenever Fedora updates Plasma Login Manager. -->
+		<package name="plasma-login-manager"/>
 		<package name="proper-release"/>
 		<package name="proper-look-and-feel"/>
 		<package name="proper-defaults"/>
 		<package name="proper-launchers"/>
 		<package name="proper-terminal"/>
 		<package name="proper-apps"/>
+		<package name="proper-appearance"/>
+		<package name="chromium"/>
 		<package name="initial-setup-gui-wayland-plasma"/>
 		<package name="kamoso"/>
 		<package name="krdc"/>
@@ -44,5 +50,19 @@
 		<ignore name="kolourpaint*"/>
 		<ignore name="skanpage*"/>
 		<ignore name="qrca*"/>
+		<!-- Phase 7 curation: Proper owns the five approved wallpapers and
+		     keeps optional cloud, container, and vendor-printer stacks in the
+		     catalogue instead of every default installation. -->
+		<ignore name="plasma-workspace-wallpapers"/>
+		<ignore name="desktop-backgrounds-kde"/>
+		<ignore name="f44-backgrounds*"/>
+		<ignore name="awscli*"/>
+		<ignore name="python3-boto*"/>
+		<ignore name="python3-s3transfer*"/>
+		<ignore name="podman*"/>
+		<ignore name="skopeo*"/>
+		<ignore name="toolbox*"/>
+		<ignore name="hplip*"/>
+		<ignore name="gutenprint*"/>
 	</packages>
 </image>

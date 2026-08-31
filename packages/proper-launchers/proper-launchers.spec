@@ -1,6 +1,6 @@
 Name:           proper-launchers
 Version:        0.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Proper Linux launcher and window workflow defaults
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -58,6 +58,9 @@ install -Dpm 0644 %{_sourcedir}/proper-shortcuts.md %{buildroot}%{_datadir}/doc/
 systemctl --global enable vicinae.service >/dev/null 2>&1 || :
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-7
+- Promote Chromium in the seeded Vicinae favourites
+
 * Sun Aug 30 2026 Proper Linux <proper@example.invalid> - 0.1-6
 - Route the taskbar and application-menu entry through the reliable opener
 

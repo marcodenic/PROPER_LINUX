@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$#" -ne 1 ]]; then
+    printf 'Usage: proper-set-login-wallpaper WALLPAPER_ID\n' >&2
+    exit 2
+fi
+
+case "$1" in
+    ProperBlueHour) image=/usr/share/wallpapers/ProperBlueHour/contents/images/1920x1080.png ;;
+    ProperHorizon) image=/usr/share/wallpapers/ProperHorizon/contents/images/1920x1080.png ;;
+    Path) image=/usr/share/wallpapers/Path/contents/images/2560x1600.jpg ;;
+    Volna) image=/usr/share/wallpapers/Volna/contents/images/5120x2880.jpg ;;
+    summer_1am) image=/usr/share/wallpapers/summer_1am/contents/images/2560x1600.jpg ;;
+    *) printf 'Unknown Proper Linux wallpaper: %s\n' "$1" >&2; exit 2 ;;
+esac
+
+[[ -r "$image" ]] || { printf 'Wallpaper is not installed: %s\n' "$image" >&2; exit 1; }
+
+config_dir=/etc/plasmalogin.conf.d
+config_file="$config_dir/50-proper-wallpaper.conf"
+install -d -m 0755 "$config_dir"
+temporary_file=$(mktemp "$config_dir/.50-proper-wallpaper.XXXXXX")
+trap 'rm -f -- "$temporary_file"' EXIT
+
+{
+    printf '[Greeter]\n'
+    printf 'WallpaperPluginId=org.kde.image\n\n'
+    printf '[Greeter][Wallpaper][org.kde.image][General]\n'
+    printf 'Image=file://%s\n' "$image"
+    printf 'PreviewImage=file://%s\n' "$image"
+} > "$temporary_file"
+
+chmod 0644 "$temporary_file"
+chown root:root "$temporary_file"
+mv -f -- "$temporary_file" "$config_file"
+trap - EXIT

@@ -1,0 +1,8 @@
+{
+  "KPlugin": {
+    "Authors": [{"Name": "Risto Saukonpää", "Email": "paristo@gmail.com"}],
+    "Id": "summer_1am",
+    "License": "LGPL-3.0-only",
+    "Name": "Summer 1 AM"
+  }
+}

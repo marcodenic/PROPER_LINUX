@@ -52,6 +52,19 @@ The complete promotion and verification procedure is in
 `docs/UI_ITERATION.md`. Regardless of which loop is used, committed packages
 and image configuration remain the source of truth.
 
+Proper's lock screen is supplied as a Plasma `ShellPackage`. Its metadata names
+Fedora's active `org.kde.plasma.desktop` package as the fallback for every
+ordinary desktop-shell surface; Proper owns only the lock-screen entry points.
+This uses KScreenLocker's configured extension point without replacing
+Fedora-owned files or freezing a private copy of the complete Plasma shell.
+
+Plasma Login Manager 6.7.4 does not expose its composition as an external theme:
+the greeter QML is compiled into its executable. Proper therefore rebuilds
+Fedora's exact source package with one version-pinned downstream entry-point
+patch and one Proper QML source. The package continues to use Fedora's PLM
+backend, authentication, session, power, and packaging integration. This narrow
+exception must be rebased and tested whenever Fedora updates PLM.
+
 ## Planned repository layout
 
 ```text
@@ -69,7 +82,9 @@ PROPER_LINUX/
 │   ├── proper-defaults/
 │   ├── proper-launchers/
 │   ├── proper-terminal/
-│   └── proper-apps/
+│   ├── proper-apps/
+│   ├── proper-appearance/
+│   └── plasma-login-manager/
 ├── apps/
 │   ├── catalog.yaml
 │   ├── schemas/
@@ -119,6 +134,23 @@ Owns system-wide visual assets:
 - Plasma Login Manager supported branding/defaults
 
 Prefer configuration and original assets over patching upstream QML.
+
+### `proper-appearance`
+
+Owns the pointer-first wallpaper gallery and the bounded helper that keeps the
+desktop, lock screen, and Plasma Login Manager on one of Proper's five packaged
+wallpapers. The privileged helper accepts only those fixed wallpaper IDs and
+writes an ordinary PLM configuration fragment; it does not accept arbitrary
+paths or execute user-provided commands.
+
+### `plasma-login-manager`
+
+Owns the exact Fedora source-RPM pin and the narrow downstream patch needed to
+load Proper's centred greeter composition. It does not replace PLM's backend or
+install an untracked binary over Fedora-owned files. `scripts/build-rpms`
+verifies the source RPM before applying the patch and building a normal RPM
+with the same package name, so ordinary Fedora dependency and update semantics
+remain intact.
 
 ### `proper-defaults`
 

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Wallpapers
+Comment=Choose a Proper Linux wallpaper and keep arrival screens in sync
+Exec=proper-appearance
+Icon=preferences-desktop-wallpaper
+Categories=Settings;DesktopSettings;
+StartupNotify=true
