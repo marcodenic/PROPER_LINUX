@@ -410,3 +410,19 @@ Status values:
   interaction review can improve product coherence without adopting Omarchy's
   much larger shell-ownership and maintenance boundary. This extends D035 and
   moves its final release-candidate checkpoint from Phase 11 to Phase 12.
+
+## D045 — Seed and migrate the Proper panel without owning panel behaviour
+
+- **Status:** Accepted for implementation
+- **Date:** 2026-08-31
+- **Decision:** Keep Plasma's upstream panel, Icon Tasks, System Tray, Show
+  Desktop, and Digital Clock components. Seed a centred, fit-content, floating,
+  translucent 56-pixel panel for new accounts and provide a one-time
+  ShellPackage update that creates the same curated panel only when the
+  ShellPackage layout store has no panel. Never recreate a panel after the
+  update has run, so a later user decision to remove it remains respected.
+- **Reason:** Selecting a custom Plasma ShellPackage also selects a separate
+  applet-layout store. Visual fallback to the upstream shell does not populate
+  that store, which left an existing review account with no panel. Explicitly
+  seeding the store and narrowly migrating only the empty state fixes arrival
+  while preserving upstream interaction code and later user customisation.

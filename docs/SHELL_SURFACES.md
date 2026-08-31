@@ -117,5 +117,10 @@ explicit PM approval, and an upstream/rebase exit plan.
 ## Review status
 
 The component and extension-point review is complete, and the validated Phase
-8 installed VM is available. The screenshot comparison and final
-keep/theme/replace decisions are the next Phase 9 work.
+8 installed VM is available. The missing-panel regression exposed by the first
+same-VM Phase 9 capture is fixed: the Proper ShellPackage now has an explicit
+new-user layout and a one-time empty-layout migration. The installed review VM
+shows the intended centred, floating, translucent panel with Proper's three
+promoted launchers and upstream status widgets. The remaining Phase 9 work is
+the transient-surface screenshot comparison and final keep/theme/replace
+decisions.

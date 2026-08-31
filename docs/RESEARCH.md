@@ -249,3 +249,18 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
   first-character preservation, lock and unlock, pointer opening and closing
   of the icon menu, and its Switch User action all passed against the installed
   system.
+
+## Plasma ShellPackage layout audit — 2026-08-31
+
+- Plasma's visual fallback lets `com.properlinux.desktop` reuse unowned shell
+  QML from `org.kde.plasma.desktop`, but the selected ShellPackage ID also owns
+  a separate `plasma-com.properlinux.desktop-appletsrc` layout store.
+- Proper now seeds that exact store through `/etc/xdg` and `/etc/skel`, with a
+  matching `plasmashellrc` view bound to the Proper shell. A one-time Plasma
+  update script repairs only an empty existing store and is then recorded by
+  Plasma as performed.
+- The installed Fedora 44 review VM exposes one 56-pixel, centred, floating,
+  fit-content panel with the Vicinae, Dolphin, and Ghostty launchers plus the
+  upstream System Tray, Show Desktop, and Digital Clock widgets. The view uses
+  Plasma's translucent panel mode; no widget fork or private Plasma API is
+  required.
