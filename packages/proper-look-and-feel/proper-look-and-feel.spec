@@ -1,9 +1,10 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
+BuildRequires:  libxml2
 Provides:       system-backgrounds-kde
 Requires:       plasma-workspace >= 6.7
 
@@ -58,6 +59,18 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/Pass
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/qmldir "$shell_root/contents/lockscreen/qmldir"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-ensure-proper-panel.js "$shell_root/contents/updates/00-ensure-proper-panel.js"
 
+%check
+# Proper's rounded shell surfaces must not regain unmasked rectangular shadow
+# slices when this spec is built outside the repository's normal wrapper.
+for asset in \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/tooltip.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/translucentbackground.svg; do
+  xmllint --noout "$asset"
+  test "$(xmllint --xpath "count(//*[starts-with(@id, 'shadow-')])" "$asset")" = 0
+done
+
 %files
 %{_datadir}/wallpapers/ProperBlueHour/
 %{_datadir}/wallpapers/ProperHorizon/
@@ -82,6 +95,11 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-ensu
 install -m 0644 %{_datadir}/proper-linux/plasmalogin.conf %{_prefix}/lib/plasmalogin/defaults.conf || :
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-12
+- Remove square shadow frames from the panel and shared shell surfaces
+- Retain depth through translucency, blur, and restrained rounded edges
+- Bump the Plasma Style version so upgraded systems invalidate cached SVGs
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-11
 - Add the approved narrow Proper Plasma Style for shell surfaces
 - Use charcoal popup, panel, heading, tooltip, and OSD assets with Breeze fallback

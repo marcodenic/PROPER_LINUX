@@ -57,6 +57,8 @@ Every version 0.1 candidate must satisfy all of these:
 - It remains visible by default and exposes hide behaviour through settings.
 - Pinned and running applications are obvious without excessive decoration.
 - Blur, colour, contrast, spacing, and animation feel coherent.
+- No shadow, blur, or contrast layer exposes rectangular bounds outside the
+  taskbar's rounded shelf.
 - Normal application content remains readable.
 - Disabling blur does not leave broken or illegible surfaces.
 - The desktop does not resemble an unmodified Fedora KDE screenshot.
@@ -148,6 +150,8 @@ in `docs/evidence/phase9-shell-implementation`.
 
 - Persistent and transient surfaces share a coherent hierarchy, spacing,
   colour, icon, focus, and motion language.
+- Rounded panels, tooltips, popups, notifications, and OSDs expose no square
+  shadow, blur, or contrast bounds around their transparent corners.
 - Every ordinary operation remains available by pointer and the existing
   upstream accessibility and authentication paths still function.
 - Disabling blur, using 200% scaling, or opening a surface on another display

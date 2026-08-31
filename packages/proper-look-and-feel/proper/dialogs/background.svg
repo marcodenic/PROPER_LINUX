@@ -1,44 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- SPDX-FileCopyrightText: 2026 Proper Linux contributors -->
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
-<svg xmlns="http://www.w3.org/2000/svg" width="190" height="80" viewBox="0 0 190 80">
+<!-- This shared dialog/tooltip surface intentionally has no shadow-* slices.
+     Unmasked Plasma shadow slices expose square bounds around rounded popups. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="60" viewBox="0 0 130 60">
   <defs>
     <style id="current-color-scheme" type="text/css">
       .ColorScheme-Background { color: #181d25; }
       .ColorScheme-Frame { color: #a6afbd; }
     </style>
-    <linearGradient id="shadow-top-gradient" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="0"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.30"/>
-    </linearGradient>
-    <linearGradient id="shadow-bottom-gradient" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="shadow-left-gradient" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.30"/>
-    </linearGradient>
-    <linearGradient id="shadow-right-gradient" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0"/>
-    </linearGradient>
-    <radialGradient id="shadow-tl-gradient" cx="1" cy="1" r="1">
-      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="shadow-tr-gradient" cx="0" cy="1" r="1">
-      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="shadow-bl-gradient" cx="1" cy="0" r="1">
-      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="shadow-br-gradient" cx="0" cy="0" r="1">
-      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0"/>
-    </radialGradient>
   </defs>
 
   <g id="top" transform="translate(14 0)">
@@ -91,17 +61,4 @@
   <path id="mask-bottomleft" d="M84 60V46H70v1c0 7.18 5.82 13 13 13h1z" fill="#000"/>
   <path id="mask-bottomright" d="M116 60V46h14v1c0 7.18-5.82 13-13 13h-1z" fill="#000"/>
 
-  <rect id="shadow-center" x="150" y="10" width="20" height="20" fill="#000" fill-opacity="0.001"/>
-  <rect id="shadow-top" x="150" width="20" height="10" fill="url(#shadow-top-gradient)"/>
-  <rect id="shadow-bottom" x="150" y="30" width="20" height="10" fill="url(#shadow-bottom-gradient)"/>
-  <rect id="shadow-left" x="140" y="10" width="10" height="20" fill="url(#shadow-left-gradient)"/>
-  <rect id="shadow-right" x="170" y="10" width="10" height="20" fill="url(#shadow-right-gradient)"/>
-  <rect id="shadow-topleft" x="140" width="10" height="10" fill="url(#shadow-tl-gradient)"/>
-  <rect id="shadow-topright" x="170" width="10" height="10" fill="url(#shadow-tr-gradient)"/>
-  <rect id="shadow-bottomleft" x="140" y="30" width="10" height="10" fill="url(#shadow-bl-gradient)"/>
-  <rect id="shadow-bottomright" x="170" y="30" width="10" height="10" fill="url(#shadow-br-gradient)"/>
-  <rect id="shadow-hint-top-margin" x="159" width="2" height="10" fill="#f0f"/>
-  <rect id="shadow-hint-bottom-margin" x="159" y="30" width="2" height="10" fill="#f0f"/>
-  <rect id="shadow-hint-left-margin" x="140" y="19" width="10" height="2" fill="#f0f"/>
-  <rect id="shadow-hint-right-margin" x="170" y="19" width="10" height="2" fill="#f0f"/>
 </svg>

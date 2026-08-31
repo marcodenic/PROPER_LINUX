@@ -19,6 +19,8 @@ for binary in rpmbuild curl rpm2cpio cpio patch; do
   command -v "$binary" >/dev/null 2>&1 || { printf 'Required command missing: %s\n' "$binary" >&2; exit 1; }
 done
 
+"$project_root/scripts/validate-plasma-theme"
+
 rm -rf "$rpm_root" "$repo_root"
 mkdir -p "$rpm_root" "$repo_root"
 

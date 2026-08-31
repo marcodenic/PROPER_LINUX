@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Reject malformed Plasma SVG assets and the rectangular panel-shadow
+# regression. The rounded shelf deliberately gets depth from translucency,
+# background blur, and its hairline frame; it does not define shadow slices.
+set -Eeuo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+style_root="$project_root/packages/proper-look-and-feel/proper"
+panel="$style_root/widgets/panel-background.svg"
+metadata="$style_root/metadata.json"
+spec="$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
+
+command -v xmllint >/dev/null 2>&1 || {
+  printf 'Required command missing: xmllint\n' >&2
+  exit 1
+}
+
+while IFS= read -r -d '' asset; do
+  xmllint --noout "$asset"
+done < <(find "$style_root" -type f -name '*.svg' -print0)
+
+package_version="$(awk '$1 == "Version:" { print $2; exit }' "$spec")"
+package_release="$(awk '$1 == "Release:" { print $2; exit }' "$spec")"
+package_release="${package_release%%%*}"
+style_version="$(sed -n 's/^[[:space:]]*"Version": "\([^"]*\)",$/\1/p' "$metadata")"
+expected_style_version="$package_version.$package_release"
+[[ "$style_version" == "$expected_style_version" ]] || {
+  printf 'Plasma Style metadata version is %s; expected %s from the RPM version and release.\n' \
+    "$style_version" "$expected_style_version" >&2
+  printf 'Bump the style version with the RPM release so Plasma cannot reuse stale SVG caches.\n' >&2
+  exit 1
+}
+
+required_ids=(
+  center top bottom left right
+  topleft topright bottomleft bottomright
+  mask-center mask-top mask-bottom mask-left mask-right
+  mask-topleft mask-topright mask-bottomleft mask-bottomright
+)
+
+for required_id in "${required_ids[@]}"; do
+  count="$(xmllint --xpath "count(//*[@id='$required_id'])" "$panel")"
+  [[ "$count" == 1 ]] || {
+    printf 'Panel asset must define id=%s exactly once; found %s.\n' "$required_id" "$count" >&2
+    exit 1
+  }
+done
+
+while IFS= read -r -d '' asset; do
+  shadow_count="$(xmllint --xpath "count(//*[starts-with(@id, 'shadow-')])" "$asset")"
+  [[ "$shadow_count" == 0 ]] || {
+    printf '%s defines %s explicit shadow element(s).\n' "$asset" "$shadow_count" >&2
+    printf 'Explicit shell shadows are forbidden until their rounded alpha masks have render regression tests.\n' >&2
+    exit 1
+  }
+done < <(find "$style_root" -type f -name '*.svg' -print0)
+
+printf 'Plasma theme valid: rounded shell surfaces with no explicit shadow slices.\n'
