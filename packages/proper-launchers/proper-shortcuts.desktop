@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Proper Shortcuts
+GenericName=Keyboard and pointer reference
+Comment=Search Proper Linux window, launcher, workspace, and capture actions
+Exec=/usr/bin/proper-tool shortcuts
+Icon=preferences-desktop-keyboard-shortcut
+Categories=Utility;
+Keywords=keyboard;shortcut;hotkey;window;launcher;capture;reference;help;
+StartupNotify=true

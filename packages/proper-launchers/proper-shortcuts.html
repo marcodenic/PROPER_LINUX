@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proper Linux shortcuts</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { margin: 0; background: #11141a; color: #f3f5f8; }
+    main { max-width: 900px; margin: 0 auto; padding: 64px 28px 96px; }
+    h1 { margin: 0; font-size: clamp(2rem, 6vw, 4.2rem); letter-spacing: -.055em; }
+    .lede { max-width: 680px; color: #aeb7c5; font-size: 1.08rem; line-height: 1.6; }
+    input { box-sizing: border-box; width: 100%; margin: 30px 0 18px; padding: 15px 18px;
+      border: 1px solid #343c49; border-radius: 14px; background: #1a1f27; color: inherit;
+      font: inherit; outline: none; }
+    input:focus { border-color: #6d9fff; box-shadow: 0 0 0 3px #6d9fff33; }
+    section { margin-top: 34px; }
+    h2 { color: #c8d3e2; font-size: .86rem; letter-spacing: .12em; text-transform: uppercase; }
+    .row { display: grid; grid-template-columns: minmax(190px, .8fr) 1.8fr; gap: 24px;
+      padding: 15px 2px; border-bottom: 1px solid #252b35; align-items: center; }
+    kbd { display: inline-block; padding: 5px 9px; border: 1px solid #424b59; border-bottom-width: 2px;
+      border-radius: 7px; background: #202631; color: #fff; font: 600 .88rem ui-monospace, monospace; }
+    .action { color: #d8dee8; line-height: 1.45; }
+    .empty { display: none; padding: 36px 0; color: #aeb7c5; }
+    footer { margin-top: 48px; color: #818b99; line-height: 1.6; }
+    @media (max-width: 620px) { main { padding-top: 40px; } .row { grid-template-columns: 1fr; gap: 8px; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Work naturally.<br>Move quickly.</h1>
+  <p class="lede">Everything here also has an ordinary pointer path. Shortcuts are accelerators, never prerequisites.</p>
+  <input id="filter" type="search" placeholder="Search shortcuts and actions…" autocomplete="off" autofocus>
+
+  <section data-group><h2>Launch and find</h2>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>Space</kbd></div><div class="action">Open Vicinae</div></div>
+    <div class="row"><div><kbd>Alt</kbd> + <kbd>F2</kbd></div><div class="action">Open KRunner fallback</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>E</kbd></div><div class="action">Open Files</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>Enter</kbd></div><div class="action">Open Ghostty</div></div>
+  </section>
+
+  <section data-group><h2>Windows and workspaces</h2>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>←</kbd> / <kbd>→</kbd></div><div class="action">Place the active window in the left or right half</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>↑</kbd></div><div class="action">Maximise the active window</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>↓</kbd></div><div class="action">Restore the active window</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>Ctrl</kbd> + <kbd>1</kbd> / <kbd>3</kbd> / <kbd>7</kbd> / <kbd>9</kbd></div><div class="action">Place the active window in a quadrant</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>Shift</kbd> + <kbd>T</kbd></div><div class="action">Arrange this workspace using the last layout; press again to restore floating positions</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>T</kbd></div><div class="action">Open Plasma's visual tile-layout editor</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>H</kbd></div><div class="action">Minimise the active window</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>D</kbd></div><div class="action">Show the desktop</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>W</kbd></div><div class="action">Open Overview</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>G</kbd></div><div class="action">Open Desktop Grid</div></div>
+  </section>
+
+  <section data-group><h2>Capture and clipboard</h2>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></div><div class="action">Capture a selected screen region with Spectacle</div></div>
+    <div class="row"><div><kbd>Meta</kbd> + <kbd>V</kbd></div><div class="action">Open Plasma clipboard history at the pointer</div></div>
+    <div class="row"><div>Vicinae: “Copy text from screen”</div><div class="action">Select a region, recognise English text locally with OCR, and copy it</div></div>
+  </section>
+
+  <p class="empty" id="empty">No matching actions.</p>
+  <footer>Open this page from Vicinae by searching for “Proper Shortcuts”. Window controls, taskbar launchers, screen edges, System Settings, and Spectacle provide the equivalent pointer paths.</footer>
+</main>
+<script>
+  const input = document.querySelector('#filter');
+  const rows = [...document.querySelectorAll('.row')];
+  const groups = [...document.querySelectorAll('[data-group]')];
+  const empty = document.querySelector('#empty');
+  input.addEventListener('input', () => {
+    const query = input.value.trim().toLocaleLowerCase();
+    let visible = 0;
+    rows.forEach(row => {
+      const match = !query || row.textContent.toLocaleLowerCase().includes(query);
+      row.hidden = !match;
+      if (match) visible++;
+    });
+    groups.forEach(group => { group.hidden = ![...group.querySelectorAll('.row')].some(row => !row.hidden); });
+    empty.style.display = visible ? 'none' : 'block';
+  });
+</script>
+</body>
+</html>

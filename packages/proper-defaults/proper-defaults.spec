@@ -1,6 +1,6 @@
 Name:           proper-defaults
 Version:        0.1
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        Proper Linux new-user KDE defaults
 License:        GPL-3.0-or-later
 BuildArch:      noarch
@@ -17,6 +17,9 @@ the small skel copies initialise a live/installer-created account. They do not
 overwrite an existing user's configuration.
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-14
+- Add the reversible, output-aware Proper workspace arranger KWin script
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-13
 - Pin Ghostty's own desktop identity so running windows group with its launcher
 
@@ -65,6 +68,8 @@ install -Dpm 0644 %{_sourcedir}/dolphinrc %{buildroot}%{_sysconfdir}/xdg/dolphin
 install -Dpm 0644 %{_sourcedir}/plasmashellrc %{buildroot}%{_sysconfdir}/xdg/plasmashellrc
 install -Dpm 0644 %{_sourcedir}/plasmashellrc %{buildroot}%{_sysconfdir}/skel/.config/plasmashellrc
 install -Dpm 0644 %{_sourcedir}/kwinrc %{buildroot}%{_sysconfdir}/xdg/kwinrc
+install -Dpm 0644 %{_sourcedir}/proper-workspace-arranger/metadata.json %{buildroot}%{_datadir}/kwin/scripts/proper-workspace-arranger/metadata.json
+install -Dpm 0644 %{_sourcedir}/proper-workspace-arranger/contents/code/main.js %{buildroot}%{_datadir}/kwin/scripts/proper-workspace-arranger/contents/code/main.js
 install -Dpm 0644 %{_sourcedir}/dolphinrc %{buildroot}%{_sysconfdir}/skel/.config/dolphinrc
 install -Dpm 0755 %{_sourcedir}/proper-live-defaults %{buildroot}%{_bindir}/proper-live-defaults
 install -Dpm 0644 %{_sourcedir}/proper-live-defaults.desktop %{buildroot}%{_sysconfdir}/xdg/autostart/proper-live-defaults.desktop
@@ -83,6 +88,7 @@ install -Dpm 0644 %{_sourcedir}/proper-live-defaults.desktop %{buildroot}%{_sysc
 %config(noreplace) %{_sysconfdir}/xdg/dolphinrc
 %config(noreplace) %{_sysconfdir}/xdg/plasmashellrc
 %config(noreplace) %{_sysconfdir}/xdg/kwinrc
+%{_datadir}/kwin/scripts/proper-workspace-arranger/
 %config(noreplace) %{_sysconfdir}/skel/.config/plasmashellrc
 %config(noreplace) %{_sysconfdir}/skel/.config/dolphinrc
 %{_bindir}/proper-live-defaults

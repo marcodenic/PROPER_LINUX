@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -eu
+
+show_error() {
+    kdialog --title "Arrange workspace" --error "$1" >/dev/null 2>&1 || true
+}
+
+invoke_shortcut() {
+    local shortcut="$1"
+    local shortcuts
+
+    shortcuts="$(qdbus-qt6 org.kde.kglobalaccel /component/kwin shortcutNames 2>/dev/null || true)"
+    if ! grep -Fxq -- "$shortcut" <<<"$shortcuts"; then
+        show_error "The Proper workspace action is not ready yet. Sign out and back in, then try again."
+        return 1
+    fi
+    qdbus-qt6 org.kde.kglobalaccel /component/kwin invokeShortcut "$shortcut" >/dev/null
+}
+
+case "${1:-choose}" in
+    choose)
+        choice="$(kdialog --title "Arrange workspace" --menu \
+            "Choose how to arrange normal windows on this workspace" \
+            primary "Primary + secondary (2/3 + 1/3)" \
+            halves "Balanced halves" \
+            columns "Three columns" \
+            grid "Balanced grid" \
+            restore "Restore floating positions" \
+            editor "Edit Plasma tile layout…" 2>/dev/null || true)"
+        [[ -n "$choice" ]] || exit 0
+        exec "$0" "$choice"
+        ;;
+    toggle) invoke_shortcut ProperArrangeWorkspace ;;
+    primary) invoke_shortcut ProperArrangeWorkspacePrimary ;;
+    halves) invoke_shortcut ProperArrangeWorkspaceHalves ;;
+    columns) invoke_shortcut ProperArrangeWorkspaceColumns ;;
+    grid) invoke_shortcut ProperArrangeWorkspaceGrid ;;
+    restore) invoke_shortcut ProperRestoreWorkspace ;;
+    editor) invoke_shortcut "Edit Tiles" ;;
+    *)
+        printf 'Unknown workspace layout: %s\n' "$1" >&2
+        exit 2
+        ;;
+esac

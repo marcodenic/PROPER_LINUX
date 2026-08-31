@@ -1,0 +1,16 @@
+{
+  "KPackageStructure": "KWin/Script",
+  "KPlugin": {
+    "Id": "proper-workspace-arranger",
+    "Name": "Proper Workspace Arranger",
+    "Description": "Reversibly arrange the current workspace while keeping normal floating windows",
+    "Version": "1.0",
+    "License": "GPL-3.0-or-later",
+    "Authors": [
+      {
+        "Name": "Proper Linux"
+      }
+    ]
+  },
+  "X-Plasma-API": "javascript"
+}

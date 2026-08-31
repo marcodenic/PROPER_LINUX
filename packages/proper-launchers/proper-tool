@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -eu
+
+show_error() {
+    local message="$1"
+    kdialog --title "Proper Linux" --error "$message" >/dev/null 2>&1 || true
+}
+
+run_gui() {
+    local binary="$1"
+    shift
+    if ! command -v "$binary" >/dev/null 2>&1; then
+        show_error "This action is unavailable because $binary is not installed."
+        exit 1
+    fi
+    exec "$binary" "$@"
+}
+
+region_ocr() {
+    local image_file error_file ocr_text character_count
+
+    image_file="$(mktemp --suffix=.png /tmp/proper-region-ocr.XXXXXX)"
+    error_file="$(mktemp /tmp/proper-region-ocr-error.XXXXXX)"
+    trap 'rm -f "$image_file" "$error_file"' EXIT
+
+    if ! spectacle --region --background --output "$image_file" >/dev/null 2>"$error_file"; then
+        exit 0
+    fi
+    if [[ ! -s "$image_file" ]]; then
+        exit 0
+    fi
+    if ! ocr_text="$(tesseract "$image_file" stdout -l eng 2>"$error_file")"; then
+        show_error "Text recognition failed. Try a clearer or larger screen region."
+        exit 1
+    fi
+    if [[ -z "${ocr_text//[[:space:]]/}" ]]; then
+        notify-send --app-name="Proper Linux" "No text found" \
+            "Try selecting a clearer or larger screen region." >/dev/null 2>&1 || true
+        exit 0
+    fi
+    printf '%s' "$ocr_text" | wl-copy --type 'text/plain;charset=utf-8'
+    character_count="${#ocr_text}"
+    notify-send --app-name="Proper Linux" "Text copied" \
+        "$character_count characters are ready to paste." >/dev/null 2>&1 || true
+}
+
+case "${1:-}" in
+    appearance) run_gui systemsettings kcm_lookandfeel ;;
+    wallpaper) run_gui proper-appearance ;;
+    night-light) run_gui systemsettings kcm_nightlight ;;
+    screenshots) run_gui spectacle --launchonly ;;
+    screenshot-region) run_gui spectacle --region ;;
+    updates) run_gui plasma-discover --mode Update ;;
+    power) run_gui systemsettings kcm_powerdevilprofilesconfig ;;
+    bluetooth) run_gui systemsettings kcm_bluetooth ;;
+    displays) run_gui systemsettings kcm_kscreen ;;
+    diagnostics) run_gui plasma-systemmonitor ;;
+    clipboard)
+        run_gui qdbus-qt6 org.kde.klipper /klipper \
+            org.kde.klipper.klipper.showKlipperPopupMenu
+        ;;
+    arrange) run_gui proper-arrange-workspace ;;
+    tile-editor)
+        run_gui proper-arrange-workspace editor
+        ;;
+    shortcuts)
+        run_gui xdg-open file:///usr/share/doc/proper-launchers/proper-shortcuts.html
+        ;;
+    ocr-region) region_ocr ;;
+    *)
+        printf 'Usage: proper-tool {appearance|wallpaper|night-light|screenshots|screenshot-region|updates|power|bluetooth|displays|diagnostics|clipboard|arrange|tile-editor|shortcuts|ocr-region}\n' >&2
+        exit 2
+        ;;
+esac

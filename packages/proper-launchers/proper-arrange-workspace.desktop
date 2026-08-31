@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Arrange Workspace
+GenericName=Window layout chooser
+Comment=Arrange this workspace, or restore its floating window positions
+Exec=/usr/bin/proper-arrange-workspace
+Icon=view-grid
+Categories=Utility;
+Keywords=tile;tiling;window;layout;workspace;split;halves;thirds;grid;restore;float;
+StartupNotify=false
