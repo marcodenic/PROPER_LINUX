@@ -135,6 +135,8 @@ Make the terminal and essential technical workflow feel intentionally designed.
 
 - Package or select a maintained Ghostty source for Fedora.
 - Apply the approved font, colours, padding, cursor, and shell presentation.
+- Use restrained terminal-only opacity and compositor blur with an opaque-cell
+  option so readability remains predictable.
 - Make Ghostty the default terminal.
 - Add an ordinary Ghostty launcher to the taskbar.
 - Integrate “Open terminal here” into Dolphin.
@@ -168,6 +170,10 @@ Provide one clear installation surface for the applications the primary customer
 - Clearly label community-maintained software only in advanced details.
 - Add install progress, installed state, launch, and failure recovery.
 - Add Vicinae actions to open Proper Apps searches and launch installed agents in Ghostty.
+- Expose one generic Coding Agent action in Vicinae, the app menu, and Dolphin.
+  Store a default only after explicit selection and successful command
+  detection; show the bounded chooser when none exists or the saved command is
+  missing, with no silent fallback and no background daemon.
 - Validate at least one Flatpak, one Fedora RPM, and one official vendor-source installation path.
 
 ### Deliverables
@@ -258,8 +264,10 @@ system feel deliberately designed.
   theme. Carry one auditable, version-pinned Fedora source-package patch for the
   layout while retaining the upstream backend and all normal package ownership.
 - Add a visual wallpaper gallery with previews for the curated collection.
-- Keep Proper Dark as the primary appearance and an ordinary light option.
-  Additional colour palettes are not a version 0.1 release blocker.
+- Keep Blue Hour as the primary appearance and provide ordinary Horizon Light
+  and Midnight options through one preview-first control. Coordinate KDE, GTK,
+  and Ghostty text size through three simple presets while keeping normal
+  desktop settings available.
 
 ### PM arrival review
 

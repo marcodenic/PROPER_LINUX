@@ -1,0 +1,23 @@
+FROM quay.io/fedora/fedora@sha256:a669925a10c2716481d60a46fc93cbbe4cfb9aade058b2ba28cf3f0de0345de2
+
+RUN dnf -y install \
+        acpica-tools \
+        binutils \
+        gcc \
+        gcc-c++ \
+        gcc-x86_64-linux-gnu \
+        git \
+        libuuid-devel \
+        make \
+        nasm \
+        patch \
+        perl-File-Compare \
+        perl-File-Copy \
+        perl-FindBin \
+        perl-IPC-Cmd \
+        perl-JSON \
+        perl-Time-Piece \
+        python3-devel \
+        rpm-build \
+        xz \
+    && dnf clean all

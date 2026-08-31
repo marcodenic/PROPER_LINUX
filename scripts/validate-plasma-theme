@@ -8,6 +8,8 @@ project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 style_root="$project_root/packages/proper-look-and-feel/proper"
 metadata="$style_root/metadata.json"
 spec="$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
+tokens="$project_root/packages/proper-look-and-feel/tokens.yaml"
+plasma_defaults="$project_root/packages/proper-defaults/plasmarc"
 
 command -v xmllint >/dev/null 2>&1 || {
   printf 'Required command missing: xmllint\n' >&2
@@ -69,4 +71,26 @@ for asset in "${shadow_assets[@]}"; do
   }
 done
 
-printf 'Plasma theme valid: mask-composed rounded surfaces with neutral fallback-suppression shadows.\n'
+panel_radius="$(sed -n "s/^radius: {panel: \([0-9][0-9]*\),.*/\1/p" "$tokens")"
+asset_radius="$(xmllint --xpath "string(//*[@id='top']/*[1]/@height)" \
+  "$style_root/widgets/panel-background.svg")"
+mask_radius="$(xmllint --xpath "string(//*[@id='mask-top']/@height)" \
+  "$style_root/widgets/panel-background.svg")"
+[[ -n "$panel_radius" && "$panel_radius" == "$asset_radius" && "$panel_radius" == "$mask_radius" ]] || {
+  printf 'Panel radius token (%s), visible corner slice (%s), and mask slice (%s) must match.\n' \
+    "$panel_radius" "$asset_radius" "$mask_radius" >&2
+  exit 1
+}
+
+tooltip_delay="$(awk '
+  /^\[PlasmaToolTips\]$/ { in_group = 1; next }
+  /^\[/ { in_group = 0 }
+  in_group && /^Delay=/ { sub(/^Delay=/, ""); print; exit }
+' "$plasma_defaults")"
+[[ "$tooltip_delay" == 0 ]] || {
+  printf 'Proper shell hover tooltips must default to Delay=0; found %s.\n' \
+    "${tooltip_delay:-unset}" >&2
+  exit 1
+}
+
+printf 'Plasma theme valid: matched panel radius/mask, neutral shadows, and hover tooltips disabled.\n'

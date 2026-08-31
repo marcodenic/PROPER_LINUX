@@ -203,12 +203,32 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
 - Current official installation methods for Codex, Claude Code, OpenCode, VS Code Insiders, Chrome, and Docker on Fedora
 - Final font, icon, and artwork licences
 
-## Phase 4 source audit — 2026-08-25
+## Phase 4 source audit — updated 2026-08-31
 
-- Ghostty upstream: <https://github.com/ghostty-org/ghostty>; official source release: <https://release.files.ghostty.org/1.2.3/ghostty-1.2.3.tar.gz>.
-- Upstream packaging guidance says to use the project source tarball rather than GitHub's generated archive. Ghostty is MIT licensed. Fedora 44's configured repositories were queried on the BOX and did not return a `ghostty` package, so `proper-terminal` builds the pinned source with the official Zig 0.14.1 binary release plus Fedora's `gtk4-devel`, `libadwaita-devel`, and related build dependencies. Zig is build-only, verified with the official minisign signature; SHA-256 is `24aeeec8af16c381934a6cd7d95c807a8cb2cf7df9fa40d359aa884195c4716c`. The resulting Ghostty RPM payload includes the executable, desktop metadata, shell integration, themes, terminfo, D-Bus service and KIO service menu.
-- Proper terminal runtime configuration is versioned in `packages/proper-terminal/ghostty.conf`; update checks must record the release URL, checksum, licence and build dependency changes before promotion.
-- Build result: official Ghostty 1.2.3 source checksum `559770fe9773161e93e3dd9177d916e27037d7f548edcf6186eabc571c0e520b`; the pinned `proper-terminal` RPM checksum is `4a2d48289bc9b4a095ca1aaeeba1c3b14e3d561311c102fa6fdf744e38d7fe75`. Update by auditing the official release tarball, its minisign signature, the declared Zig requirement and the generated runtime payload before rebuilding.
+- Ghostty upstream: <https://github.com/ghostty-org/ghostty>; pinned official
+  source release: <https://release.files.ghostty.org/1.3.1/ghostty-1.3.1.tar.gz>.
+  SHA-256 is
+  `3349d25600ffbda281197a18314f7d18791969cffe9474f0ff16a45a9ebfccdb`.
+- Upstream packaging guidance says to use the project source tarball rather
+  than GitHub's generated archive. Ghostty is MIT licensed. Fedora 44's
+  configured repositories did not provide a `ghostty` package, so
+  `proper-terminal` builds the signed release with the official Zig 0.15.2
+  binary release plus Fedora's GTK, libadwaita, and related build dependencies.
+  Zig is build-only, its minisign signature is verified, and its SHA-256 is
+  `02aa270f183da276e5b5920b1dac44a63f1a49e55050ebde3aecc9eb82f93239`.
+- Ghostty 1.3.1 still uses KWin's removed private blur protocol. Proper carries
+  a narrow backport of upstream's merged `ext-background-effect-v1` work
+  (<https://github.com/ghostty-org/ghostty/commit/9c30bfadc5d8e7ebf7ea6a7d7b45bf02c3b4ca7b>)
+  while retaining the legacy fallback for older compositors. The patch remains
+  separate from the source archive and must be dropped when the next pinned
+  Ghostty release includes that upstream change.
+- Proper terminal runtime configuration is versioned in
+  `packages/proper-terminal/ghostty.conf`. It uses 92% background opacity,
+  keeps cell backgrounds opaque, and asks the compositor for background blur;
+  normal content windows remain opaque.
+- Update by auditing the official release tarball and minisign signature, the
+  declared Zig requirement, the blur patch's upstream status, build dependency
+  changes, and the generated runtime payload before rebuilding.
 
 ## Phase 5 provider audit — 2026-08-25
 

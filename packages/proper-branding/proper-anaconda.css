@@ -1,0 +1,31 @@
+/* Proper Linux Anaconda GTK fallback branding. */
+@define-color proper_background #07090d;
+@define-color proper_accent #6f9fd0;
+
+.logo-sidebar {
+    background-image: none;
+    background-color: @proper_background;
+}
+
+.logo {
+    background-image: url('/usr/share/proper-linux/identity/proper-wordmark.svg');
+    background-position: 50% 28px;
+    background-repeat: no-repeat;
+    background-size: 220px auto;
+    background-color: transparent;
+}
+
+.product-logo {
+    background-image: none;
+    background-color: transparent;
+}
+
+AnacondaSpokeWindow #nav-box {
+    background-color: @proper_background;
+    background-image: none;
+    color: white;
+}
+
+AnacondaSpokeWindow #nav-box GtkButton:checked {
+    border-color: @proper_accent;
+}

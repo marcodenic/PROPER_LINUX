@@ -5,9 +5,13 @@
 # QMP socket is the supported input/control path for graphical acceptance.
 # Set PROPER_VM_POINTER=relative when using VNC/RFB clients that emit relative
 # mouse events; the default tablet mode provides QEMU's absolute pointer.
-# The default review profile uses a normal 1920x1080 framebuffer at 100%
-# scaling so the VM opens at a familiar desktop size. Set
+# The default PM-review presentation uses a normal resizable local GTK window
+# with a 1920x1080 framebuffer at 100% scaling. The guest is zoomed to fit the
+# client area, so maximising the window fills it instead of leaving a small
+# centred guest surface. Set
 # PROPER_VM_PROFILE=hidpi for a 3840x2160 framebuffer at 200% scaling.
+# Forced full-screen launch is deliberately unsupported. VNC is an automation
+# backend and does not open a local review window.
 # Set PROPER_VM_BOOT=installed to omit the ISO after installation, and set
 # PROPER_VM_OUTPUTS=2 for the focused multi-display compatibility view.
 set -Eeuo pipefail
@@ -15,8 +19,29 @@ set -Eeuo pipefail
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 iso_path="${1:?Usage: scripts/run-vm /absolute/path/to/image.iso [vm-disk.qcow2]}"
 disk_path="${2:-"$project_root/../proper-linux-build/vm/proper-linux.qcow2"}"
-firmware_code="${OVMF_CODE:-/usr/share/edk2/ovmf/OVMF_CODE.fd}"
-firmware_vars_template="${OVMF_VARS:-/usr/share/edk2/ovmf/OVMF_VARS.fd}"
+source "$project_root/image/firmware/edk2-ovmf-fedora44.lock"
+output_root="${PROPER_OUTPUT_DIR:-"$project_root/../proper-linux-build"}"
+firmware_profile="${PROPER_VM_FIRMWARE:-proper}"
+if [[ -n "${OVMF_CODE:-}" || -n "${OVMF_VARS:-}" ]]; then
+  firmware_profile=custom
+  firmware_code="${OVMF_CODE:-/usr/share/edk2/ovmf/OVMF_CODE.fd}"
+  firmware_vars_template="${OVMF_VARS:-/usr/share/edk2/ovmf/OVMF_VARS.fd}"
+else
+  case "$firmware_profile" in
+    proper)
+      firmware_code="$output_root/firmware/$EDK2_FIRMWARE_BUILD_ID/OVMF_CODE.fd"
+      firmware_vars_template="$output_root/firmware/$EDK2_FIRMWARE_BUILD_ID/OVMF_VARS.fd"
+      ;;
+    host)
+      firmware_code=/usr/share/edk2/ovmf/OVMF_CODE.fd
+      firmware_vars_template=/usr/share/edk2/ovmf/OVMF_VARS.fd
+      ;;
+    *)
+      printf 'Unknown VM firmware profile: %s (use proper or host).\n' "$firmware_profile" >&2
+      exit 1
+      ;;
+  esac
+fi
 vm_dir="$(dirname "$disk_path")"
 disk_stem="$(basename "${disk_path%.*}")"
 firmware_vars="$vm_dir/$disk_stem.OVMF_VARS.fd"
@@ -56,6 +81,10 @@ vm_display_delay="${PROPER_VM_DISPLAY_DELAY:-35}"
 vm_auto_display="${PROPER_VM_AUTO_DISPLAY:-1}"
 vm_backend="${PROPER_VM_BACKEND:-gtk}"
 vm_vnc_display="${PROPER_VM_VNC_DISPLAY:-}"
+if [[ -n "${PROPER_VM_FULLSCREEN:-}" && ! "${PROPER_VM_FULLSCREEN}" =~ ^(0|off|false)$ ]]; then
+  printf 'Forced full-screen VM launch is unsupported; maximise the normal review window instead.\n' >&2
+  exit 1
+fi
 vm_pointer="${PROPER_VM_POINTER:-tablet}"
 case "$vm_pointer" in
   tablet) pointer_args=(-device qemu-xhci -device usb-tablet,id=proper_tablet) ;;
@@ -104,6 +133,13 @@ esac
 [[ "$vm_refresh" =~ ^[0-9]+([.][0-9]+)?$ ]] || { printf 'VM refresh must be a positive number.\n' >&2; exit 1; }
 [[ "$vm_memory" =~ ^[0-9]+$ && "$vm_memory" -ge 1024 ]] || { printf 'PROPER_VM_MEMORY must be at least 1024 megabytes.\n' >&2; exit 1; }
 [[ "$vm_outputs" =~ ^[1-4]$ ]] || { printf 'PROPER_VM_OUTPUTS must be an integer from 1 to 4.\n' >&2; exit 1; }
+gpu_args=(-device "virtio-vga,xres=$vm_width,yres=$vm_height,max_outputs=1")
+# QEMU 10.2 exposes extra scanout capacity through max_outputs but leaves all
+# heads after the first disconnected.  Give each requested compatibility-view
+# output its own virtio controller so Plasma sees a real connected display.
+for ((output_index = 2; output_index <= vm_outputs; output_index++)); do
+  gpu_args+=(-device "virtio-gpu-pci,id=proper_gpu_$output_index,xres=$vm_width,yres=$vm_height,max_outputs=1")
+done
 if [[ -n "$vm_ssh_port" ]]; then
   [[ "$vm_ssh_port" =~ ^[0-9]+$ && "$vm_ssh_port" -ge 1024 && "$vm_ssh_port" -le 65535 ]] || {
     printf 'PROPER_VM_SSH_PORT must be an unprivileged TCP port from 1024 to 65535.\n' >&2
@@ -117,7 +153,15 @@ fi
 [[ "$vm_auto_display" == 0 || "$vm_auto_display" == 1 ]] || { printf 'PROPER_VM_AUTO_DISPLAY must be 0 or 1.\n' >&2; exit 1; }
 [[ -c /dev/kvm && -r /dev/kvm && -w /dev/kvm ]] || { printf '/dev/kvm is unavailable; graphical acceptance requires host KVM access.\n' >&2; exit 1; }
 command -v qemu-system-x86_64 >/dev/null || { printf 'qemu-system-x86_64 is not installed.\n' >&2; exit 1; }
-[[ -f "$firmware_code" && -f "$firmware_vars_template" ]] || { printf 'OVMF firmware not found; set OVMF_CODE and OVMF_VARS if Fedora uses another path.\n' >&2; exit 1; }
+if [[ ! -f "$firmware_code" || ! -f "$firmware_vars_template" ]]; then
+  if [[ "$firmware_profile" == proper ]]; then
+    printf 'Proper-branded OVMF firmware is missing. Build it with scripts/build-vm-firmware.\n' >&2
+    printf 'Use PROPER_VM_FIRMWARE=host only for raw upstream-firmware diagnostics.\n' >&2
+  else
+    printf 'OVMF firmware not found; set OVMF_CODE and OVMF_VARS to valid paths.\n' >&2
+  fi
+  exit 1
+fi
 
 # Refuse to start a second VM using this disk.  Match the fully resolved disk
 # path in the command line so an unrelated QEMU process cannot be mistaken
@@ -142,9 +186,11 @@ if [[ -e "$monitor_socket" || -e "$qmp_socket" ]]; then
   done
 fi
 
-qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m "$vm_memory" -device "virtio-vga,xres=$vm_width,yres=$vm_height,max_outputs=$vm_outputs" "${pointer_args[@]}" "${display_args[@]}" -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive "file=$disk_path,if=none,format=qcow2,id=proper_disk" -device "virtio-blk-pci,drive=proper_disk,bootindex=$disk_bootindex" "${aux_drive_args[@]}" "${media_args[@]}" "${network_args[@]}" &
+qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m "$vm_memory" "${gpu_args[@]}" "${pointer_args[@]}" "${display_args[@]}" -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive "file=$disk_path,if=none,format=qcow2,id=proper_disk" -device "virtio-blk-pci,drive=proper_disk,bootindex=$disk_bootindex" "${aux_drive_args[@]}" "${media_args[@]}" "${network_args[@]}" &
 qemu_pid=$!
 display_helper_pid=
+
+printf 'VM firmware profile %s: %s\n' "$firmware_profile" "$firmware_code"
 
 cleanup_display_helper() {
   if [[ -n "${display_helper_pid:-}" ]] && kill -0 "$display_helper_pid" 2>/dev/null; then
@@ -164,6 +210,12 @@ else
   printf 'Automatic VM display selection disabled. Apply it with:\n'
   printf '  scripts/set-vm-display %q %q %q %q %q %q\n' \
     "$qmp_socket" "$monitor_socket" "$vm_width" "$vm_height" "$vm_scale" "$vm_refresh"
+fi
+
+if [[ "$vm_backend" == gtk ]]; then
+  printf 'Local PM-review window is resizable with zoom-to-fit enabled; maximise it normally to fill the screen.\n'
+else
+  printf 'VNC backend is automation-only; it does not open a local PM-review window.\n'
 fi
 
 wait "$qemu_pid"

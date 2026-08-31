@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -eu
+
+show_error() {
+    local message="$1"
+    kdialog --title "Coding Agent" --error "$message" >/dev/null 2>&1 || true
+}
+
+agent_directory="${1:-$PWD}"
+if [[ ! -d "$agent_directory" ]]; then
+    show_error "That project folder is no longer available."
+    exit 2
+fi
+agent_directory="$(cd -- "$agent_directory" && pwd -P)"
+
+config_root="${XDG_CONFIG_HOME:-$HOME/.config}"
+default_file="$config_root/proper-linux/default-agent"
+default_agent=""
+if [[ -r "$default_file" ]]; then
+    IFS= read -r default_agent < "$default_file" || true
+fi
+
+agent_command=""
+case "$default_agent" in
+    codex) agent_command="codex" ;;
+    claude-code) agent_command="claude" ;;
+    opencode) agent_command="opencode" ;;
+    "") ;;
+    *) default_agent="" ;;
+esac
+
+if [[ -n "$agent_command" ]]; then
+    agent_path=""
+    if [[ -x "$HOME/.local/bin/$agent_command" ]]; then
+        agent_path="$HOME/.local/bin/$agent_command"
+    elif agent_path="$(command -v "$agent_command" 2>/dev/null)" && [[ -n "$agent_path" ]]; then
+        :
+    else
+        agent_path=""
+    fi
+    if [[ -n "$agent_path" ]]; then
+        if ! command -v ghostty >/dev/null 2>&1; then
+            show_error "Ghostty is required to open your coding agent."
+            exit 1
+        fi
+        exec ghostty --working-directory "$agent_directory" -e "$agent_path"
+    fi
+    exec /usr/bin/proper-apps --choose-agent --working-directory "$agent_directory" --missing "$default_agent"
+fi
+
+exec /usr/bin/proper-apps --choose-agent --working-directory "$agent_directory"

@@ -24,5 +24,10 @@ if (panels().length === 0) {
 
     panel.addWidget("org.kde.plasma.systemtray")
     panel.addWidget("org.kde.plasma.showdesktop")
-    panel.addWidget("org.kde.plasma.digitalclock")
+    const clock = panel.addWidget("org.kde.plasma.digitalclock")
+    clock.currentConfigGroup = ["Appearance"]
+    clock.writeConfig("showSeconds", false)
+    clock.writeConfig("showDate", true)
+    clock.writeConfig("dateFormat", "custom")
+    clock.writeConfig("customDateFormat", "MMMM d")
 }

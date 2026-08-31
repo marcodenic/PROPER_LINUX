@@ -1,17 +1,18 @@
 Name:           proper-appearance
 Version:        0.1
-Release:        2%{?dist}
-Summary:        Proper Linux wallpaper gallery and arrival sync
+Release:        3%{?dist}
+Summary:        Proper Linux appearance, text sizing, and arrival sync
 License:        GPL-3.0-or-later
 BuildRequires:  qt6-qtbase-devel
 Requires:       plasma-workspace
 Requires:       polkit
-Requires:       proper-look-and-feel >= 0.1-6
+Requires:       proper-look-and-feel >= 0.1-17
+Requires:       /usr/bin/kwriteconfig6
 
 %description
-A restrained visual gallery for the five curated Proper Linux wallpapers.
-Selections apply to the Plasma desktop and lock screen, with an explicit,
-authenticated option to synchronise Plasma Login Manager.
+A restrained visual control for three curated desktop styles, coordinated
+text-size presets, and the five Proper Linux wallpapers. Wallpaper selections
+can explicitly synchronise Plasma Login Manager after authentication.
 
 %prep
 cp %{_sourcedir}/proper-appearance.cpp %{_sourcedir}/proper-appearance.pro .
@@ -31,6 +32,10 @@ install -Dpm 0755 %{_sourcedir}/proper-set-login-wallpaper %{buildroot}%{_libexe
 %{_datadir}/applications/proper-appearance.desktop
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-3
+- Add preview-first desktop styles and coordinated Plasma, GTK, and Ghostty text sizes
+- Keep content surfaces opaque while the Proper shell and terminal own translucency
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-2
 - Give the wallpaper gallery a restrained Proper Dark presentation
 

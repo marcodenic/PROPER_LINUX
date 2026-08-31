@@ -137,11 +137,18 @@ Prefer configuration and original assets over patching upstream QML.
 
 ### `proper-appearance`
 
-Owns the pointer-first wallpaper gallery and the bounded helper that keeps the
-desktop, lock screen, and Plasma Login Manager on one of Proper's five packaged
-wallpapers. The privileged helper accepts only those fixed wallpaper IDs and
-writes an ordinary PLM configuration fragment; it does not accept arbitrary
-paths or execute user-provided commands.
+Owns the small pointer-first appearance control: live previews for the three
+curated global styles, coordinated Compact/Standard/Large text presets, and the
+five-wallpaper gallery. Applying a style delegates to Plasma's supported Global
+Theme and wallpaper tools. Text presets write ordinary per-user KDE, GTK, and
+Ghostty settings; they do not replace application configuration wholesale.
+
+The bounded privileged helper keeps the desktop, lock screen, and Plasma Login
+Manager on one of Proper's packaged wallpapers. It accepts only those fixed
+wallpaper IDs and writes an ordinary PLM configuration fragment; it does not
+accept arbitrary paths or execute user-provided commands. The appearance
+window itself remains opaque: translucency belongs to selected shell surfaces
+and Ghostty, not every content window.
 
 ### `plasma-login-manager`
 
@@ -182,7 +189,8 @@ If either upstream component requires a patch, carry it separately with an upstr
 Owns:
 
 - Ghostty package/source selection
-- default Ghostty configuration
+- default Ghostty configuration, including restrained background opacity
+- the separately carried upstream `ext-background-effect-v1` blur backport
 - shell presentation that does not replace the user's shell unnecessarily
 - ordinary taskbar launcher
 - Dolphin “Open terminal here” integration
@@ -190,7 +198,11 @@ Owns:
 
 ### `proper-apps`
 
-Owns the curated application-directory UI and provider adapters. The catalogue data lives separately under `apps/` so products can be added or corrected without redesigning the interface.
+Owns the curated application-directory UI and provider adapters. The catalogue
+data lives separately under `apps/` so products can be added or corrected
+without redesigning the interface. It also owns the explicit default-agent
+choice and the bounded `proper-agent` dispatcher used by the generic Coding
+Agent actions; only the fixed Codex, Claude Code, and OpenCode IDs are accepted.
 
 ## Desktop stack
 
@@ -291,7 +303,14 @@ The normal UI exposes one Install action. Advanced details expose the selected s
 
 ## AI integration
 
-Version 0.1 installs or launches agent clients as ordinary user applications. Vicinae commands may open the selected agent in Ghostty. Proper Apps may manage installation and direct users into official authentication flows.
+Version 0.1 installs or launches agent clients as ordinary user applications.
+The app menu, Dolphin, and Vicinae expose one generic **Coding Agent** action.
+When no default exists, Proper Apps asks the user to choose Codex, Claude Code,
+or OpenCode and can run the catalogue's audited installation path. It saves the
+choice only after an existing executable is confirmed or installation succeeds.
+If a saved executable later disappears, the chooser offers reinstall, another
+agent, or cancel; it never silently falls back. A valid default opens in a new
+Ghostty window rooted at the requested directory.
 
 There is no privileged agent daemon, shared credential store, or automatic root authority in version 0.1.
 

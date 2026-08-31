@@ -1,0 +1,8 @@
+# Common desktop service policy retained from fedora-release 44-18.
+
+disable sshd.socket
+disable sshd.service
+
+enable cups.socket
+enable cups.path
+disable cups.service

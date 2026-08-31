@@ -1,0 +1,54 @@
+[Plymouth Theme]
+Name=Proper
+Description=Proper Linux grid identity with a quiet five-cell progress pulse
+ModuleName=two-step
+
+[two-step]
+Font=Noto Sans 12
+TitleFont=Noto Sans 28
+ImageDir=/usr/share/plymouth/themes/proper
+DialogHorizontalAlignment=.5
+DialogVerticalAlignment=.5
+TitleHorizontalAlignment=.5
+TitleVerticalAlignment=.5
+HorizontalAlignment=.5
+VerticalAlignment=.57
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.44
+Transition=none
+TransitionDuration=0.0
+BackgroundStartColor=0x050608
+BackgroundEndColor=0x050608
+ProgressBarBackgroundColor=0x182536
+ProgressBarForegroundColor=0x9bc7f1
+MessageBelowAnimation=true
+
+[boot-up]
+UseEndAnimation=false
+
+[shutdown]
+UseEndAnimation=false
+
+[reboot]
+UseEndAnimation=false
+
+[updates]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Installing updates
+SubTitle=Keep your computer powered on
+
+[system-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Upgrading Proper Linux
+SubTitle=Keep your computer powered on
+
+[firmware-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Updating firmware
+SubTitle=Keep your computer powered on

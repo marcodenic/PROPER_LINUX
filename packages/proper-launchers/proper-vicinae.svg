@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: 2026 Proper Linux contributors -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 32">
+  <!-- The asymmetric canvas adds perceptual separation from the first app
+       while leaving Plasma's native task spacing and behaviour untouched. -->
+  <circle cx="14" cy="16" r="9.5" fill="#f8fbff" stroke="#334155" stroke-opacity="0.35"/>
+</svg>

@@ -1,0 +1,202 @@
+diff -ruN original/build.zig.zon modified/build.zig.zon
+--- original/build.zig.zon	2026-03-13 16:00:30.000000000 +0000
++++ modified/build.zig.zon	2026-08-31 18:52:26.661287315 +0100
+@@ -91,8 +91,8 @@
+             .lazy = true,
+         },
+         .wayland_protocols = .{
+-            .url = "https://deps.files.ghostty.org/wayland-protocols-258d8f88f2c8c25a830c6316f87d23ce1a0f12d9.tar.gz",
+-            .hash = "N-V-__8AAKw-DAAaV8bOAAGqA0-oD7o-HNIlPFYKRXSPT03S",
++            .url = "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/1.47/wayland-protocols-1.47.tar.gz",
++            .hash = "N-V-__8AAFdWDwA0ktbNUi9pFBHCRN4weXIgIfCrVjfGxqgA",
+             .lazy = true,
+         },
+         .plasma_wayland_protocols = .{
+diff -ruN original/build.zig.zon.txt modified/build.zig.zon.txt
+--- original/build.zig.zon.txt	2026-03-13 16:00:30.000000000 +0000
++++ modified/build.zig.zon.txt	2026-08-31 18:52:26.662287324 +0100
+@@ -34,3 +34,4 @@
+ https://deps.files.ghostty.org/zlib-1220fed0c74e1019b3ee29edae2051788b080cd96e90d56836eea857b0b966742efb.tar.gz
+ https://github.com/ivanstepanovftw/zigimg/archive/d7b7ab0ba0899643831ef042bd73289510b39906.tar.gz
+ https://github.com/ocornut/imgui/archive/refs/tags/v1.92.5-docking.tar.gz
++https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/1.47/wayland-protocols-1.47.tar.gz
+diff -ruN original/src/apprt/gtk/winproto/wayland.zig modified/src/apprt/gtk/winproto/wayland.zig
+--- original/src/apprt/gtk/winproto/wayland.zig	2026-03-13 16:00:30.000000000 +0000
++++ modified/src/apprt/gtk/winproto/wayland.zig	2026-08-31 18:53:15.020651502 +0100
+@@ -14,6 +14,7 @@
+ const ApprtWindow = @import("../class/window.zig").Window;
+ 
+ const wl = wayland.client.wl;
++const ext = wayland.client.ext;
+ const org = wayland.client.org;
+ const xdg = wayland.client.xdg;
+ 
+@@ -25,6 +26,12 @@
+     context: *Context,
+ 
+     const Context = struct {
++        compositor: ?*wl.Compositor = null,
++
++        ext_background_effect_manager: ?*ext.BackgroundEffectManagerV1 = null,
++
++        background_effect_capabilities: ext.BackgroundEffectManagerV1.Capability = .{},
++
+         kde_blur_manager: ?*org.KdeKwinBlurManager = null,
+ 
+         // FIXME: replace with `zxdg_decoration_v1` once GTK merges
+@@ -83,11 +90,16 @@
+         registry.setListener(*Context, registryListener, context);
+         if (display.roundtrip() != .SUCCESS) return error.RoundtripFailed;
+ 
+-        // Do another round-trip to get the default decoration mode
++        // Do another round-trip to get the background-effect capabilities and
++        // the default decoration mode advertised by the compositor.
++        if (context.ext_background_effect_manager) |effect_manager| {
++            effect_manager.setListener(*Context, backgroundEffectManagerListener, context);
++        }
+         if (context.kde_decoration_manager) |deco_manager| {
+             deco_manager.setListener(*Context, decoManagerListener, context);
+-            if (display.roundtrip() != .SUCCESS) return error.RoundtripFailed;
+         }
++        if (context.ext_background_effect_manager != null or context.kde_decoration_manager != null)
++            if (display.roundtrip() != .SUCCESS) return error.RoundtripFailed;
+ 
+         return .{
+             .display = display,
+@@ -221,6 +233,18 @@
+             },
+         }
+     }
++
++    fn backgroundEffectManagerListener(
++        _: *ext.BackgroundEffectManagerV1,
++        event: ext.BackgroundEffectManagerV1.Event,
++        context: *Context,
++    ) void {
++        switch (event) {
++            .capabilities => |capabilities| {
++                context.background_effect_capabilities = capabilities.flags;
++            },
++        }
++    }
+ };
+ 
+ /// Per-window (wl_surface) state for the Wayland protocol.
+@@ -236,6 +260,9 @@
+     /// A token that, when present, indicates that the window is blurred.
+     blur_token: ?*org.KdeKwinBlur = null,
+ 
++    /// Compositor-neutral background effect used by current Plasma releases.
++    background_effect: ?*ext.BackgroundEffectSurfaceV1 = null,
++
+     /// Object that controls the decoration mode (client/server/auto)
+     /// of the window.
+     decoration: ?*org.KdeKwinServerDecoration = null,
+@@ -285,6 +312,16 @@
+             break :deco deco;
+         };
+ 
++        const background_effect: ?*ext.BackgroundEffectSurfaceV1 = effect: {
++            const manager = app.context.ext_background_effect_manager orelse
++                break :effect null;
++            const value = manager.getBackgroundEffect(wl_surface) catch |err| {
++                log.warn("could not create background effect object={}", .{err});
++                break :effect null;
++            };
++            break :effect value;
++        };
++
+         if (apprt_window.isQuickTerminal()) {
+             _ = gdk.Surface.signals.enter_monitor.connect(
+                 gdk_surface,
+@@ -300,17 +337,21 @@
+             .surface = wl_surface,
+             .app_context = app.context,
+             .decoration = deco,
++            .background_effect = background_effect,
+         };
+     }
+ 
+     pub fn deinit(self: Window, alloc: Allocator) void {
+         _ = alloc;
++        if (self.background_effect) |effect| effect.destroy();
+         if (self.blur_token) |blur| blur.release();
+         if (self.decoration) |deco| deco.release();
+         if (self.slide) |slide| slide.release();
+     }
+ 
+-    pub fn resizeEvent(_: *Window) !void {}
++    pub fn resizeEvent(self: *Window) !void {
++        try self.syncBlur();
++    }
+ 
+     pub fn syncAppearance(self: *Window) !void {
+         self.syncBlur() catch |err| {
+@@ -361,13 +402,48 @@
+ 
+     /// Update the blur state of the window.
+     fn syncBlur(self: *Window) !void {
+-        const manager = self.app_context.kde_blur_manager orelse return;
+         const config = if (self.apprt_window.getConfig()) |v|
+             v.get()
+         else
+             return;
+         const blur = config.@"background-blur";
+ 
++        if (self.background_effect) |effect| {
++            if (!self.app_context.background_effect_capabilities.blur) return;
++            if (!blur.enabled()) {
++                effect.setBlurRegion(null);
++                return;
++            }
++
++            const compositor = self.app_context.compositor orelse return;
++            const native = self.apprt_window.as(gtk.Native);
++            const surface = native.getSurface() orelse return;
++            const region = try compositor.createRegion();
++            defer region.destroy();
++
++            var x: f64 = 0;
++            var y: f64 = 0;
++            native.getSurfaceTransform(&x, &y);
++            x += 1;
++            y += 1;
++            var width: f64 = @floatFromInt(surface.getWidth());
++            var height: f64 = @floatFromInt(surface.getHeight());
++            width -= x * 2;
++            height -= y * 2;
++            if (width <= 0 or height <= 0) return;
++            region.add(
++                @intFromFloat(x),
++                @intFromFloat(y),
++                @intFromFloat(width),
++                @intFromFloat(height),
++            );
++            effect.setBlurRegion(region);
++            return;
++        }
++
++        // Retain the legacy KDE protocol as a fallback for older compositors.
++        const manager = self.app_context.kde_blur_manager orelse return;
++
+         if (self.blur_token) |tok| {
+             // Only release token when transitioning from blurred -> not blurred
+             if (!blur.enabled()) {
+diff -ruN original/src/build/SharedDeps.zig modified/src/build/SharedDeps.zig
+--- original/src/build/SharedDeps.zig	2026-03-13 16:00:30.000000000 +0000
++++ modified/src/build/SharedDeps.zig	2026-08-31 18:52:26.662287324 +0100
+@@ -637,12 +637,14 @@
+             plasma_wayland_protocols_dep.path("src/protocols/slide.xml"),
+         );
+         scanner.addSystemProtocol("staging/xdg-activation/xdg-activation-v1.xml");
++        scanner.addSystemProtocol("staging/ext-background-effect/ext-background-effect-v1.xml");
+ 
+         scanner.generate("wl_compositor", 1);
+         scanner.generate("org_kde_kwin_blur_manager", 1);
+         scanner.generate("org_kde_kwin_server_decoration_manager", 1);
+         scanner.generate("org_kde_kwin_slide_manager", 1);
+         scanner.generate("xdg_activation_v1", 1);
++        scanner.generate("ext_background_effect_manager_v1", 1);
+ 
+         step.root_module.addImport("wayland", b.createModule(.{
+             .root_source_file = scanner.result,

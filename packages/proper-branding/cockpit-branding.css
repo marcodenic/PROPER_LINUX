@@ -1,0 +1,36 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#badge {
+    inline-size: 225px;
+    block-size: 80px;
+    background-image: url("logo.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#brand::before {
+    content: "${NAME}";
+}
+
+.anaconda {
+    --brand-default-light: #9bc7f1;
+    --brand-default: #6f9fd0;
+    --brand-default-dark: #4778a9;
+
+    .logo {
+        background-image: url("logo.svg");
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+:not(.pf-v6-theme-dark) .anaconda {
+    --pf-t--global--color--brand--default: var(--brand-default-dark);
+    --pf-t--global--color--brand--hover: #315f8d;
+}
+
+.pf-v6-theme-dark .anaconda {
+    --pf-t--global--color--brand--default: var(--brand-default-light);
+    --pf-t--global--color--brand--hover: var(--brand-default);
+}

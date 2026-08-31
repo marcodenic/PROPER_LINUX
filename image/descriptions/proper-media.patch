@@ -1,0 +1,85 @@
+diff --git a/Fedora.kiwi b/Fedora.kiwi
+index 9fb8c80..c11dd28 100644
+--- a/Fedora.kiwi
++++ b/Fedora.kiwi
+@@ -1,12 +1,12 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ 
+-<image schemaversion="7.4" name="Fedora">
++<image schemaversion="7.4" name="Proper-Linux">
+ 	<description type="system">
+-		<author>Fedora Project Contributors</author>
+-		<contact>devel@lists.fedoraproject.org</contact>
+-		<specification>Fedora Linux</specification>
++		<author>Proper Linux contributors</author>
++		<contact>https://github.com/marcodenic/PROPER_LINUX</contact>
++		<specification>Proper Linux</specification>
+ 	</description>
+ 	<preferences>
+-		<version>44</version>
++		<version>0.1</version>
+ 		<packagemanager>dnf5</packagemanager>
+ 		<locale>en_US</locale>
+ 		<keytable>us</keytable>
+diff --git a/components/liveinstall.xml b/components/liveinstall.xml
+index c44f3a3..6519428 100644
+--- a/components/liveinstall.xml
++++ b/components/liveinstall.xml
+@@ -7,12 +7,12 @@
+ 	</profiles>
+ 	<preferences profiles="LiveInstall" arch="x86_64">
+ 		<type image="iso"
+-			publisher="Fedora Project" volid="Fedora_Linux" application_id="Fedora_Linux"
++			publisher="Proper Linux" volid="Proper-Linux" application_id="Proper-Linux"
+ 			primary="true" flags="dmsquash" filesystem="erofs" erofscompression="lzma,level=6" mediacheck="true"
+ 			firmware="uefi" efiparttable="gpt" efifatimagesize="30" kernelcmdline="quiet rhgb"
+ 			fscreateoptions="-Efragments -C 1048576"
+ 			>
+-			<bootloader name="grub2" grub_template="grub-x86.cfg.iso-template" console="console" timeout="10"/>
++			<bootloader name="grub2" grub_template="grub-x86.cfg.iso-template" console="console" timeout="6"/>
+ 		</type>
+ 	</preferences>
+ 	<preferences profiles="LiveInstall" arch="aarch64">
+diff --git a/grub-x86.cfg.iso-template b/grub-x86.cfg.iso-template
+index 7c2ad07..6ade3f8 100644
+--- a/grub-x86.cfg.iso-template
++++ b/grub-x86.cfg.iso-template
+@@ -1,6 +1,6 @@
+ # Inspired by the config used for lorax-built live media
+ 
+-set default="1"
++set default="0"
+ 
+ if [ "$$grub_platform" == "efi" ]; then
+ 	function load_video {
+@@ -27,16 +27,27 @@ set timeout_style=${boot_timeout_style}
+ 
+ search ${search_params}
+
+-menuentry "Start ${title}" --class fedora --class gnu-linux --class gnu --class os {
++set menu_color_normal=light-gray/black
++set menu_color_highlight=black/light-gray
++
++echo '  # # # #     # # # #       # # #     # # # #     # # # # #   # # # #'
++echo '  #       #   #       #   #       #   #       #   #           #       #'
++echo '  # # # #     # # # #     #       #   # # # #     # # # #     # # # #'
++echo '  #           #     #     #       #   #           #           #     #'
++echo '  #           #       #     # # #     #           # # # # #   #       #'
++echo '                              L I N U X'
++echo ''
++
++menuentry "Start Proper Linux" --class proper --class gnu-linux --class gnu --class os {
+ 	linux ($$root)${bootpath}/${kernel_file} ${boot_options}
+ 	initrd ($$root)${bootpath}/${initrd_file}
+ }
+-menuentry "Test this media & start ${title}" --class fedora --class gnu-linux --class gnu --class os {
++menuentry "Check media and start Proper Linux" --class proper --class gnu-linux --class gnu --class os {
+ 	linux ($$root)${bootpath}/${kernel_file} ${boot_options} rd.live.check
+ 	initrd ($$root)${bootpath}/${initrd_file}
+ }
+ submenu "Troubleshooting -->" {
+-	menuentry "Start ${title} in basic graphics mode" --class fedora --class gnu-linux --class gnu --class os {
++	menuentry "Start Proper Linux in basic graphics mode" --class proper --class gnu-linux --class gnu --class os {
+ 		linux ($$root)${bootpath}/${kernel_file} ${boot_options} $${basicgfx}
+ 		initrd ($$root)${bootpath}/${initrd_file}
+ 	}

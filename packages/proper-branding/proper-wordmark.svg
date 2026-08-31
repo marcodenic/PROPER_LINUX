@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426 62" role="img" aria-label="Proper">
+  <title>Proper</title>
+  <defs><rect id="cell" width="10" height="10" rx="0.7"/></defs>
+  <g fill="#f7f8fa">
+    <!-- P -->
+    <use href="#cell" x="0" y="0"/><use href="#cell" x="13" y="0"/><use href="#cell" x="26" y="0"/><use href="#cell" x="39" y="0"/>
+    <use href="#cell" x="0" y="13"/><use href="#cell" x="52" y="13"/>
+    <use href="#cell" x="0" y="26"/><use href="#cell" x="13" y="26"/><use href="#cell" x="26" y="26"/><use href="#cell" x="39" y="26"/>
+    <use href="#cell" x="0" y="39"/><use href="#cell" x="0" y="52"/>
+    <!-- R -->
+    <use href="#cell" x="73" y="0"/><use href="#cell" x="86" y="0"/><use href="#cell" x="99" y="0"/><use href="#cell" x="112" y="0"/>
+    <use href="#cell" x="73" y="13"/><use href="#cell" x="125" y="13"/>
+    <use href="#cell" x="73" y="26"/><use href="#cell" x="86" y="26"/><use href="#cell" x="99" y="26"/><use href="#cell" x="112" y="26"/>
+    <use href="#cell" x="73" y="39"/><use href="#cell" x="99" y="39"/>
+    <use href="#cell" x="73" y="52"/><use href="#cell" x="112" y="52"/>
+    <!-- O -->
+    <use href="#cell" x="159" y="0"/><use href="#cell" x="172" y="0"/><use href="#cell" x="185" y="0"/>
+    <use href="#cell" x="146" y="13"/><use href="#cell" x="198" y="13"/>
+    <use href="#cell" x="146" y="26"/><use href="#cell" x="198" y="26"/>
+    <use href="#cell" x="146" y="39"/><use href="#cell" x="198" y="39"/>
+    <use href="#cell" x="159" y="52"/><use href="#cell" x="172" y="52"/><use href="#cell" x="185" y="52"/>
+    <!-- P -->
+    <use href="#cell" x="219" y="0"/><use href="#cell" x="232" y="0"/><use href="#cell" x="245" y="0"/><use href="#cell" x="258" y="0"/>
+    <use href="#cell" x="219" y="13"/><use href="#cell" x="271" y="13"/>
+    <use href="#cell" x="219" y="26"/><use href="#cell" x="232" y="26"/><use href="#cell" x="245" y="26"/><use href="#cell" x="258" y="26"/>
+    <use href="#cell" x="219" y="39"/><use href="#cell" x="219" y="52"/>
+    <!-- E -->
+    <use href="#cell" x="292" y="0"/><use href="#cell" x="305" y="0"/><use href="#cell" x="318" y="0"/><use href="#cell" x="331" y="0"/><use href="#cell" x="344" y="0"/>
+    <use href="#cell" x="292" y="13"/>
+    <use href="#cell" x="292" y="26"/><use href="#cell" x="305" y="26"/><use href="#cell" x="318" y="26"/><use href="#cell" x="331" y="26"/>
+    <use href="#cell" x="292" y="39"/>
+    <use href="#cell" x="292" y="52"/><use href="#cell" x="305" y="52"/><use href="#cell" x="318" y="52"/><use href="#cell" x="331" y="52"/><use href="#cell" x="344" y="52"/>
+    <!-- R -->
+    <use href="#cell" x="365" y="0"/><use href="#cell" x="378" y="0"/><use href="#cell" x="391" y="0"/><use href="#cell" x="404" y="0"/>
+    <use href="#cell" x="365" y="13"/><use href="#cell" x="417" y="13"/>
+    <use href="#cell" x="365" y="26"/><use href="#cell" x="378" y="26"/><use href="#cell" x="391" y="26"/><use href="#cell" x="404" y="26"/>
+    <use href="#cell" x="365" y="39"/><use href="#cell" x="391" y="39"/>
+    <use href="#cell" x="365" y="52"/><use href="#cell" x="404" y="52"/>
+  </g>
+</svg>

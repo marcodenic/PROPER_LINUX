@@ -2,7 +2,7 @@
 Name=Applications & Search
 Comment=Search applications, files, commands and actions
 Exec=/usr/bin/proper-launcher
-Icon=edit-find
+Icon=proper-vicinae
 Terminal=false
 Type=Application
 Categories=Utility;

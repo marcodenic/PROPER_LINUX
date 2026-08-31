@@ -565,3 +565,121 @@ Status values:
   Initial Setup then failed to acquire the VM's DRM device and left a black
   first boot. Removing that redundant package restored Fedora's maintained
   Plasma-native setup flow through the administrator-account page.
+
+## D055 — Refine the shelf without replacing Plasma behaviour
+
+- **Status:** Accepted at PM taskbar review; radius and tooltip details superseded by D057
+- **Date:** 2026-08-31
+- **Decision:** Keep the approved Proper Horizon shelf, its 18-pixel corner
+  geometry, and Plasma's upstream Icon Tasks, System Tray, Show Desktop, and
+  Digital Clock. Soften the shelf fill and edge so the frame reads as depth,
+  not a white outline; preserve the complete rounded masks and neutral shadow
+  slices from D053. Replace the promoted Vicinae search glyph with a larger
+  quiet white dot and retain **Applications & Search** as its accessible name
+  and tooltip. Add perceptual space after that launcher, use a month-and-day
+  clock date without the year, add four pixels of space at the clock end, and
+  retain Plasma's native active line and running-dot task states. Do not add a
+  moving hover lens.
+- **Reason:** The PM approved the refined preview for implementation and asked
+  to judge further adjustments in the real desktop. These changes establish a
+  distinctive taskbar without custom applet or compositor code and therefore
+  keep the interaction and stability boundary established by D046.
+
+## D056 — PM review VMs use a scalable local window
+
+- **Status:** Accepted after review-presentation regression
+- **Date:** 2026-08-31
+- **Decision:** Present every product-manager-facing VM through QEMU's local
+  GTK backend in a normal resizable window, with one 1920x1080 output at 100%
+  scaling and zoom-to-fit enabled. Maximising the window must make the guest
+  fill the available client area; do not force full screen. Keep VNC and
+  additional virtual GPUs available only for unattended automation and focused
+  display-compatibility checks; they must not replace the visible PM review
+  surface.
+- **Reason:** A two-output VNC compatibility run was left as the visible VM.
+  Although its guest framebuffer remained 1920x1080, the remote presentation
+  appeared as a tiny viewer surface and regressed the explicitly requested
+  large review window. Separating presentation from automation prevents a
+  correct guest resolution from masking an unusable host window.
+
+## D057 — Remove hover-triggered shell tooltips and tighten the shelf radius
+
+- **Status:** Accepted at PM taskbar review
+- **Date:** 2026-08-31
+- **Decision:** Disable Plasma's informational tooltips on pointer hover by
+  setting the supported global tooltip delay to zero. Keep applet and action
+  names in their upstream accessibility metadata, retain click-to-open panels,
+  and leave the Workspace Behaviour setting available for users who want to
+  re-enable hover tooltips. Reduce the Proper shelf corner radius from 18 to
+  16 pixels while preserving the rounded compositor mask and upstream panel
+  behaviour.
+- **Reason:** Plasma 6.7.4 uses one shared tooltip window. After its initial
+  delay, moving between adjacent panel targets replaces the contents
+  immediately, making tooltips feel as if they appear on every hover; large
+  clock content also looks detached when constrained beside the edge of a
+  fit-content panel. The PM rejected hover-only explanations and requested a
+  slightly tighter taskbar shape.
+
+## D058 — Brand the QEMU review firmware and keep hardware firmware out of scope
+
+- **Status:** Accepted after Phase 12 boot-path review
+- **Date:** 2026-08-31
+- **Decision:** Build the PM review VM's OVMF firmware from Fedora 44's exact
+  pinned `edk2-20260508-8.fc44` source RPM and patch set, replacing only the
+  built-in TianoCore bitmap with Proper's canonical grid wordmark and
+  suppressing successful boot-option path chatter while retaining failure
+  diagnostics. Make that artifact the default in `scripts/run-vm`; raw host
+  OVMF remains an explicit diagnostics profile. Continue to use Fedora's
+  signed shim and EFI directory underneath. Physical installations retain the
+  computer manufacturer's firmware presentation because an operating-system
+  image cannot and should not rewrite motherboard firmware.
+- **Source:** Fedora `edk2-20260508-8.fc44.src.rpm`, SHA-256
+  `2dc18705f149274cccb0ecd5a184bb9602e4fde57e0f448b9af674502117b5a4`,
+  upstream commit `b03a21a63e3b` plus Fedora's packaged patches.
+- **Licence:** The source RPM declares Apache-2.0 and its listed BSD, GPL, ISC,
+  MIT, patent, and public-domain component terms. Proper's original wordmark
+  remains under the project's artwork licence.
+- **Update method:** When Fedora's `edk2-ovmf` changes, download and checksum
+  the new source RPM, review its patch set and licence metadata, update the
+  lock and builder base deliberately, rebuild the firmware, then recapture the
+  UEFI-to-Plymouth sequence before promotion.
+- **Reason:** TianoCore and successful `/EFI/fedora/...` status text are useful
+  implementation diagnostics but visibly break Proper's reviewed arrival.
+  Rebuilding the exact distro source preserves the upstream firmware boundary
+  while making the controlled VM presentation coherent.
+
+## D059 — Use selective translucency and a small preview-first appearance control
+
+- **Status:** Accepted for implementation
+- **Date:** 2026-08-31
+- **Decision:** Update the D027 source pin to signed Ghostty 1.3.1 and Zig
+  0.15.2, carrying the separately recorded upstream
+  `ext-background-effect-v1` backport until it lands in a pinned release. Give
+  Ghostty a restrained 92% background opacity with opaque cell backgrounds and
+  compositor blur. Keep normal content windows opaque.
+  Extend `proper-appearance` from D042 with live previews for Blue Hour,
+  Horizon Light, and Midnight plus Compact, Standard, and Large text presets
+  coordinated across KDE, GTK, and new Ghostty windows. Continue to apply
+  styles through Plasma's supported Global Theme and wallpaper tools.
+- **Reason:** Omarchy's useful lesson is selective depth and decisive curation,
+  not blanket transparency. Terminal and shell glass can expose enough
+  wallpaper to establish place while opaque application content preserves
+  contrast. Three coherent looks and three text choices provide useful
+  personalisation without recreating the complete system-settings surface.
+
+## D060 — Make the default coding agent explicit and safely recoverable
+
+- **Status:** Accepted for implementation
+- **Date:** 2026-08-31
+- **Decision:** Expose one generic Coding Agent action through the application
+  menu, Dolphin, and Vicinae. On first use, ask the user to choose Codex, Claude
+  Code, or OpenCode; detect manually installed commands and offer the audited
+  Proper Apps installer otherwise. Save the fixed agent ID only after the
+  executable exists or installation succeeds. Launch the saved client in an
+  ordinary Ghostty window rooted at the requested folder. If it later goes
+  missing, offer reinstall, another selection, or cancel and never infer a
+  fallback.
+- **Reason:** A stable generic action is convenient only if its target remains
+  legible and user-controlled. The explicit bounded choice avoids surprising
+  launches, works with existing manual installs, and adds no privileged daemon,
+  credential broker, or background process.

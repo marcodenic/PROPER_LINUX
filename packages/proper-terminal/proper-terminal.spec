@@ -1,22 +1,24 @@
 Name: proper-terminal
-Version: 1.2.3
-Release: 7%{?dist}
+Version: 1.3.1
+Release: 1%{?dist}
 Summary: Ghostty terminal and Proper developer essentials
 License: MIT
 URL: https://ghostty.org/
-Source0: https://release.files.ghostty.org/1.2.3/ghostty-1.2.3.tar.gz
+Source0: https://release.files.ghostty.org/1.3.1/ghostty-1.3.1.tar.gz
 Source1: ghostty.conf
 Source2: proper-terminal.desktop
 Source3: proper-terminal-dolphin.desktop
-Source4: https://ziglang.org/download/0.14.1/zig-x86_64-linux-0.14.1.tar.xz
-Source5: https://ziglang.org/download/0.14.1/zig-x86_64-linux-0.14.1.tar.xz.minisig
-Source6: https://release.files.ghostty.org/1.2.3/ghostty-1.2.3.tar.gz.minisig
+Source4: https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz
+Source5: https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz.minisig
+Source6: https://release.files.ghostty.org/1.3.1/ghostty-1.3.1.tar.gz.minisig
+Patch0: ghostty-ext-background-effect.patch
 BuildRequires: gcc
 BuildRequires: gtk4-devel
 BuildRequires: libadwaita-devel
 BuildRequires: gtk4-layer-shell-devel
 BuildRequires: pkgconf
 BuildRequires: gettext
+BuildRequires: git-core
 BuildRequires: minisign
 BuildRequires: pandoc
 BuildRequires: oniguruma-devel
@@ -34,21 +36,24 @@ Pinned upstream Ghostty with Proper's terminal defaults and Dolphin integration.
 %setup -q -n ghostty-%{version}
 minisign -Vm %{SOURCE4} -x %{SOURCE5} -P RWSGOq2NVecA2UPNdBUZykf1CCb147pkmdtYxgb3Ti+JO/wCYvhbAb/U
 minisign -Vm %{SOURCE0} -x %{SOURCE6} -P RWQlAjJC23149WL2sEpT/l0QKy7hMIFhYdQOFy0Z7z7PbneUgvlsnYcV
+%patch -P 0 -p1
 %build
 tar -xf %{SOURCE4}
-zig_bin="$PWD/zig-x86_64-linux-0.14.1/zig"
+zig_bin="$PWD/zig-x86_64-linux-0.15.2/zig"
 export PATH="$(dirname "$zig_bin"):$PATH"
 export ZIG_GLOBAL_CACHE_DIR="$PWD/zig-global-cache"
-sed -i '/codeberg.org\/atman\/zg/d; /github.com\/TUSF\/zigimg/d' build.zig.zon.txt
-sed -i 's|https://github.com/mbadolato/iTerm2-Color-Schemes/releases/download/release-20251002-142451-4a5043e/ghostty-themes.tgz|https://github.com/mbadolato/iTerm2-Color-Schemes/releases/download/release-20260525-155808-7335c0a/ghostty-themes.tgz|' build.zig.zon.txt build.zig.zon
-sed -i 's|N-V-__8AALIsAwDyo88G5mGJGN2lSVmmFMx4YePfUvp_2o3Y|N-V-__8AAGi9AwC7QV7hLqjN6iBkXA2y5dxw285nkSLlVB7I|' build.zig.zon
-sed -i 's|git+https://github.com/rockorager/libvaxis#1f41c121e8fc153d9ce8c6eb64b2bbab68ad7d23|https://github.com/rockorager/libvaxis/archive/1f41c121e8fc153d9ce8c6eb64b2bbab68ad7d23.tar.gz|' build.zig.zon.txt build.zig.zon
 ./nix/build-support/fetch-zig-cache.sh
-"$zig_bin" fetch 'git+https://github.com/TUSF/zigimg#31268548fe3276c0e95f318a6c0d2ab10565b58d' >/dev/null
-"$zig_bin" fetch 'git+https://codeberg.org/atman/zg#4a002763419a34d61dcbb1f415821b83b9bf8ddc' >/dev/null
 DESTDIR="$PWD/ghostty-root" "$zig_bin" build --prefix /usr --system "$ZIG_GLOBAL_CACHE_DIR/p" -Doptimize=ReleaseFast -Dcpu=baseline
 %install
 cp -a ghostty-root/usr/. %{buildroot}%{_prefix}/
+# Ghostty 1.3.1's default install step also emits its experimental VT SDK.
+# Proper ships the terminal application, not a development surface with no
+# in-product consumer, so keep that SDK out of the lean desktop package.
+rm -r %{buildroot}%{_includedir}/ghostty
+rm %{buildroot}%{_prefix}/lib/libghostty-vt.so
+rm %{buildroot}%{_prefix}/lib/libghostty-vt.so.0
+rm %{buildroot}%{_prefix}/lib/libghostty-vt.so.0.1.0
+rm %{buildroot}%{_datadir}/pkgconfig/libghostty-vt.pc
 install -Dpm 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/skel/.config/ghostty/config
 install -Dpm 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/xdg/ghostty/config
 install -Dpm 0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/proper-terminal.desktop
@@ -60,6 +65,11 @@ install -Dpm 0644 %{SOURCE3} %{buildroot}%{_datadir}/kio/servicemenus/proper-ter
 %config(noreplace) %{_sysconfdir}/skel/.config/ghostty/config
 %config(noreplace) %{_sysconfdir}/xdg/ghostty/config
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 1.3.1-1
+- Update to the signed Ghostty 1.3.1 release and Zig 0.15.2 toolchain
+- Add restrained 92 percent background opacity aligned to Proper Horizon tokens
+- Backport Ghostty's ext-background-effect protocol for blur on Plasma 6.7
+
 * Sun Aug 30 2026 Proper Linux <proper@example.invalid> - 1.2.3-7
 - Remove the retained dropdown prototype and keep ordinary Ghostty launching
 

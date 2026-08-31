@@ -166,7 +166,7 @@ static QIcon catalogueIcon(const QJsonObject &entry, int size = 72) {
 class AppCard final : public QFrame {
     Q_OBJECT
 public:
-    AppCard(const QJsonObject &entry, bool installed, QWidget *parent = nullptr)
+    AppCard(const QJsonObject &entry, bool installed, bool agentChoice = false, QWidget *parent = nullptr)
         : QFrame(parent), id(entry.value("id").toString()) {
         setObjectName("appCard");
         setFixedSize(252, 224);
@@ -207,7 +207,8 @@ public:
         auto *action = new QPushButton;
         action->setCursor(Qt::PointingHandCursor);
         const bool launchable = !entry.value("launch_args").toArray().isEmpty();
-        action->setText(installed ? (launchable ? "Open" : "Installed") : "Install");
+        action->setText(agentChoice ? (installed ? "Use" : "Install and use")
+                                    : (installed ? (launchable ? "Open" : "Installed") : "Install"));
         action->setEnabled(!installed || launchable);
         action->setObjectName(installed ? "secondaryButton" : "primaryButton");
         bottom->addWidget(action);
@@ -290,7 +291,8 @@ private:
 class ProperApps final : public QWidget {
     Q_OBJECT
 public:
-    ProperApps() {
+    ProperApps(bool chooseAgent = false, const QString &directory = {}, const QString &missing = {})
+        : agentChooser(chooseAgent), agentDirectory(directory), missingAgent(missing) {
         setObjectName("root");
         setWindowTitle("Proper Apps");
         setWindowIcon(QIcon::fromTheme("system-software-install"));
@@ -301,6 +303,7 @@ public:
         loadWebApps();
         refreshInstalledState();
         populateCategories();
+        configureAgentMode();
         refresh();
     }
 
@@ -347,17 +350,24 @@ private:
         root->setSpacing(14);
         auto *header = new QHBoxLayout;
         auto *titleBlock = new QVBoxLayout;
-        auto *title = new QLabel("Proper Apps");
-        QFont titleFont = title->font();
+        titleLabel = new QLabel("Proper Apps");
+        QFont titleFont = titleLabel->font();
         titleFont.setPixelSize(28);
         titleFont.setBold(true);
-        title->setFont(titleFont);
-        titleBlock->addWidget(title);
-        auto *subtitle = new QLabel("Excellent software, one dependable install path.");
-        subtitle->setObjectName("subtitle");
-        titleBlock->addWidget(subtitle);
+        titleLabel->setFont(titleFont);
+        titleBlock->addWidget(titleLabel);
+        subtitleLabel = new QLabel("Excellent software, one dependable install path.");
+        subtitleLabel->setObjectName("subtitle");
+        titleBlock->addWidget(subtitleLabel);
         header->addLayout(titleBlock);
         header->addStretch();
+        agentButton = new QPushButton("Coding agent…");
+        agentButton->setObjectName("secondaryButton");
+        header->addWidget(agentButton, 0, Qt::AlignBottom);
+        agentCancelButton = new QPushButton("Cancel");
+        agentCancelButton->setObjectName("secondaryButton");
+        agentCancelButton->hide();
+        header->addWidget(agentCancelButton, 0, Qt::AlignBottom);
         search = new QLineEdit;
         search->setPlaceholderText("Search apps");
         search->setClearButtonEnabled(true);
@@ -365,7 +375,9 @@ private:
         header->addWidget(search, 0, Qt::AlignBottom);
         root->addLayout(header);
 
-        auto *navRow = new QHBoxLayout;
+        navBar = new QWidget;
+        auto *navRow = new QHBoxLayout(navBar);
+        navRow->setContentsMargins(0, 0, 0, 0);
         navGroup = new QButtonGroup(this);
         navGroup->setExclusive(true);
         const QStringList views = {"Recommended", "Installed", "All", "Web apps"};
@@ -387,7 +399,7 @@ private:
         countLabel = new QLabel;
         countLabel->setObjectName("countLabel");
         navRow->addWidget(countLabel);
-        root->addLayout(navRow);
+        root->addWidget(navBar);
 
         banner = new QLabel;
         banner->setObjectName("banner");
@@ -453,6 +465,80 @@ private:
             refresh();
         });
         connect(addWebAppButton, &QPushButton::clicked, this, &ProperApps::createWebApp);
+        connect(agentButton, &QPushButton::clicked, this, [] {
+            QProcess::startDetached("/usr/bin/proper-apps", {"--choose-agent"});
+        });
+        connect(agentCancelButton, &QPushButton::clicked, this, &QWidget::close);
+    }
+
+    static const QSet<QString> &supportedAgentIds() {
+        static const QSet<QString> ids = {"codex", "claude-code", "opencode"};
+        return ids;
+    }
+
+    static QString defaultAgentFile() {
+        return homePath() + "/.config/proper-linux/default-agent";
+    }
+
+    QString currentDefaultAgent() const {
+        QFile file(defaultAgentFile());
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return {};
+        const QString id = QString::fromUtf8(file.readLine()).trimmed();
+        return supportedAgentIds().contains(id) ? id : QString();
+    }
+
+    bool saveDefaultAgent(const QString &id) {
+        if (!supportedAgentIds().contains(id)) return false;
+        if (!QDir().mkpath(QFileInfo(defaultAgentFile()).absolutePath())) return false;
+        QSaveFile file(defaultAgentFile());
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
+        file.write(id.toUtf8() + "\n");
+        return file.commit();
+    }
+
+    QString agentName(const QString &id) const {
+        const QJsonObject entry = entryFor(id);
+        return entry.isEmpty() ? id : entry.value("name").toString();
+    }
+
+    void configureAgentMode() {
+        if (!agentChooser) {
+            const QString id = currentDefaultAgent();
+            if (!id.isEmpty()) agentButton->setText("Coding agent: " + agentName(id));
+            return;
+        }
+
+        setWindowTitle("Choose a coding agent · Proper Apps");
+        titleLabel->setText("Choose your coding agent");
+        subtitleLabel->setText("This becomes the target of the generic Coding Agent action. Nothing runs in the background.");
+        agentButton->hide();
+        agentCancelButton->show();
+        search->hide();
+        navBar->hide();
+        category->hide();
+        countLabel->hide();
+        view = 2;
+
+        if (!QFileInfo(agentDirectory).isDir()) agentDirectory = homePath();
+        else agentDirectory = QFileInfo(agentDirectory).absoluteFilePath();
+
+        if (supportedAgentIds().contains(missingAgent)) {
+            banner->setText(agentName(missingAgent) + " is your saved default but is no longer installed. Reinstall it, choose another agent, or close this window to cancel.");
+            banner->setVisible(true);
+            return;
+        }
+
+        QStringList installed;
+        for (const QString &id : supportedAgentIds()) {
+            const auto entry = entryFor(id);
+            if (!entry.isEmpty() && isInstalled(entry)) installed << entry.value("name").toString();
+        }
+        if (installed.isEmpty())
+            showBanner("No supported coding agent is installed yet. Choose Install and use; the default is saved only after installation succeeds.");
+        else if (installed.size() == 1)
+            showBanner(installed.first() + " is already installed. Choose Use, or install a different agent.");
+        else
+            showBanner("Choose an installed agent, or install another. You can change this later from Proper Apps.");
     }
 
     void loadCatalogue() {
@@ -567,6 +653,8 @@ private:
         for (const auto &value : entries) {
             const auto entry = value.toObject();
             const bool installed = isInstalled(entry);
+            if (agentChooser && !supportedAgentIds().contains(entry.value("id").toString()))
+                continue;
             // Search the whole catalogue from the landing view so an optional
             // app never looks unavailable merely because it is not featured.
             if (view == 0 && query.isEmpty() && !entry.value("recommended").toBool())
@@ -580,7 +668,7 @@ private:
                 haystack += " " + tag.toString();
             if (!query.isEmpty() && !haystack.toLower().contains(query))
                 continue;
-            auto *card = new AppCard(entry, installed);
+            auto *card = new AppCard(entry, installed, agentChooser);
             connect(card, &AppCard::primaryRequested, this, &ProperApps::primaryAction);
             connect(card, &AppCard::detailsRequested, this, &ProperApps::showDetails);
             catalogueFlow->addWidget(card);
@@ -746,7 +834,7 @@ private:
         close->setObjectName("secondaryButton");
         actions->addWidget(close);
         connect(close, &QPushButton::clicked, &dialog, &QDialog::reject);
-        if (installed && entry.value("removable").toBool()) {
+        if (!agentChooser && installed && entry.value("removable").toBool()) {
             auto *remove = new QPushButton("Remove");
             remove->setObjectName("secondaryButton");
             actions->addWidget(remove);
@@ -754,15 +842,15 @@ private:
         }
         actions->addStretch();
         if (installed && !entry.value("launch_args").toArray().isEmpty()) {
-            auto *open = new QPushButton("Open");
+            auto *open = new QPushButton(agentChooser ? "Use" : "Open");
             open->setObjectName("primaryButton");
             actions->addWidget(open);
-            connect(open, &QPushButton::clicked, &dialog, [this, id, &dialog] { dialog.accept(); launchEntry(id); });
+            connect(open, &QPushButton::clicked, &dialog, [this, id, &dialog] { dialog.accept(); primaryAction(id); });
         } else if (!installed) {
-            auto *install = new QPushButton("Install");
+            auto *install = new QPushButton(agentChooser ? "Install and use" : "Install");
             install->setObjectName("primaryButton");
             actions->addWidget(install);
-            connect(install, &QPushButton::clicked, &dialog, [this, id, &dialog] { dialog.accept(); installEntry(id); });
+            connect(install, &QPushButton::clicked, &dialog, [this, id, &dialog] { dialog.accept(); primaryAction(id); });
         }
         root->addLayout(actions);
         dialog.exec();
@@ -771,7 +859,21 @@ private:
     void primaryAction(const QString &id) {
         const auto entry = entryFor(id);
         if (entry.isEmpty()) return;
-        if (isInstalled(entry)) launchEntry(id); else installEntry(id);
+        if (!agentChooser) {
+            if (isInstalled(entry)) launchEntry(id); else installEntry(id);
+            return;
+        }
+        if (!supportedAgentIds().contains(id)) return;
+        if (isInstalled(entry)) {
+            if (!saveDefaultAgent(id)) {
+                showFailure("The default agent could not be saved.", defaultAgentFile());
+                return;
+            }
+            launchAgent(id);
+        } else {
+            pendingDefaultAgent = id;
+            installEntry(id);
+        }
     }
 
     static QJsonObject step(const QString &program, const QStringList &arguments, bool privileged) {
@@ -821,6 +923,22 @@ private:
         showBanner("Opened " + entry.value("name").toString() + ".");
     }
 
+    void launchAgent(const QString &id) {
+        const auto entry = entryFor(id);
+        const QString commandName = entry.value("detection").toObject().value("value").toString();
+        const QString command = resolveProgram(commandName);
+        const QString terminal = resolveProgram("ghostty");
+        if (command.isEmpty()) {
+            showFailure(agentName(id) + " is not installed.", "Missing executable: " + commandName);
+            return;
+        }
+        if (terminal.isEmpty() || !QProcess::startDetached(terminal, {"--working-directory", agentDirectory, "-e", command})) {
+            showFailure("The coding agent is installed but Ghostty could not open it.", "Working directory: " + agentDirectory);
+            return;
+        }
+        close();
+    }
+
     void startOperation(const QString &id, const QJsonArray &steps, const QString &verb) {
         if (process) return;
         activeEntryId = id;
@@ -837,6 +955,8 @@ private:
     void runActiveStep() {
         const auto entry = entryFor(activeEntryId);
         if (activeStep >= activeSteps.size()) {
+            const QString completedId = activeEntryId;
+            const QString completedVerb = activeVerb;
             operationProgress->setVisible(false);
             showBanner((activeVerb == "install" ? "Installed " : "Removed ") + entry.value("name").toString() + ".");
             activeSteps = {};
@@ -844,6 +964,19 @@ private:
             activeVerb.clear();
             refreshInstalledState();
             refresh();
+            if (agentChooser && completedVerb == "install" && pendingDefaultAgent == completedId) {
+                pendingDefaultAgent.clear();
+                const auto installedEntry = entryFor(completedId);
+                if (installedEntry.isEmpty() || !isInstalled(installedEntry)) {
+                    showFailure("Installation finished, but the agent command was not found.", completedId);
+                    return;
+                }
+                if (!saveDefaultAgent(completedId)) {
+                    showFailure("The agent was installed, but the default could not be saved.", defaultAgentFile());
+                    return;
+                }
+                launchAgent(completedId);
+            }
             return;
         }
         const auto current = activeSteps.at(activeStep).toObject();
@@ -903,6 +1036,7 @@ private:
         activeSteps = {};
         activeEntryId.clear();
         activeVerb.clear();
+        pendingDefaultAgent.clear();
         showFailure(message, details);
         refreshInstalledState();
         refresh();
@@ -1028,11 +1162,20 @@ private:
     QJsonArray webApps;
     QSet<QString> installedRpms;
     QSet<QString> installedFlatpaks;
+    bool agentChooser = false;
+    QString agentDirectory;
+    QString missingAgent;
+    QString pendingDefaultAgent;
     int view = 0;
+    QLabel *titleLabel = nullptr;
+    QLabel *subtitleLabel = nullptr;
     QLineEdit *search = nullptr;
     QComboBox *category = nullptr;
     QLabel *countLabel = nullptr;
     QLabel *banner = nullptr;
+    QWidget *navBar = nullptr;
+    QPushButton *agentButton = nullptr;
+    QPushButton *agentCancelButton = nullptr;
     QProgressBar *operationProgress = nullptr;
     QButtonGroup *navGroup = nullptr;
     QStackedWidget *stack = nullptr;
@@ -1079,7 +1222,18 @@ int main(int argc, char **argv) {
     QApplication::setApplicationName("Proper Apps");
     if (argc == 3 && QString::fromLocal8Bit(argv[1]) == "--launch-web-app")
         return launchWebAppFromCommandLine(QString::fromLocal8Bit(argv[2]));
-    ProperApps window;
+    bool chooseAgent = false;
+    QString directory = QDir::homePath();
+    QString missing;
+    for (int index = 1; index < argc; ++index) {
+        const QString argument = QString::fromLocal8Bit(argv[index]);
+        if (argument == "--choose-agent") chooseAgent = true;
+        else if (argument == "--working-directory" && index + 1 < argc)
+            directory = QString::fromLocal8Bit(argv[++index]);
+        else if (argument == "--missing" && index + 1 < argc)
+            missing = QString::fromLocal8Bit(argv[++index]);
+    }
+    ProperApps window(chooseAgent, directory, missing);
     window.show();
     return app.exec();
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SoftwareIdentity
+  xmlns="http://standards.iso.org/iso/19770/-2/2015/schema.xsd"
+  xml:lang="en-GB"
+  tagId="org.properlinux.ProperLinux-0.1-Desktop"
+  tagVersion="1"
+  name="Proper Linux"
+  version="0.1"
+  versionScheme="multipartnumeric"
+  media="(OS:linux)">
+  <Entity
+    name="Proper Linux"
+    regid="properlinux.org"
+    role="tagCreator softwareCreator aggregator distributor" />
+  <Meta
+    product="Proper Linux"
+    colloquialVersion="0.1"
+    edition="Desktop"
+    summary="A curated desktop Linux distribution built on Fedora Linux and KDE Plasma." />
+</SoftwareIdentity>

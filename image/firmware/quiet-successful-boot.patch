@@ -1,0 +1,19 @@
+diff --git a/OvmfPkg/Library/PlatformBmPrintScLib/StatusCodeHandler.c b/OvmfPkg/Library/PlatformBmPrintScLib/StatusCodeHandler.c
+index c29c3cff53..e35c87a58b 100644
+--- a/OvmfPkg/Library/PlatformBmPrintScLib/StatusCodeHandler.c
++++ b/OvmfPkg/Library/PlatformBmPrintScLib/StatusCodeHandler.c
+@@ -105,6 +105,14 @@ HandleStatusCode (
+     return EFI_SUCCESS;
+   }
+ 
++  // A successful boot is already communicated by the branded logo and
++  // progress indicator. Do not expose implementation paths such as
++  // /EFI/fedora/shimx64.efi during an ordinary Proper Linux start. Keep the
++  // existing failure reports below so a broken boot remains diagnosable.
++  if ((Value == mLoadPrep) || (Value == mStartPrep)) {
++    return EFI_SUCCESS;
++  }
++
+   //
+   // Ignore status codes that are not reported by the same containing module.
+   //

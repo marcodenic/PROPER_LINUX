@@ -1,0 +1,12 @@
+{
+  "KPackageStructure": "Plasma/LookAndFeel",
+  "KPlugin": {
+    "Authors": [{"Name": "Proper Linux"}],
+    "Description": "Proper Linux high-contrast midnight desktop defaults",
+    "Id": "com.properlinux.midnight.desktop",
+    "License": "GPL-3.0-or-later",
+    "Name": "Proper Midnight",
+    "Version": "0.1",
+    "Website": "https://github.com/marcodenic/PROPER_LINUX"
+  }
+}

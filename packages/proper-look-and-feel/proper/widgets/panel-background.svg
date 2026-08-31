@@ -12,59 +12,59 @@
     </style>
   </defs>
 
-  <g id="top" transform="translate(18 0)">
-    <rect width="32" height="18" fill="#141a22" fill-opacity="0.88"/>
-    <rect width="32" height="1" fill="#a6afbd" fill-opacity="0.16"/>
+  <g id="top" transform="translate(16 0)">
+    <rect width="36" height="16" fill="#141a22" fill-opacity="0.78"/>
+    <rect width="36" height="1" fill="#d8e9f8" fill-opacity="0.13"/>
   </g>
-  <g id="bottom" transform="translate(18 50)">
-    <rect width="32" height="18" fill="#141a22" fill-opacity="0.88"/>
-    <rect y="17" width="32" height="1" fill="#a6afbd" fill-opacity="0.16"/>
+  <g id="bottom" transform="translate(16 52)">
+    <rect width="36" height="16" fill="#141a22" fill-opacity="0.78"/>
+    <rect y="15" width="36" height="1" fill="#a6afbd" fill-opacity="0.09"/>
   </g>
-  <g id="left" transform="translate(0 18)">
-    <rect width="18" height="32" fill="#141a22" fill-opacity="0.88"/>
-    <rect width="1" height="32" fill="#a6afbd" fill-opacity="0.16"/>
+  <g id="left" transform="translate(0 16)">
+    <rect width="16" height="36" fill="#141a22" fill-opacity="0.78"/>
+    <rect width="1" height="36" fill="#d8e9f8" fill-opacity="0.12"/>
   </g>
-  <g id="right" transform="translate(50 18)">
-    <rect width="18" height="32" fill="#141a22" fill-opacity="0.88"/>
-    <rect x="17" width="1" height="32" fill="#a6afbd" fill-opacity="0.16"/>
+  <g id="right" transform="translate(52 16)">
+    <rect width="16" height="36" fill="#141a22" fill-opacity="0.78"/>
+    <rect x="15" width="1" height="36" fill="#a6afbd" fill-opacity="0.09"/>
   </g>
-  <rect id="center" x="18" y="18" width="32" height="32" fill="#141a22" fill-opacity="0.88"/>
+  <rect id="center" x="16" y="16" width="36" height="36" fill="#141a22" fill-opacity="0.78"/>
   <g id="topleft">
-    <path d="M18 0v18H0v-1C0 7.61 7.61 0 17 0h1z" fill="#141a22" fill-opacity="0.88"/>
-    <path d="M18 .5h-1C7.89.5.5 7.89.5 17v1" fill="none" stroke="#a6afbd" stroke-opacity="0.16"/>
+    <path d="M16 0v16H0v-1C0 6.72 6.72 0 15 0h1z" fill="#141a22" fill-opacity="0.78"/>
+    <path d="M16 .5h-1C6.99.5.5 6.99.5 15v1" fill="none" stroke="#e8f6ff" stroke-opacity="0.18"/>
   </g>
-  <g id="topright" transform="translate(50 0)">
-    <path d="M0 0v18h18v-1C18 7.61 10.39 0 1 0H0z" fill="#141a22" fill-opacity="0.88"/>
-    <path d="M0 .5h1c9.11 0 16.5 7.39 16.5 16.5v1" fill="none" stroke="#a6afbd" stroke-opacity="0.16"/>
+  <g id="topright" transform="translate(52 0)">
+    <path d="M0 0v16h16v-1C16 6.72 9.28 0 1 0H0z" fill="#141a22" fill-opacity="0.78"/>
+    <path d="M0 .5h1c8.01 0 14.5 6.49 14.5 14.5v1" fill="none" stroke="#b9cde0" stroke-opacity="0.10"/>
   </g>
-  <g id="bottomleft" transform="translate(0 50)">
-    <path d="M18 18V0H0v1c0 9.39 7.61 17 17 17h1z" fill="#141a22" fill-opacity="0.88"/>
-    <path d="M18 17.5h-1C7.89 17.5.5 10.11.5 1V0" fill="none" stroke="#a6afbd" stroke-opacity="0.16"/>
+  <g id="bottomleft" transform="translate(0 52)">
+    <path d="M16 16V0H0v1c0 8.28 6.72 15 15 15h1z" fill="#141a22" fill-opacity="0.78"/>
+    <path d="M16 15.5h-1C6.99 15.5.5 9.01.5 1V0" fill="none" stroke="#a6afbd" stroke-opacity="0.10"/>
   </g>
-  <g id="bottomright" transform="translate(50 50)">
-    <path d="M0 18V0h18v1c0 9.39-7.61 17-17 17H0z" fill="#141a22" fill-opacity="0.88"/>
-    <path d="M0 17.5h1c9.11 0 16.5-7.39 16.5-16.5V0" fill="none" stroke="#a6afbd" stroke-opacity="0.16"/>
+  <g id="bottomright" transform="translate(52 52)">
+    <path d="M0 16V0h16v1c0 8.28-6.72 15-15 15H0z" fill="#141a22" fill-opacity="0.78"/>
+    <path d="M0 15.5h1c8.01 0 14.5-6.49 14.5-14.5V0" fill="none" stroke="#a6afbd" stroke-opacity="0.09"/>
   </g>
 
   <rect id="hint-top-margin" x="33" width="2" height="10" fill="#f0f"/>
   <rect id="hint-bottom-margin" x="33" y="58" width="2" height="10" fill="#f0f"/>
   <rect id="hint-left-margin" y="33" width="10" height="2" fill="#f0f"/>
-  <rect id="hint-right-margin" x="58" y="33" width="10" height="2" fill="#f0f"/>
+  <rect id="hint-right-margin" x="54" y="33" width="14" height="2" fill="#f0f"/>
   <rect id="hint-stretch-borders" x="69" width="1" height="1" fill="#f60"/>
   <!-- Compose the translucent centre beneath the border and clip it through
        the mask frame. Without this hint Plasma's contrast/blur pass treats
        each rounded corner slice as an opaque rectangle. -->
   <rect id="hint-compose-over-border" x="70" width="1" height="1" fill="#f60"/>
 
-  <rect id="mask-top" x="98" width="32" height="18" fill="#000"/>
-  <rect id="mask-bottom" x="98" y="50" width="32" height="18" fill="#000"/>
-  <rect id="mask-left" x="80" y="18" width="18" height="32" fill="#000"/>
-  <rect id="mask-right" x="130" y="18" width="18" height="32" fill="#000"/>
-  <rect id="mask-center" x="98" y="18" width="32" height="32" fill="#000"/>
-  <path id="mask-topleft" d="M98 0v18H80v-1c0-9.39 7.61-17 17-17h1z" fill="#000"/>
-  <path id="mask-topright" d="M130 0v18h18v-1c0-9.39-7.61-17-17-17h-1z" fill="#000"/>
-  <path id="mask-bottomleft" d="M98 68V50H80v1c0 9.39 7.61 17 17 17h1z" fill="#000"/>
-  <path id="mask-bottomright" d="M130 68V50h18v1c0 9.39-7.61 17-17 17h-1z" fill="#000"/>
+  <rect id="mask-top" x="96" width="36" height="16" fill="#000"/>
+  <rect id="mask-bottom" x="96" y="52" width="36" height="16" fill="#000"/>
+  <rect id="mask-left" x="80" y="16" width="16" height="36" fill="#000"/>
+  <rect id="mask-right" x="132" y="16" width="16" height="36" fill="#000"/>
+  <rect id="mask-center" x="96" y="16" width="36" height="36" fill="#000"/>
+  <path id="mask-topleft" d="M96 0v16H80v-1c0-8.28 6.72-15 15-15h1z" fill="#000"/>
+  <path id="mask-topright" d="M132 0v16h16v-1c0-8.28-6.72-15-15-15h-1z" fill="#000"/>
+  <path id="mask-bottomleft" d="M96 68V52H80v1c0 8.28 6.72 15 15 15h1z" fill="#000"/>
+  <path id="mask-bottomright" d="M132 68V52h16v1c0 8.28-6.72 15-15 15h-1z" fill="#000"/>
 
   <rect id="shadow-center" x="170" y="10" width="20" height="20" fill="#000" fill-opacity="0.001"/>
   <rect id="shadow-top" x="170" width="20" height="10" fill="#000" fill-opacity="0.001"/>

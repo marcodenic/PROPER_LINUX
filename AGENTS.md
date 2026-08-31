@@ -46,6 +46,7 @@ The user is the product manager and primary customer. Their visual judgment is a
 ## BOX and VM discipline
 
 - At the start of build or VM work, run `scripts/check-box` and verify the current hostname and `/dev/kvm` access. Treat logs or claims from earlier tasks as historical context, not evidence about the current task environment.
+- Launch every product-manager-facing review with the default local GTK presentation from `scripts/run-vm`: one 1920x1080 output in a normal resizable window with zoom-to-fit enabled, so maximising the host window fills its client area. Do not force full screen. VNC and multi-output modes are automation/compatibility tools, not PM presentation surfaces; never substitute them for the visible review window.
 - Run at most one Proper Linux QEMU VM at a time. Before launching one, inspect existing QEMU command lines and monitor sockets. Reuse the intended VM when possible; otherwise verify the exact PID, ISO, disk, and socket before terminating a stale VM gracefully. Never kill VMs with a broad process-name pattern.
 - Give the active VM a unique disk plus explicit monitor/control sockets, and verify that each socket is owned by the sole expected QEMU PID before sending input.
 - A QEMU `screendump` proves only that the guest can be observed. It does not prove that Codex can control the GTK window, and a successful `socat` exit proves only that QEMU accepted a monitor command—not that the installer accepted the intended click.

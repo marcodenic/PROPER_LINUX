@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Coding Agent
+Comment=Open your chosen coding agent in Ghostty
+Exec=proper-agent
+Icon=applications-development
+Terminal=false
+Categories=Development;
+StartupNotify=true

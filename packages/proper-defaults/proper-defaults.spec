@@ -1,6 +1,6 @@
 Name:           proper-defaults
 Version:        0.1
-Release:        15%{?dist}
+Release:        18%{?dist}
 Summary:        Proper Linux new-user KDE defaults
 License:        GPL-3.0-or-later
 BuildArch:      noarch
@@ -9,7 +9,7 @@ Requires:       proper-look-and-feel
 Requires:       proper-launchers
 Requires:       proper-terminal
 Requires:       proper-apps
-Requires:       proper-appearance >= 0.1-2
+Requires:       proper-appearance >= 0.1-3
 
 %description
 KDE configuration defaults. KDE reads the XDG copies as system defaults and
@@ -17,6 +17,15 @@ the small skel copies initialise a live/installer-created account. They do not
 overwrite an existing user's configuration.
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-18
+- Select the Proper Horizon colour scheme for new desktop sessions
+
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-17
+- Disable Plasma's hover-triggered informational tooltips by default
+
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-16
+- Use a human-readable month and day in the taskbar without a redundant year
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-15
 - Integrate the approved Proper Plasma Style with the workspace arranger
 

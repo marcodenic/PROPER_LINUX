@@ -11,6 +11,12 @@
 		     be rebased whenever Fedora updates Plasma Login Manager. -->
 		<package name="plasma-login-manager"/>
 		<package name="proper-release"/>
+		<package name="proper-branding"/>
+		<package name="proper-welcome"/>
+		<!-- Fedora consumers require the generic system-logos capability, not
+		     Fedora's official marks.  Use the upstream compatibility package and
+		     let proper-branding own every selected visible identity. -->
+		<package name="generic-logos"/>
 		<package name="proper-look-and-feel"/>
 		<package name="proper-defaults"/>
 		<package name="proper-launchers"/>
@@ -48,6 +54,7 @@
 		<ignore name="plasma-welcome*"/>
 		<ignore name="fedora-media-writer*"/>
 		<ignore name="mediawriter*"/>
+		<ignore name="fedora-logos"/>
 		<ignore name="elisa*"/>
 		<ignore name="dragonplayer*"/>
 		<ignore name="kolourpaint*"/>

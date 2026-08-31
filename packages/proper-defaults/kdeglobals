@@ -4,7 +4,7 @@ widgetStyle=Breeze
 
 [General]
 BrowserApplication=chromium-browser.desktop
-ColorScheme=BreezeDark
+ColorScheme=Proper
 SingleClick=false
 TerminalApplication=ghostty
 

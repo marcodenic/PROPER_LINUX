@@ -1,6 +1,6 @@
 Name:           proper-launchers
 Version:        0.1
-Release:        9%{?dist}
+Release:        11%{?dist}
 Summary:        Proper Linux launcher and window workflow defaults
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -11,6 +11,8 @@ Requires:       libnotify
 Requires:       plasma-discover
 Requires:       plasma-systemsettings
 Requires:       plasma-systemmonitor
+Requires:       proper-apps >= 0.1-7
+Requires:       proper-appearance >= 0.1-3
 Requires:       qt6-qttools
 Requires:       spectacle
 Requires:       systemd
@@ -44,6 +46,7 @@ install -Dpm 0644 %{_sourcedir}/vicinae.service %{buildroot}%{_userunitdir}/vici
 # Replace it after cmake --install so every taskbar/menu activation goes
 # through Proper's readiness-aware opener.
 install -Dpm 0644 %{_sourcedir}/vicinae.desktop %{buildroot}%{_datadir}/applications/vicinae.desktop
+install -Dpm 0644 %{_sourcedir}/proper-vicinae.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/proper-vicinae.svg
 install -Dpm 0644 %{_sourcedir}/proper-vicinae-shortcut.desktop %{buildroot}%{_datadir}/applications/proper-vicinae-shortcut.desktop
 install -Dpm 0644 %{_sourcedir}/proper-arrange-workspace.desktop %{buildroot}%{_datadir}/applications/proper-arrange-workspace.desktop
 install -Dpm 0644 %{_sourcedir}/proper-shortcuts.desktop %{buildroot}%{_datadir}/applications/proper-shortcuts.desktop
@@ -70,6 +73,7 @@ done
 %{_datadir}/applications/proper-shortcuts.desktop
 %{_datadir}/vicinae/
 %{_datadir}/icons/hicolor/512x512/apps/vicinae.png
+%{_datadir}/icons/hicolor/scalable/apps/proper-vicinae.svg
 %config(noreplace) %{_sysconfdir}/skel/.config/vicinae/settings.json
 %config(noreplace) %{_sysconfdir}/skel/.config/kglobalshortcutsrc
 %doc %{_datadir}/doc/proper-launchers/proper-shortcuts.md
@@ -80,6 +84,14 @@ done
 systemctl --global enable vicinae.service >/dev/null 2>&1 || :
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-11
+- Add the generic Coding Agent action to Vicinae
+- Route Appearance Settings to Proper's preview-first appearance control
+
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-10
+- Replace the promoted search glyph with Proper's quiet white launcher dot
+- Keep the Applications and Search name and tooltip as the pointer affordance
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-9
 - Present Vicinae as the semantic Applications and Search pointer affordance
 - Replace the upstream brand mark with the coherent Breeze search icon

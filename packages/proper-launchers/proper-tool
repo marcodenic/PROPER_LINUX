@@ -45,7 +45,7 @@ region_ocr() {
 }
 
 case "${1:-}" in
-    appearance) run_gui systemsettings kcm_lookandfeel ;;
+    appearance) run_gui proper-appearance ;;
     wallpaper) run_gui proper-appearance ;;
     night-light) run_gui systemsettings kcm_nightlight ;;
     screenshots) run_gui spectacle --launchonly ;;

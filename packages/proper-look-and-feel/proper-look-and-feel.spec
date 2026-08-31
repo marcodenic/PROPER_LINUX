@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        14%{?dist}
+Release:        17%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -26,6 +26,10 @@ install -Dpm 0644 %{_sourcedir}/summer-1am.jpg %{buildroot}%{_datadir}/wallpaper
 install -Dpm 0644 %{_sourcedir}/summer_1am/metadata.json %{buildroot}%{_datadir}/wallpapers/summer_1am/metadata.json
 install -Dpm 0644 %{_sourcedir}/com.properlinux.dark.desktop/metadata.json %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.dark.desktop/metadata.json
 install -Dpm 0644 %{_sourcedir}/com.properlinux.dark.desktop/contents/defaults %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.dark.desktop/contents/defaults
+install -Dpm 0644 %{_sourcedir}/com.properlinux.light.desktop/metadata.json %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.light.desktop/metadata.json
+install -Dpm 0644 %{_sourcedir}/com.properlinux.light.desktop/contents/defaults %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.light.desktop/contents/defaults
+install -Dpm 0644 %{_sourcedir}/com.properlinux.midnight.desktop/metadata.json %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.midnight.desktop/metadata.json
+install -Dpm 0644 %{_sourcedir}/com.properlinux.midnight.desktop/contents/defaults %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.midnight.desktop/contents/defaults
 install -Dpm 0644 %{_sourcedir}/proper-wallpaper.conf %{buildroot}%{_sysconfdir}/xdg/plasma-workspace/env/proper-wallpaper.conf
 # Fedora 44 PLM reads the distro default from this exact file. Its README
 # documents /etc/plasmalogin.conf as the administrator override and
@@ -33,6 +37,8 @@ install -Dpm 0644 %{_sourcedir}/proper-wallpaper.conf %{buildroot}%{_sysconfdir}
 install -Dpm 0644 %{_sourcedir}/plasmalogin.conf %{buildroot}%{_datadir}/proper-linux/plasmalogin.conf
 install -Dpm 0644 %{_sourcedir}/tokens.yaml %{buildroot}%{_datadir}/proper-linux/tokens.yaml
 install -Dpm 0644 %{_sourcedir}/Proper.colors %{buildroot}%{_datadir}/color-schemes/Proper.colors
+install -Dpm 0644 %{_sourcedir}/ProperLight.colors %{buildroot}%{_datadir}/color-schemes/ProperLight.colors
+install -Dpm 0644 %{_sourcedir}/ProperMidnight.colors %{buildroot}%{_datadir}/color-schemes/ProperMidnight.colors
 style_root=%{buildroot}%{_datadir}/plasma/desktoptheme/proper
 install -Dpm 0644 %{_sourcedir}/proper/metadata.json "$style_root/metadata.json"
 install -Dpm 0644 %{_sourcedir}/proper/colors "$style_root/colors"
@@ -58,6 +64,7 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/Lock
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/PasswordSync.qml "$shell_root/contents/lockscreen/PasswordSync.qml"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/qmldir "$shell_root/contents/lockscreen/qmldir"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-ensure-proper-panel.js "$shell_root/contents/updates/00-ensure-proper-panel.js"
+install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/01-refine-proper-panel.js "$shell_root/contents/updates/01-refine-proper-panel.js"
 
 %check
 # Proper's rounded shell surfaces use a mask-composed centre and nine neutral
@@ -81,6 +88,15 @@ for asset in \
   test "$(xmllint --xpath "count(${shadow_selector}[@fill-opacity and number(@fill-opacity) <= 0.001])" "$asset")" = 9
   test "$(xmllint --xpath "count(//*[@id = 'hint-compose-over-border'])" "$asset")" = 1
 done
+panel_radius=$(sed -n "s/^radius: {panel: \([0-9][0-9]*\),.*/\1/p" \
+  %{buildroot}%{_datadir}/proper-linux/tokens.yaml)
+asset_radius=$(xmllint --xpath "string(//*[@id='top']/*[1]/@height)" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg)
+mask_radius=$(xmllint --xpath "string(//*[@id='mask-top']/@height)" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg)
+test -n "$panel_radius"
+test "$panel_radius" = "$asset_radius"
+test "$panel_radius" = "$mask_radius"
 
 %files
 %{_datadir}/wallpapers/ProperBlueHour/
@@ -89,12 +105,16 @@ done
 %{_datadir}/wallpapers/Volna/
 %{_datadir}/wallpapers/summer_1am/
 %{_datadir}/plasma/look-and-feel/com.properlinux.dark.desktop/
+%{_datadir}/plasma/look-and-feel/com.properlinux.light.desktop/
+%{_datadir}/plasma/look-and-feel/com.properlinux.midnight.desktop/
 %{_datadir}/plasma/desktoptheme/proper/
 %{_datadir}/plasma/shells/com.properlinux.desktop/
 %config(noreplace) %{_sysconfdir}/xdg/plasma-workspace/env/proper-wallpaper.conf
 %{_datadir}/proper-linux/plasmalogin.conf
 %{_datadir}/proper-linux/tokens.yaml
 %{_datadir}/color-schemes/Proper.colors
+%{_datadir}/color-schemes/ProperLight.colors
+%{_datadir}/color-schemes/ProperMidnight.colors
 %license %{_licensedir}/%{name}/CC-BY-SA-4.0.txt
 %license %{_licensedir}/%{name}/LGPL-3.0-only.txt
 %license %{_licensedir}/%{name}/GPL-2.0-or-later.txt
@@ -106,6 +126,19 @@ done
 install -m 0644 %{_datadir}/proper-linux/plasmalogin.conf %{_prefix}/lib/plasmalogin/defaults.conf || :
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-17
+- Add three curated, previewable Proper desktop styles without changing the shell layout
+- Align the default, light, and midnight colour schemes to Proper Horizon tokens
+
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-16
+- Reduce the shelf corner radius from 18 pixels to 16 pixels
+- Bump the Plasma Style version so upgraded systems invalidate cached SVGs
+
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-15
+- Refine the shelf with softer glass, restrained continuous edges, and more end space
+- Migrate the stock clock from numeric dates to a human-readable month and day
+- Bump the Plasma Style version so upgraded systems invalidate cached SVGs
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-14
 - Mask the translucent contrast and blur layer to every rounded shell surface
 - Add package checks that prevent rectangular compositor regions returning

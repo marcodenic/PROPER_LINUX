@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Install Proper Linux
+GenericName=System Installer
+Comment=Install Proper Linux on this computer
+Exec=/usr/bin/proper-welcome --install
+Icon=org.properlinux.Installer
+Terminal=false
+StartupNotify=true
+StartupWMClass=liveinst

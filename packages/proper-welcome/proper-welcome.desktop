@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Welcome to Proper Linux
+Comment=Choose whether to try or install Proper Linux
+Exec=/usr/bin/proper-welcome
+Icon=proper-logo-icon
+OnlyShowIn=KDE;
+Terminal=false
+NoDisplay=true
+X-KDE-autostart-phase=1
+X-KDE-autostart-after=panel

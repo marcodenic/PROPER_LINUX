@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+# Build the pinned Fedora OVMF source with Proper's review-only boot identity.
+set -Eeuo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$project_root/image/firmware/edk2-ovmf-fedora44.lock"
+
+output_root="${PROPER_OUTPUT_DIR:-"$project_root/../proper-linux-build"}"
+cache_root="${PROPER_CACHE_DIR:-"$output_root/cache"}"
+source_cache="$cache_root/firmware"
+firmware_dir="$output_root/firmware/$EDK2_FIRMWARE_BUILD_ID"
+source_rpm="$source_cache/$EDK2_SOURCE_RPM"
+logo=
+build_dir=
+
+cleanup() {
+  if [[ -n "${build_dir:-}" && -d "$build_dir" ]]; then
+    rm -rf -- "$build_dir"
+  fi
+}
+trap cleanup EXIT
+
+for binary in dnf magick podman sha256sum; do
+  command -v "$binary" >/dev/null 2>&1 || {
+    printf 'Required firmware-build command is missing: %s\n' "$binary" >&2
+    exit 1
+  }
+done
+
+mkdir -p "$source_cache" "$firmware_dir"
+if [[ ! -f "$source_rpm" ]]; then
+  dnf download --source --destdir "$source_cache" "$EDK2_SOURCE_NEVRA"
+fi
+printf '%s  %s\n' "$EDK2_SOURCE_RPM_SHA256" "$source_rpm" | sha256sum --check --status || {
+  printf 'Pinned edk2 source RPM checksum mismatch: %s\n' "$source_rpm" >&2
+  exit 1
+}
+
+build_dir="$(mktemp -d "$firmware_dir/.build.XXXXXX")"
+logo="$build_dir/proper-ovmf-logo.bmp"
+install -m 0644 \
+  "$project_root/image/firmware/quiet-successful-boot.patch" \
+  "$build_dir/quiet-successful-boot.patch"
+
+# OVMF renders a bitmap directly. Use the canonical grid wordmark on the same
+# near-black field as Proper Plymouth so the firmware-to-OS handoff is quiet.
+magick -background '#050608' -density 192 \
+  "$project_root/packages/proper-branding/proper-wordmark.svg" \
+  -resize '360x52>' -gravity center -extent 426x96 \
+  -alpha off -depth 8 -type TrueColor -compress none "BMP3:$logo"
+
+# EDK II accepts the Windows v3 bitmap container only when its pixel data is
+# uncompressed.  Fail here with a useful message instead of minutes into the
+# firmware compile if the host ImageMagick defaults ever change.
+logo_metadata="$(identify -verbose "$logo")"
+grep -q '^  Format: BMP3 ' <<<"$logo_metadata"
+grep -q '^  Type: TrueColor' <<<"$logo_metadata"
+grep -q '^  Compression: None' <<<"$logo_metadata"
+
+podman build \
+  --tag "$EDK2_BUILDER_IMAGE" \
+  --file "$project_root/image/firmware/Containerfile" \
+  "$project_root/image/firmware"
+
+podman run --rm \
+  --volume "$source_rpm:/input/edk2.src.rpm:ro,Z" \
+  --volume "$build_dir:/output:Z" \
+  --env "EDK2_SOURCE_COMMIT=$EDK2_SOURCE_COMMIT" \
+  --env "EDK2_SOURCE_DATE_EPOCH=$EDK2_SOURCE_DATE_EPOCH" \
+  --env "EDK2_RELEASE_DATE=$EDK2_RELEASE_DATE" \
+  --env "EDK2_SOURCE_NEVRA=$EDK2_SOURCE_NEVRA" \
+  "$EDK2_BUILDER_IMAGE" \
+  bash -Eeuo pipefail -c '
+    topdir=/work/rpmbuild
+    mkdir -p "$topdir"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+    rpm -ivh --define "_topdir $topdir" /input/edk2.src.rpm
+    rpmbuild -bp --nodeps --define "_topdir $topdir" "$topdir/SPECS/edk2.spec"
+
+    source_dir="$(find "$topdir/BUILD" -type d -name "edk2-$EDK2_SOURCE_COMMIT" -print -quit)"
+    test -n "$source_dir" && test -d "$source_dir"
+    install -m 0644 /output/proper-ovmf-logo.bmp "$source_dir/MdeModulePkg/Logo/Logo.bmp"
+    git -C "$source_dir" apply --ignore-space-change --ignore-whitespace \
+      /output/quiet-successful-boot.patch
+
+    cd "$source_dir"
+    export SOURCE_DATE_EPOCH="$EDK2_SOURCE_DATE_EPOCH"
+    touch -d "@$SOURCE_DATE_EPOCH" OvmfPkg/AmdSev/Grub/grub.efi
+    python3 CryptoPkg/Library/OpensslLib/configure.py
+    export EXTRA_OPTFLAGS="-O2 -pipe"
+    export EXTRA_LDFLAGS=""
+    export RPM_PACKAGE_NAME="edk2-proper"
+    export RPM_PACKAGE_VERSION="${EDK2_SOURCE_NEVRA#edk2-}"
+    export RPM_PACKAGE_RELEASE="1"
+    ./edk2-build.py --config edk2-build.fedora --silent \
+      --release-date "$EDK2_RELEASE_DATE" -m ovmf
+
+    install -m 0644 Fedora/ovmf/OVMF_CODE.fd /output/OVMF_CODE.fd
+    install -m 0644 Fedora/ovmf/OVMF_VARS.fd /output/OVMF_VARS.fd
+  '
+
+install -m 0644 "$build_dir/OVMF_CODE.fd" "$firmware_dir/OVMF_CODE.fd"
+install -m 0644 "$build_dir/OVMF_VARS.fd" "$firmware_dir/OVMF_VARS.fd"
+install -m 0644 "$logo" "$firmware_dir/proper-ovmf-logo.bmp"
+(
+  cd "$firmware_dir"
+  sha256sum OVMF_CODE.fd OVMF_VARS.fd > SHA256SUMS
+)
+{
+  printf 'Firmware-Build-ID: %s\n' "$EDK2_FIRMWARE_BUILD_ID"
+  printf 'Source-NEVRA: %s\n' "$EDK2_SOURCE_NEVRA"
+  printf 'Source-RPM-SHA256: %s\n' "$EDK2_SOURCE_RPM_SHA256"
+  printf 'Source-Commit: %s\n' "$EDK2_SOURCE_COMMIT"
+  printf 'Source-Date-Epoch: %s\n' "$EDK2_SOURCE_DATE_EPOCH"
+  printf 'Builder-Base: %s@%s\n' "$EDK2_BUILDER_BASE" "$EDK2_BUILDER_BASE_DIGEST"
+  printf 'Proper-Patch-SHA256: '
+  sha256sum "$project_root/image/firmware/quiet-successful-boot.patch" | cut -d' ' -f1
+  printf 'Proper-Logo-SHA256: '
+  sha256sum "$firmware_dir/proper-ovmf-logo.bmp" | cut -d' ' -f1
+} > "$firmware_dir/BUILD-METADATA"
+
+printf 'Built Proper VM firmware from %s\n' "$EDK2_SOURCE_NEVRA"
+printf 'Code: %s\nVars: %s\nChecksums: %s\n' \
+  "$firmware_dir/OVMF_CODE.fd" \
+  "$firmware_dir/OVMF_VARS.fd" \
+  "$firmware_dir/SHA256SUMS"

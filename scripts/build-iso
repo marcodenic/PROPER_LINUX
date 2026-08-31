@@ -14,7 +14,7 @@ else
 fi
 build_source_dir="$iso_dir/source"
 
-for binary in git sha256sum; do
+for binary in git lsinitrd patch sha256sum xorriso; do
   command -v "$binary" >/dev/null 2>&1 || { printf 'Required command missing: %s\n' "$binary" >&2; exit 1; }
 done
 [[ -n "$UPSTREAM_COMMIT" ]] || { printf 'Fedora input is not pinned. Run scripts/pin-fedora-base, review the lock, then rerun.\n' >&2; exit 1; }
@@ -47,6 +47,7 @@ else
     PROPER_OUTPUT_DIR="$output_root" "$project_root/scripts/build-rpms"
   fi
   cp -a "$project_root/image/descriptions/proper.xml" "$build_source_dir/proper.xml"
+  patch --batch --forward -d "$build_source_dir" -p1 < "$project_root/image/descriptions/proper-media.patch"
   # Fedora's upstream hook ends with `exit 0`.  Insert our live-session hook
   # before that terminator so KIWI actually executes it while composing the
   # image rather than leaving it as unreachable text.
@@ -110,6 +111,64 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
   fi
   grep -Eq '^plasma-setup\|' "${package_manifests[0]}" || {
     printf 'Fedora plasma-setup is missing from the Proper image package manifest.\n' >&2
+    exit 1
+  }
+  for package in proper-release proper-branding proper-welcome; do
+    grep -Eq "^${package}\\|" "${package_manifests[0]}" || {
+      printf 'Required arrival package is missing from the Proper image: %s\n' "$package" >&2
+      exit 1
+    }
+  done
+  if grep -Eq '^fedora-release-identity-kde-desktop\|' "${package_manifests[0]}"; then
+    printf 'Fedora KDE edition identity remained installed beside proper-release.\n' >&2
+    exit 1
+  fi
+  grep -Eq '^generic-logos\|' "${package_manifests[0]}" || {
+    printf 'Generic system-logo compatibility package is missing from the Proper image.\n' >&2
+    exit 1
+  }
+  if grep -Eq '^fedora-logos\|' "${package_manifests[0]}"; then
+    printf 'Fedora official logo package remained in the Proper image.\n' >&2
+    exit 1
+  fi
+  image_os_release="$iso_dir/image-build/build/image-root/usr/lib/os-release"
+  [[ -f "$image_os_release" ]] && grep -qx 'ID=proper' "$image_os_release" || {
+    printf 'Built image does not identify itself as Proper Linux: %s\n' "$image_os_release" >&2
+    exit 1
+  }
+  image_plymouth_config="$iso_dir/image-build/build/image-root/etc/plymouth/plymouthd.conf"
+  [[ -f "$image_plymouth_config" ]] && grep -qx 'Theme=proper' "$image_plymouth_config" || {
+    printf 'Built image does not select the Proper Plymouth theme: %s\n' "$image_plymouth_config" >&2
+    exit 1
+  }
+  mapfile -t image_initramfs < <(find "$iso_dir/image-build/build/image-root/boot" -maxdepth 1 -type f -name 'initramfs-*.img' ! -name 'initramfs-0-rescue-*' -print)
+  (( ${#image_initramfs[@]} == 1 )) || {
+    printf 'Expected exactly one normal image initramfs; found %d.\n' "${#image_initramfs[@]}" >&2
+    exit 1
+  }
+  image_initramfs_listing="$(lsinitrd "${image_initramfs[0]}")"
+  grep -q 'usr/share/plymouth/themes/proper/proper.plymouth' <<<"$image_initramfs_listing" || {
+    printf 'Proper Plymouth theme is absent from the image initramfs.\n' >&2
+    exit 1
+  }
+  mapfile -t image_bls_entries < <(find "$iso_dir/image-build/build/image-root/boot/loader/entries" -maxdepth 1 -type f -name '*.conf' -print)
+  (( ${#image_bls_entries[@]} > 0 )) || {
+    printf 'Built image has no boot-loader specification entries.\n' >&2
+    exit 1
+  }
+  for bls_entry in "${image_bls_entries[@]}"; do
+    grep -Eq '^title Proper Linux ' "$bls_entry" || {
+      printf 'Boot entry is not branded Proper Linux: %s\n' "$bls_entry" >&2
+      exit 1
+    }
+  done
+  pvd_info="$(xorriso -indev "${images[0]}" -pvd_info 2>/dev/null)"
+  grep -Eq '^Volume Id[[:space:]]*: Proper' <<<"$pvd_info" || {
+    printf 'ISO volume identity is not Proper Linux.\n' >&2
+    exit 1
+  }
+  grep -Eq '^Publisher Id[[:space:]]*: PROPER LINUX' <<<"$pvd_info" || {
+    printf 'ISO publisher identity is not Proper Linux.\n' >&2
     exit 1
   }
 fi

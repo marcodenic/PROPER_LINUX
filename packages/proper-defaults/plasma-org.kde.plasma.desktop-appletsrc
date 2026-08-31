@@ -50,3 +50,5 @@ plugin=org.kde.plasma.digitalclock
 [Containments][2][Applets][7][Configuration]
 Appearance.showSeconds=false
 Appearance.showDate=true
+Appearance.dateFormat=custom
+Appearance.customDateFormat=MMMM d

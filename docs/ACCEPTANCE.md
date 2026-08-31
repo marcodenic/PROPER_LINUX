@@ -115,6 +115,8 @@ installed VM; refreshed visual approval is pending against
 - An intentional failure state
 - Advanced source details
 - One AI-agent installation/launch path
+- The generic Coding Agent action with no saved default, an installed default,
+  and a saved executable that has been removed
 
 ### Pass criteria
 
@@ -124,6 +126,9 @@ installed VM; refreshed visual approval is pending against
 - Progress and errors are understandable.
 - Source, licence, and maintenance status are still inspectable.
 - At least one Flatpak, Fedora RPM, and official vendor-source path has been exercised.
+- No agent is selected silently: a choice is saved only after its command is
+  present, and a missing saved command offers reinstall, another choice, or
+  cancel without launching a fallback.
 - No office suite appears in the default image; office applications are not a launch priority.
 
 ## PM shell-surfaces review
@@ -214,6 +219,8 @@ review. Evidence is preserved in `docs/evidence/phase11-workflows`.
 12. Install one priority application through Proper Apps.
 13. Check for updates through Fedora's normal UI.
 14. Change a visible Proper default, reboot, and confirm the user's choice persists.
+15. Preview and apply a desktop style and text-size preset, then confirm a new
+    Ghostty window uses the coordinated terminal setting.
 
 ### Pass criteria
 
