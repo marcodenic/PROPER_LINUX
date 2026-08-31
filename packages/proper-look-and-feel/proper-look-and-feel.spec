@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -46,6 +46,7 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/Lock
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml "$shell_root/contents/lockscreen/LockScreenUi.qml"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/PasswordSync.qml "$shell_root/contents/lockscreen/PasswordSync.qml"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/qmldir "$shell_root/contents/lockscreen/qmldir"
+install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-ensure-proper-panel.js "$shell_root/contents/updates/00-ensure-proper-panel.js"
 
 %files
 %{_datadir}/wallpapers/ProperBlueHour/
@@ -70,6 +71,9 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/qmld
 install -m 0644 %{_datadir}/proper-linux/plasmalogin.conf %{_prefix}/lib/plasmalogin/defaults.conf || :
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-8
+- Seed the upstream Plasma panel once for the Proper ShellPackage layout store
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-7
 - Ship full licence texts for the curated artwork and lock-screen QML
 
