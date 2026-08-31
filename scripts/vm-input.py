@@ -32,6 +32,8 @@ def main() -> int:
     key_up.add_argument("qcode")
     combo = sub.add_parser("combo")
     combo.add_argument("qcodes", nargs="+", help="keys held in order, then released in reverse order")
+    type_text = sub.add_parser("type")
+    type_text.add_argument("text", help="ASCII text to type into the focused guest control")
     click = sub.add_parser("click")
     click.add_argument("x", type=int)
     click.add_argument("y", type=int)
@@ -51,7 +53,46 @@ def main() -> int:
     args = parser.parse_args()
 
     followup_events = None
-    if args.action == "key":
+    event_frames = None
+    if args.action == "type":
+        unshifted = {
+            " ": "spc", "-": "minus", "=": "equal", "[": "bracket_left",
+            "]": "bracket_right", "\\": "backslash", ";": "semicolon",
+            "'": "apostrophe", "`": "grave_accent", ",": "comma", ".": "dot",
+            "/": "slash",
+        }
+        shifted = {
+            "!": "1", "@": "2", "#": "3", "$": "4", "%": "5", "^": "6",
+            "&": "7", "*": "8", "(": "9", ")": "0", "_": "minus", "+": "equal",
+            "{": "bracket_left", "}": "bracket_right", "|": "backslash",
+            ":": "semicolon", '"': "apostrophe", "~": "grave_accent", "<": "comma",
+            ">": "dot", "?": "slash",
+        }
+        # Send every transition as its own QMP frame. Long event arrays can be
+        # truncated by the input path, and collapsed transitions lose keys.
+        event_frames = []
+        for character in args.text:
+            needs_shift = character.isalpha() and character.isupper()
+            if character.isalpha():
+                qcode = character.lower()
+            elif character.isdigit():
+                qcode = character
+            elif character in unshifted:
+                qcode = unshifted[character]
+            elif character in shifted:
+                qcode = shifted[character]
+                needs_shift = True
+            else:
+                parser.error(f"unsupported character for QMP typing: {character!r}")
+            if needs_shift:
+                event_frames.append([{"type": "key", "data": {"down": True, "key": {"type": "qcode", "data": "shift"}}}])
+            event_frames.extend([
+                [{"type": "key", "data": {"down": True, "key": {"type": "qcode", "data": qcode}}}],
+                [{"type": "key", "data": {"down": False, "key": {"type": "qcode", "data": qcode}}}],
+            ])
+            if needs_shift:
+                event_frames.append([{"type": "key", "data": {"down": False, "key": {"type": "qcode", "data": "shift"}}}])
+    elif args.action == "key":
         events = [
             {"type": "key", "data": {"down": True, "key": {"type": "qcode", "data": args.qcode}}},
             {"type": "key", "data": {"down": False, "key": {"type": "qcode", "data": args.qcode}}},
@@ -100,9 +141,16 @@ def main() -> int:
             response = qmp(sock, {"execute": "qmp_capabilities"})
             if "error" in response:
                 raise RuntimeError(response["error"])
-            response = qmp(sock, {"execute": "input-send-event", "arguments": {"events": events}})
-            if "error" in response:
-                raise RuntimeError(response["error"])
+            if event_frames is not None:
+                for frame in event_frames:
+                    response = qmp(sock, {"execute": "input-send-event", "arguments": {"events": frame}})
+                    if "error" in response:
+                        raise RuntimeError(response["error"])
+                    time.sleep(0.006)
+            else:
+                response = qmp(sock, {"execute": "input-send-event", "arguments": {"events": events}})
+                if "error" in response:
+                    raise RuntimeError(response["error"])
             if followup_events:
                 time.sleep(0.08)
                 response = qmp(sock, {

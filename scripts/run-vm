@@ -8,6 +8,8 @@
 # The default review profile uses a normal 1920x1080 framebuffer at 100%
 # scaling so the VM opens at a familiar desktop size. Set
 # PROPER_VM_PROFILE=hidpi for a 3840x2160 framebuffer at 200% scaling.
+# Set PROPER_VM_BOOT=installed to omit the ISO after installation, and set
+# PROPER_VM_OUTPUTS=2 for the focused multi-display compatibility view.
 set -Eeuo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -46,6 +48,9 @@ vm_height="${PROPER_VM_HEIGHT:-$profile_height}"
 vm_scale="${PROPER_VM_SCALE:-$profile_scale}"
 vm_refresh="${PROPER_VM_REFRESH:-60}"
 vm_memory="${PROPER_VM_MEMORY:-8192}"
+vm_boot="${PROPER_VM_BOOT:-live}"
+vm_outputs="${PROPER_VM_OUTPUTS:-1}"
+vm_ssh_port="${PROPER_VM_SSH_PORT:-}"
 vm_display_delay="${PROPER_VM_DISPLAY_DELAY:-35}"
 vm_auto_display="${PROPER_VM_AUTO_DISPLAY:-1}"
 vm_backend="${PROPER_VM_BACKEND:-gtk}"
@@ -78,11 +83,35 @@ elif [[ -n "${PROPER_VM_AUX_DISK:-}" ]]; then
   aux_drive_args=(-drive "file=$PROPER_VM_AUX_DISK,if=virtio,format=raw,readonly=on")
 fi
 
-[[ -f "$iso_path" ]] || { printf 'ISO not found: %s\n' "$iso_path" >&2; exit 1; }
+case "$vm_boot" in
+  live)
+    [[ -f "$iso_path" ]] || { printf 'ISO not found: %s\n' "$iso_path" >&2; exit 1; }
+    # Explicit device boot indexes override persistent OVMF entries left by a
+    # completed installation, so live mode cannot silently boot the disk.
+    disk_bootindex=2
+    media_args=(-drive "file=$iso_path,media=cdrom,if=none,format=raw,readonly=on,id=proper_live" -device ide-cd,drive=proper_live,bootindex=1 -boot menu=on)
+    ;;
+  installed)
+    [[ -f "$disk_path" ]] || { printf 'Installed VM disk not found: %s\n' "$disk_path" >&2; exit 1; }
+    disk_bootindex=1
+    media_args=(-boot menu=on)
+    ;;
+  *) printf 'Unknown VM boot mode: %s (use live or installed).\n' "$vm_boot" >&2; exit 1 ;;
+esac
 [[ "$vm_width" =~ ^[0-9]+$ && "$vm_height" =~ ^[0-9]+$ ]] || { printf 'VM dimensions must be positive integers.\n' >&2; exit 1; }
 [[ "$vm_scale" =~ ^[0-9]+([.][0-9]+)?$ ]] || { printf 'VM scale must be a positive number.\n' >&2; exit 1; }
 [[ "$vm_refresh" =~ ^[0-9]+([.][0-9]+)?$ ]] || { printf 'VM refresh must be a positive number.\n' >&2; exit 1; }
 [[ "$vm_memory" =~ ^[0-9]+$ && "$vm_memory" -ge 1024 ]] || { printf 'PROPER_VM_MEMORY must be at least 1024 megabytes.\n' >&2; exit 1; }
+[[ "$vm_outputs" =~ ^[1-4]$ ]] || { printf 'PROPER_VM_OUTPUTS must be an integer from 1 to 4.\n' >&2; exit 1; }
+if [[ -n "$vm_ssh_port" ]]; then
+  [[ "$vm_ssh_port" =~ ^[0-9]+$ && "$vm_ssh_port" -ge 1024 && "$vm_ssh_port" -le 65535 ]] || {
+    printf 'PROPER_VM_SSH_PORT must be an unprivileged TCP port from 1024 to 65535.\n' >&2
+    exit 1
+  }
+  network_args=(-nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:${vm_ssh_port}-:22")
+else
+  network_args=(-nic user,model=virtio-net-pci)
+fi
 [[ "$vm_display_delay" =~ ^[0-9]+$ ]] || { printf 'VM display delay must be a non-negative integer.\n' >&2; exit 1; }
 [[ "$vm_auto_display" == 0 || "$vm_auto_display" == 1 ]] || { printf 'PROPER_VM_AUTO_DISPLAY must be 0 or 1.\n' >&2; exit 1; }
 [[ -c /dev/kvm && -r /dev/kvm && -w /dev/kvm ]] || { printf '/dev/kvm is unavailable; graphical acceptance requires host KVM access.\n' >&2; exit 1; }
@@ -112,7 +141,7 @@ if [[ -e "$monitor_socket" || -e "$qmp_socket" ]]; then
   done
 fi
 
-qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m "$vm_memory" -device "virtio-vga,xres=$vm_width,yres=$vm_height" "${pointer_args[@]}" "${display_args[@]}" -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive file="$disk_path",if=virtio,format=qcow2 "${aux_drive_args[@]}" -cdrom "$iso_path" -boot order=d -nic user,model=virtio-net-pci &
+qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -cpu host -smp 8 -m "$vm_memory" -device "virtio-vga,xres=$vm_width,yres=$vm_height,max_outputs=$vm_outputs" "${pointer_args[@]}" "${display_args[@]}" -monitor "unix:$monitor_socket,server=on,wait=off" -qmp "unix:$qmp_socket,server=on,wait=off" -drive if=pflash,format=raw,readonly=on,file="$firmware_code" -drive if=pflash,format=raw,file="$firmware_vars" -drive "file=$disk_path,if=none,format=qcow2,id=proper_disk" -device "virtio-blk-pci,drive=proper_disk,bootindex=$disk_bootindex" "${aux_drive_args[@]}" "${media_args[@]}" "${network_args[@]}" &
 qemu_pid=$!
 display_helper_pid=
 
