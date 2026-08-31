@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- SPDX-FileCopyrightText: 2026 Proper Linux contributors -->
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
-<!-- The panel intentionally has no shadow-* slices. Plasma stretches those
-     slices independently of this frame; an unmasked slice exposes a square
-     shadow around the 18 px rounded shelf. -->
-<svg xmlns="http://www.w3.org/2000/svg" width="148" height="68" viewBox="0 0 148 68">
+<!-- Plasma falls back to Breeze shadow slices when a theme omits them. These
+     neutral slices suppress that fallback; their tiny non-zero alpha keeps
+     their geometry discoverable without creating a visible square halo. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="68" viewBox="0 0 200 68">
   <defs>
     <style id="current-color-scheme" type="text/css">
       .ColorScheme-Background { color: #141a22; }
@@ -61,4 +61,18 @@
   <path id="mask-topright" d="M130 0v18h18v-1c0-9.39-7.61-17-17-17h-1z" fill="#000"/>
   <path id="mask-bottomleft" d="M98 68V50H80v1c0 9.39 7.61 17 17 17h1z" fill="#000"/>
   <path id="mask-bottomright" d="M130 68V50h18v1c0 9.39-7.61 17-17 17h-1z" fill="#000"/>
+
+  <rect id="shadow-center" x="170" y="10" width="20" height="20" fill="#000" fill-opacity="0.001"/>
+  <rect id="shadow-top" x="170" width="20" height="10" fill="#000" fill-opacity="0.001"/>
+  <rect id="shadow-bottom" x="170" y="30" width="20" height="10" fill="#000" fill-opacity="0.001"/>
+  <rect id="shadow-left" x="160" y="10" width="10" height="20" fill="#000" fill-opacity="0.001"/>
+  <rect id="shadow-right" x="190" y="10" width="10" height="20" fill="#000" fill-opacity="0.001"/>
+  <rect id="shadow-topleft" x="160" width="10" height="10" fill="#000" fill-opacity="0.001"/>
+  <rect id="shadow-topright" x="190" width="10" height="10" fill="#000" fill-opacity="0.001"/>
+  <rect id="shadow-bottomleft" x="160" y="30" width="10" height="10" fill="#000" fill-opacity="0.001"/>
+  <rect id="shadow-bottomright" x="190" y="30" width="10" height="10" fill="#000" fill-opacity="0.001"/>
+  <rect id="shadow-hint-top-margin" x="179" width="2" height="10" fill="#f0f"/>
+  <rect id="shadow-hint-bottom-margin" x="179" y="30" width="2" height="10" fill="#f0f"/>
+  <rect id="shadow-hint-left-margin" x="160" y="19" width="10" height="2" fill="#f0f"/>
+  <rect id="shadow-hint-right-margin" x="190" y="19" width="10" height="2" fill="#f0f"/>
 </svg>

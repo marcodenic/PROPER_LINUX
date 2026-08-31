@@ -540,7 +540,8 @@ Status values:
 - **Date:** 2026-08-31
 - **Decision:** Give the rounded Proper shelf, tooltips, popups, notifications,
   and OSD containers depth through translucency, background blur, restrained
-  frames, and spatial separation. Do not define Plasma `shadow-*` slices in
+  frames, and spatial separation. Define neutral `shadow-*` slices to suppress
+  Plasma's Breeze fallback, but do not ship visible shadow slices in
   Proper-owned shell assets unless a future implementation matches every
   surface radius and has installed-render regression tests. Validate this rule
   before every RPM build, and bump the Plasma Style metadata version whenever

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Reject malformed Plasma SVG assets and the rectangular panel-shadow
-# regression. The rounded shelf deliberately gets depth from translucency,
-# background blur, and its hairline frame; it does not define shadow slices.
+# regression. The rounded shelf gets depth from translucency, background blur,
+# and its hairline frame; neutral slices suppress Plasma's Breeze fallback.
 set -Eeuo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -18,6 +18,11 @@ command -v xmllint >/dev/null 2>&1 || {
 while IFS= read -r -d '' asset; do
   xmllint --noout "$asset"
 done < <(find "$style_root" -type f -name '*.svg' -print0)
+
+shadow_assets=(
+  "$panel"
+  "$style_root/dialogs/background.svg"
+)
 
 package_version="$(awk '$1 == "Version:" { print $2; exit }' "$spec")"
 package_release="$(awk '$1 == "Release:" { print $2; exit }' "$spec")"
@@ -46,13 +51,16 @@ for required_id in "${required_ids[@]}"; do
   }
 done
 
-while IFS= read -r -d '' asset; do
-  shadow_count="$(xmllint --xpath "count(//*[starts-with(@id, 'shadow-')])" "$asset")"
-  [[ "$shadow_count" == 0 ]] || {
-    printf '%s defines %s explicit shadow element(s).\n' "$asset" "$shadow_count" >&2
-    printf 'Explicit shell shadows are forbidden until their rounded alpha masks have render regression tests.\n' >&2
+for asset in "${shadow_assets[@]}"; do
+  shadow_selector="//*[starts-with(@id, 'shadow-') and not(starts-with(@id, 'shadow-hint-'))]"
+  shadow_count="$(xmllint --xpath "count($shadow_selector)" "$asset")"
+  neutral_shadow_count="$(xmllint --xpath "count(${shadow_selector}[@fill-opacity and number(@fill-opacity) <= 0.001])" "$asset")"
+  [[ "$shadow_count" == 9 && "$neutral_shadow_count" == 9 ]] || {
+    printf '%s must define nine neutral shadow-suppression slices; found %s total and %s neutral.\n' \
+      "$asset" "$shadow_count" "$neutral_shadow_count" >&2
+    printf 'Visible shell shadows are forbidden until their rounded alpha masks have render regression tests.\n' >&2
     exit 1
   }
-done < <(find "$style_root" -type f -name '*.svg' -print0)
+done
 
-printf 'Plasma theme valid: rounded shell surfaces with no explicit shadow slices.\n'
+printf 'Plasma theme valid: rounded shell surfaces with neutral fallback-suppression shadows.\n'
