@@ -123,10 +123,10 @@ new-user layout and a one-time empty-layout migration. The installed review VM
 shows the intended centred, floating, translucent panel with Proper's three
 promoted launchers and upstream status widgets.
 
-The installed screenshot and interaction comparison is now recorded in
-`docs/evidence/phase9-shell-surfaces`. It found no acceptance failure that
-justifies a widget fork or third-party Plasma theme. The proposed version 0.1
-boundary is therefore:
+The installed screenshot and interaction comparison is now recorded, with
+labelled contact sheets, in `docs/evidence/phase9-shell-surfaces`. It has not
+found a functional acceptance failure that justifies a widget fork. The
+provisional version 0.1 boundary for PM review is therefore:
 
 - **configure** the upstream panel and task manager with Proper's small layout;
 - **keep** Vicinae as the promoted launcher;
@@ -136,7 +136,9 @@ boundary is therefore:
   applets; and
 - **replace no Plasma component** in Phase 9.
 
-This set is ready for the PM shell-surfaces checkpoint. Bluetooth,
-battery-present, real-audio-device, and second-display states are not
-representable in the current single-output VM and remain explicitly recorded
-evidence limits.
+This set is ready for the PM shell-surfaces checkpoint; it is not yet approved.
+The evidence also records a Vicinae Bluetooth-search mismatch, conflicting
+Proper/Breeze wording in the brightness panel, and the absence of a true
+brightness-key OSD capture. Bluetooth pairing/connected, battery-present,
+real-audio-device, and second-display states are not representable in the
+current single-output VM and remain explicit evidence limits.

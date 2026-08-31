@@ -121,21 +121,20 @@ Every version 0.1 candidate must satisfy all of these:
 
 ## PM shell-surfaces review
 
-Status: installed-VM evidence is ready in
-`docs/evidence/phase9-shell-surfaces`; PM keep/theme/replace approval is
-pending.
+Status: awaiting PM visual review. Installed-VM evidence and contact sheets are
+preserved in `docs/evidence/phase9-shell-surfaces`.
 
 ### Evidence
 
-- Matched 1920×1080 and 200% screenshots for the taskbar, tray, notifications,
-  OSDs, network, Bluetooth, audio, power, clock/calendar, clipboard,
-  authentication prompts, task switching, Overview, Desktop Grid, and
-  workspace switching
+- A 1920x1080 baseline for the taskbar, tray, notifications, volume OSD,
+  network, Bluetooth empty state, audio empty state, power, clock/calendar,
+  clipboard, authentication, task switching, Overview, Desktop Grid, Present
+  Windows, and the custom lock screen
+- Targeted 200% taskbar and notification screenshots
 - Blur-enabled and blur-disabled views
-- Pointer and keyboard interaction captures for every promoted surface
-- Normal, empty, busy, action, cancellation, and error states where applicable
-- A keep/theme/replace decision for each surface, including source, licence,
-  update method, and maintenance owner for every non-Fedora asset
+- Pointer and keyboard interaction results for the promoted paths exercised so
+  far
+- A provisional keep/theme/replace recommendation for PM review
 
 ### Pass criteria
 

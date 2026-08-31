@@ -426,3 +426,30 @@ Status values:
   that store, which left an existing review account with no panel. Explicitly
   seeding the store and narrowly migrating only the empty state fixes arrival
   while preserving upstream interaction code and later user customisation.
+
+## D046 — Proposed upstream Plasma boundary for PM shell review
+
+- **Status:** Proposed; PM shell-surfaces decision pending
+- **Date:** 2026-08-31
+- **Proposal:** Keep the dark translucent floating Proper panel and its task
+  identity defaults. Retain Plasma's upstream tray, notifications, OSDs,
+  network, Bluetooth, audio, power, clipboard, authentication, Alt+Tab,
+  Overview, and Desktop Grid implementations, then apply only the Proper theme
+  and configuration changes approved at the visual checkpoint.
+- **Reason:** Installed-VM review has not found a functional acceptance failure
+  that justifies owning those applets. Their current appearance is still a PM
+  decision: the evidence identifies several theme-level opportunities and two
+  configuration defects without presuming visual approval.
+
+## D047 — Add reversible workspace arrangement without mandatory auto-tiling
+
+- **Status:** Accepted for Phase 11 implementation
+- **Date:** 2026-08-31
+- **Decision:** Keep KWin floating by default, edge snapping, `Meta`+arrow
+  quick tiling, and the native `Meta+T` tile editor. Add a Proper “Arrange
+  workspace” action that applies a chosen layout to ordinary windows on the
+  current workspace and monitor, then restores their captured floating
+  geometry when toggled. New windows continue to open floating.
+- **Reason:** This gives the PM the requested instant tiled/floating workflow
+  without continuous auto-reflow, mandatory tiling, or a replacement window
+  manager. Pointer, Vicinae, and keyboard paths remain peers.
