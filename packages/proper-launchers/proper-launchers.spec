@@ -1,6 +1,6 @@
 Name:           proper-launchers
 Version:        0.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Proper Linux launcher and window workflow defaults
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -80,6 +80,11 @@ done
 systemctl --global enable vicinae.service >/dev/null 2>&1 || :
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-9
+- Present Vicinae as the semantic Applications and Search pointer affordance
+- Replace the upstream brand mark with the coherent Breeze search icon
+- Enable and pin Vicinae's pointer-accessible Browse Apps view
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-8
 - Add pointer and Vicinae paths for workspace layouts and desktop utilities
 - Add a searchable shortcut reference and local region OCR action

@@ -1,6 +1,6 @@
 Name:           proper-defaults
 Version:        0.1
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Proper Linux new-user KDE defaults
 License:        GPL-3.0-or-later
 BuildArch:      noarch
@@ -17,6 +17,9 @@ the small skel copies initialise a live/installer-created account. They do not
 overwrite an existing user's configuration.
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-15
+- Integrate the approved Proper Plasma Style with the workspace arranger
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-14
 - Add the reversible, output-aware Proper workspace arranger KWin script
 

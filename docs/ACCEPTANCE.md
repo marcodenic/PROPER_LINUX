@@ -98,6 +98,11 @@ Every version 0.1 candidate must satisfy all of these:
 
 ## PM checkpoint 4 — Proper Apps
 
+Status: the original version 0.1 provider path was approved before Phase 6.
+The broader Phase 10 catalogue redesign is implemented and validated in the
+installed VM; refreshed visual approval is pending against
+`docs/evidence/phase10-proper-apps`.
+
 ### Evidence
 
 - Catalogue home and category view
@@ -121,8 +126,11 @@ Every version 0.1 candidate must satisfy all of these:
 
 ## PM shell-surfaces review
 
-Status: awaiting PM visual review. Installed-VM evidence and contact sheets are
-preserved in `docs/evidence/phase9-shell-surfaces`.
+Status: PM visual direction approved; implementation validation in progress.
+Baseline contact sheets are preserved in
+`docs/evidence/phase9-shell-surfaces`, the approved mockup direction in
+`docs/evidence/phase9-shell-mockups`, and the first installed-VM implementation
+in `docs/evidence/phase9-shell-implementation`.
 
 ### Evidence
 

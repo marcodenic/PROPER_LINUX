@@ -43,6 +43,10 @@ def main() -> int:
     move.add_argument("--height", type=int, default=1080)
     button = sub.add_parser("button")
     button.add_argument("name", choices=("left", "right", "middle"), default="left")
+    button_down = sub.add_parser("button-down")
+    button_down.add_argument("name", choices=("left", "right", "middle"), default="left")
+    button_up = sub.add_parser("button-up")
+    button_up.add_argument("name", choices=("left", "right", "middle"), default="left")
     args = parser.parse_args()
 
     if args.action == "key":
@@ -75,6 +79,11 @@ def main() -> int:
     elif args.action == "button":
         events = [{"type": "btn", "data": {"button": args.name, "down": True}},
                   {"type": "btn", "data": {"button": args.name, "down": False}}]
+    elif args.action in ("button-down", "button-up"):
+        events = [{"type": "btn", "data": {
+            "button": args.name,
+            "down": args.action == "button-down",
+        }}]
 
     try:
         with socket.socket(socket.AF_UNIX) as sock:

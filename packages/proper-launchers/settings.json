@@ -12,10 +12,24 @@
     "layer_shell": { "enabled": true, "keyboard_interactivity": "exclusive", "layer": "top" }
   },
   "favorites": [
+    "system:browse-apps",
     "applications:chromium-browser",
     "applications:org.kde.dolphin",
     "applications:com.mitchellh.ghostty",
     "files:search",
     "shortcuts:root"
-  ]
+  ],
+  "providers": {
+    "system": {
+      "entrypoints": {
+        "browse-apps": {
+          "enabled": true,
+          "preferences": {
+            "sortAlphabetically": true,
+            "showHidden": false
+          }
+        }
+      }
+    }
+  }
 }

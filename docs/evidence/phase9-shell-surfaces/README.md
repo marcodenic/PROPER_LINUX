@@ -2,10 +2,11 @@
 
 ## Review status
 
-The installed-VM baseline is ready for PM review. It is not an approval of the
-current appearance. The component-retention recommendations below are
-provisional until the PM marks each surface sufficient, theme-only, or in need
-of deeper redesign.
+The PM approved the soft-shelf panel direction, calmer popups, semantic
+Applications & Search launcher, and upstream Plasma component boundary. This
+directory preserves the pre-implementation baseline; the accepted direction
+and installed implementation are recorded in the adjacent Phase 9 evidence
+directories.
 
 ## Contact sheets
 

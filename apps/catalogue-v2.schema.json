@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema", "version", "generated", "entries"],
+  "properties": {
+    "schema": {"const": "org.properlinux.catalogue"},
+    "version": {"const": 2},
+    "generated": {"type": "string"},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "name", "kind", "category", "description", "homepage",
+          "source_url", "provider", "provider_id", "status", "license",
+          "architectures", "icon", "accent", "recommended", "removable",
+          "validated", "detection", "launch_args"
+        ],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "name": {"type": "string"},
+          "kind": {"enum": ["application", "capability"]},
+          "category": {"type": "string"},
+          "description": {"type": "string"},
+          "homepage": {"type": "string", "format": "uri"},
+          "source_url": {"type": "string", "format": "uri"},
+          "provider": {"enum": ["fedora", "flatpak", "vendor"]},
+          "provider_id": {"type": "string"},
+          "status": {"type": "string"},
+          "license": {"type": "string"},
+          "architectures": {"type": "array", "items": {"type": "string"}},
+          "icon": {"type": "string"},
+          "accent": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"},
+          "recommended": {"type": "boolean"},
+          "removable": {"type": "boolean"},
+          "validated": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+          "caveat": {"type": "string"},
+          "tags": {"type": "array", "items": {"type": "string"}},
+          "detection": {
+            "type": "object",
+            "required": ["type", "value"],
+            "properties": {
+              "type": {"enum": ["rpm", "flatpak", "command"]},
+              "value": {"type": "string"}
+            }
+          },
+          "launch_args": {"type": "array", "items": {"type": "string"}},
+          "install_steps": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/step"}
+          },
+          "uninstall_steps": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/step"}
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "step": {
+      "type": "object",
+      "required": ["program", "args", "privileged"],
+      "properties": {
+        "program": {"type": "string"},
+        "args": {"type": "array", "items": {"type": "string"}},
+        "privileged": {"type": "boolean"}
+      }
+    }
+  }
+}
