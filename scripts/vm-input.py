@@ -25,6 +25,10 @@ def main() -> int:
     sub = parser.add_subparsers(dest="action", required=True)
     key = sub.add_parser("key")
     key.add_argument("qcode")
+    key_down = sub.add_parser("key-down")
+    key_down.add_argument("qcode")
+    key_up = sub.add_parser("key-up")
+    key_up.add_argument("qcode")
     combo = sub.add_parser("combo")
     combo.add_argument("qcodes", nargs="+", help="keys held in order, then released in reverse order")
     click = sub.add_parser("click")
@@ -46,6 +50,11 @@ def main() -> int:
             {"type": "key", "data": {"down": True, "key": {"type": "qcode", "data": args.qcode}}},
             {"type": "key", "data": {"down": False, "key": {"type": "qcode", "data": args.qcode}}},
         ]
+    elif args.action in ("key-down", "key-up"):
+        events = [{"type": "key", "data": {
+            "down": args.action == "key-down",
+            "key": {"type": "qcode", "data": args.qcode},
+        }}]
     elif args.action == "combo":
         events = [
             {"type": "key", "data": {"down": True, "key": {"type": "qcode", "data": qcode}}}

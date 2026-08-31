@@ -1,6 +1,6 @@
 Name:           proper-defaults
 Version:        0.1
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        Proper Linux new-user KDE defaults
 License:        GPL-3.0-or-later
 BuildArch:      noarch
@@ -17,6 +17,9 @@ the small skel copies initialise a live/installer-created account. They do not
 overwrite an existing user's configuration.
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-13
+- Pin Ghostty's own desktop identity so running windows group with its launcher
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-12
 - Bind the seeded floating translucent panel view to the Proper ShellPackage
 

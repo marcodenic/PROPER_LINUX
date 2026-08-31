@@ -264,3 +264,22 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
   upstream System Tray, Show Desktop, and Digital Clock widgets. The view uses
   Plasma's translucent panel mode; no widget fork or private Plasma API is
   required.
+- Icon Tasks groups a Wayland window by the application's own desktop identity.
+  Pinning the wrapper `proper-terminal.desktop` launched Ghostty successfully
+  but produced a second running icon. Pinning
+  `com.mitchellh.ghostty.desktop` preserves the Proper packaging while grouping
+  the running window correctly.
+
+## Phase 9 installed shell-surface audit — 2026-08-31
+
+- The installed review covered the configured panel, Vicinae, tray, calendar,
+  notifications, Discover's busy state, volume and mute OSDs, connected
+  networking, the audio empty state, clipboard, emoji, Polkit success/failure/
+  cancellation, Alt+Tab, Overview, Desktop Grid, 200% scaling, and the
+  blur-disabled fallback.
+- The Fedora/KDE Breeze-derived surfaces remain coherent with Proper Dark and
+  retain their upstream pointer, keyboard, accessibility, security, and update
+  ownership. No observed failure justifies importing a third-party Global
+  Theme or maintaining a forked applet for version 0.1.
+- The exact evidence set and its hardware limits are recorded under
+  `docs/evidence/phase9-shell-surfaces`.

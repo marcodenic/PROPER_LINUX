@@ -121,6 +121,10 @@ Every version 0.1 candidate must satisfy all of these:
 
 ## PM shell-surfaces review
 
+Status: installed-VM evidence is ready in
+`docs/evidence/phase9-shell-surfaces`; PM keep/theme/replace approval is
+pending.
+
 ### Evidence
 
 - Matched 1920×1080 and 200% screenshots for the taskbar, tray, notifications,

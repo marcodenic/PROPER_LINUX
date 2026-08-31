@@ -18,7 +18,7 @@ if (panels().length === 0) {
 
     const tasks = panel.addWidget("org.kde.plasma.icontasks")
     tasks.currentConfigGroup = ["General"]
-    tasks.writeConfig("launchers", "applications:vicinae.desktop,applications:org.kde.dolphin.desktop,applications:proper-terminal.desktop")
+    tasks.writeConfig("launchers", "applications:vicinae.desktop,applications:org.kde.dolphin.desktop,applications:com.mitchellh.ghostty.desktop")
     tasks.writeConfig("showOnlyCurrentDesktop", false)
     tasks.writeConfig("showOnlyCurrentActivity", false)
 

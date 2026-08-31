@@ -31,7 +31,7 @@ immutability=1
 plugin=org.kde.plasma.icontasks
 
 [Containments][2][Applets][3][Configuration][General]
-launchers=applications:vicinae.desktop,applications:org.kde.dolphin.desktop,applications:proper-terminal.desktop
+launchers=applications:vicinae.desktop,applications:org.kde.dolphin.desktop,applications:com.mitchellh.ghostty.desktop
 showOnlyCurrentDesktop=false
 showOnlyCurrentActivity=false
 

@@ -121,6 +121,22 @@ The component and extension-point review is complete, and the validated Phase
 same-VM Phase 9 capture is fixed: the Proper ShellPackage now has an explicit
 new-user layout and a one-time empty-layout migration. The installed review VM
 shows the intended centred, floating, translucent panel with Proper's three
-promoted launchers and upstream status widgets. The remaining Phase 9 work is
-the transient-surface screenshot comparison and final keep/theme/replace
-decisions.
+promoted launchers and upstream status widgets.
+
+The installed screenshot and interaction comparison is now recorded in
+`docs/evidence/phase9-shell-surfaces`. It found no acceptance failure that
+justifies a widget fork or third-party Plasma theme. The proposed version 0.1
+boundary is therefore:
+
+- **configure** the upstream panel and task manager with Proper's small layout;
+- **keep** Vicinae as the promoted launcher;
+- **keep Breeze-derived** tray, popup, notification, OSD, clipboard,
+  authentication, task-switcher, Overview, and Desktop Grid surfaces;
+- **keep upstream-owned** network, Bluetooth, audio, battery, and power
+  applets; and
+- **replace no Plasma component** in Phase 9.
+
+This set is ready for the PM shell-surfaces checkpoint. Bluetooth,
+battery-present, real-audio-device, and second-display states are not
+representable in the current single-output VM and remain explicitly recorded
+evidence limits.
