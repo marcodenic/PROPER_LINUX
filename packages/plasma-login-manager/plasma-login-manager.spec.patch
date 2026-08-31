@@ -5,7 +5,7 @@
  Name:           plasma-login-manager
  Version:        6.7.4
 -Release:        1%{?dist}
-+Release:        1.proper1%{?dist}
++Release:        1.proper2%{?dist}
  License:        BSD-3-Clause and CC0-1.0 and (GPL-2.0-only or GPL-3.0-only) and GPL-2.0-or-later and LGPL-2.0-or-later and LGPL-2.1-or-later
  Summary:        QML based login manager from KDE
  
@@ -37,10 +37,13 @@
  
  
  %conf
-@@ -202,6 +209,10 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kcm_plasmalogin.desktop
+@@ -202,6 +209,13 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kcm_plasmalogin.desktop
  
  
  %changelog
++* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 6.7.4-1.proper2
++- Preserve the first password character that wakes the idle greeter
++
 +* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 6.7.4-1.proper1
 +- Replace the embedded greeter composition with the approved minimal centred
 +  Proper login while retaining Fedora's PLM backend and packaging

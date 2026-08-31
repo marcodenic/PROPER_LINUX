@@ -279,8 +279,9 @@ Status values:
 - **Date:** 2026-08-31
 - **Decision:** Treat Phase 6 as the installed review-system milestone. Add
   dedicated curation/browser, arrival/personalisation, Proper Apps 2, and
-  window/utility phases before producing the Phase 11 release candidate. Move
-  PM checkpoint 5 to the end of Phase 11.
+  window/utility phases before producing the then-numbered Phase 11 release
+  candidate. D044 subsequently inserts the shell-surfaces review and renumbers
+  that release candidate as Phase 12.
 - **Reason:** Installed-system review proved the core desktop while identifying
   material product work that should be designed and reviewed independently,
   rather than hidden inside a final ISO punch list.
@@ -355,7 +356,7 @@ Status values:
 - **Date:** 2026-08-31
 - **Decision:** Do not rebuild the ISO solely to measure Phase 7. Proceed
   directly into Phase 8 and record the installed-size and compressed-ISO delta
-  during the clean Phase 11 release-candidate build.
+  during the clean final release-candidate build (now Phase 12 under D044).
 - **Reason:** The image definition and package boundaries can be verified now;
   an intermediate full rebuild would delay the approved arrival work without
   replacing the final integration measurement.
@@ -390,3 +391,22 @@ Status values:
   design therefore cannot be delivered by a supported theme package alone.
   A small source-package patch is more auditable and updateable than replacing
   Fedora-owned runtime files or forking the login manager.
+
+## D044 — Review Plasma shell surfaces before expanding the application catalogue
+
+- **Status:** Accepted for implementation
+- **Date:** 2026-08-31
+- **Decision:** Add a dedicated Phase 9 review of the panel, task states, tray,
+  notifications, OSDs, connectivity/audio/power panels, clipboard and emoji
+  paths, authentication prompts, and KWin workspace controls. Prefer supported
+  Global Theme, Plasma Style, colour, icon, layout, widget, and KWin extension
+  points. Create a narrow Proper Plasma Style where approved and fall back to
+  Breeze for unowned assets. Keep the functional applets upstream unless a
+  documented acceptance failure and explicit PM decision justify maintained
+  widget or source code. Renumber the catalogue, workflow, and release-candidate
+  work as Phases 10, 11, and 12.
+- **Reason:** Proper currently gives the lock screen a custom composition but
+  leaves most other shell surfaces Breeze-derived. A systematic visual and
+  interaction review can improve product coherence without adopting Omarchy's
+  much larger shell-ownership and maintenance boundary. This extends D035 and
+  moves its final release-candidate checkpoint from Phase 11 to Phase 12.

@@ -38,6 +38,8 @@ Item {
     Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
     Kirigami.Theme.inherit: false
 
+    Component.onCompleted: Qt.callLater(() => passwordBox.forceActiveFocus())
+
     function userData(role) {
         if (selectedUserIndex < 0 || selectedUserIndex >= userCount) {
             return ""
@@ -218,7 +220,11 @@ Item {
             }
             width: Math.min(330, parent.width * 0.5)
             spacing: 8
-            enabled: root.uiVisible && !root.authenticating
+            // Keep the focused field live while the greeter is in its idle
+            // state. The global event filter deliberately lets ordinary key
+            // presses continue to their target, so the first character both
+            // reveals the form and becomes the first password character.
+            enabled: !root.authenticating
             opacity: root.uiVisible ? 1 : 0
 
             Behavior on opacity {

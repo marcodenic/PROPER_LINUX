@@ -206,7 +206,7 @@ hardening.
 
 - The installed review VM is usable with Vicinae, Dolphin, Ghostty, Proper
   Apps, and an installed browser.
-- The product manager approves the Phase 7–11 plan.
+- The product manager approves the Phase 7–12 plan.
 
 ## Phase 7 — Curation and browser
 
@@ -229,7 +229,7 @@ make Chromium the promoted browser without disrupting Fedora's installer.
 - Move Podman/Skopeo/Toolbox and additional HPLIP/Gutenprint compatibility
   drivers to Proper Apps while retaining core printing.
 - Record installed-size and compressed-ISO changes with the final integrated
-  Phase 11 build; the PM explicitly waived an intermediate Phase 7 rebuild.
+  Phase 12 build; the PM explicitly waived an intermediate Phase 7 rebuild.
 
 ### Exit criteria
 
@@ -267,11 +267,56 @@ Show the login and lock alternatives, wallpaper switching, and persistence
 after logout and reboot.
 
 The PM approved the minimal lock composition and centred login direction on
-2026-08-31. Source packaging and isolated greeter validation are complete;
-installed-VM persistence remains part of this checkpoint and is not replaced
-by the design approval.
+2026-08-31. Source packaging, isolated greeter validation, installed login,
+lock and unlock, first-character preservation, wallpaper persistence, the
+pointer-operated action menu, and Switch User all pass in the Fedora 44 review
+VM. The arrival checkpoint is complete.
 
-## Phase 9 — Proper Apps 2
+## Phase 9 — Plasma shell surfaces
+
+### Objective
+
+Review every persistent and transient Plasma shell surface as one product
+system, adopt the strongest maintained Plasma 6 building blocks, and refine
+only the surfaces that fail Proper's visual or interaction standard without
+replacing Plasma.
+
+### Work
+
+- Use `docs/SHELL_SURFACES.md` as the ownership, extension-point, and candidate
+  record.
+- Capture the taskbar and task states, tray, notifications, volume and
+  brightness OSDs, network/Bluetooth/audio/power panels, clock/calendar,
+  clipboard, emoji path, Polkit prompt, Alt+Tab, Overview, Desktop Grid, and
+  workspace switching at 1920x1080 and 200% scaling.
+- Compare the installed Fedora, Breeze, Breeze Dark, and Breeze Twilight
+  baselines with a small, source- and licence-audited set of current Plasma 6
+  Global Themes and Plasma Styles.
+- Record the component owner, supported extension point, source, licence,
+  pinned version, and update method for every retained external asset.
+- Define a narrow Proper Plasma Style only where configuration and existing
+  assets cannot produce the approved result. Let unowned theme elements fall
+  back to Breeze.
+- Keep Vicinae as the promoted launcher and use stock Plasma launchers only as
+  interaction/reference baselines.
+- Prefer upstream applets and supported configuration for notifications,
+  networking, Bluetooth, audio, power, and clipboard. Fork or rewrite an applet
+  only for a documented acceptance failure and with explicit PM approval and
+  an update/rebase exit plan.
+- Test pointer, keyboard, focus, reduced-motion, blur-disabled, third-party tray
+  icon, notification action, authentication failure/cancellation, and
+  multi-display states.
+- Package accepted assets and defaults through `proper-look-and-feel` and
+  `proper-defaults`; preserve existing user choices during package updates.
+
+### PM shell-surfaces review
+
+Compare the complete baseline and selected screenshot sets, exercise every
+ordinary surface with the pointer, and approve which surfaces remain
+Breeze-derived, which gain Proper theme assets, and which—if any—justify
+targeted widget work.
+
+## Phase 10 — Proper Apps 2
 
 ### Objective
 
@@ -296,7 +341,7 @@ preinstalling the optional applications it presents.
 Browse, search, install, launch, and remove representative entries entirely
 with the pointer at 1920x1080 and 200% scaling.
 
-## Phase 10 — Window organisation and desktop utilities
+## Phase 11 — Window organisation and desktop utilities
 
 ### Objective
 
@@ -319,7 +364,7 @@ fast without making tiling or shortcut memorisation mandatory.
 Demonstrate the window layouts and every promoted utility with both pointer and
 keyboard paths.
 
-## Phase 11 — Final Proper Linux 0.1 candidate
+## Phase 12 — Final Proper Linux 0.1 candidate
 
 ### Objective
 

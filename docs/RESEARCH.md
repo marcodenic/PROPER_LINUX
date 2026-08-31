@@ -238,8 +238,14 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
   `8ba5f9a5b31b2cb09d6846c590d09891dadb9a5625426b8552577299093b67fd`.
 - The patched package built successfully in the pinned Fedora 44 build
   container. Its `ProperMain.qml` was compiled into the greeter's QML module,
-  and the resulting `plasma-login-manager-6.7.4-1.proper1.fc44.x86_64.rpm` is
-  SHA-256
-  `fd6c8ca7fe834c6e08752f85710af67878f80e13e7385da1cf6b0668e8710262`.
+  and the validated
+  `plasma-login-manager-6.7.4-1.proper2.fc44.x86_64.rpm` is SHA-256
+  `50f91f9acbaa18462fa6938c1446f283edd570ad8604bdf69169c8a0983deab8`.
   Running that package's greeter in offscreen `--test` mode for eight seconds
   produced no QML or runtime errors and remained alive until the test timeout.
+- The matching `kcm-plasmalogin-6.7.4-1.proper2.fc44.x86_64.rpm` is SHA-256
+  `11478102ebb730821912504d7fc39f99e537b2cdeeb9b7f7656def63b31fc8c8`.
+  Both exact packages were installed in the Fedora 44 review VM. Normal login,
+  first-character preservation, lock and unlock, pointer opening and closing
+  of the icon menu, and its Switch User action all passed against the installed
+  system.

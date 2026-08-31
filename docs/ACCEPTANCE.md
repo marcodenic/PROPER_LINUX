@@ -119,6 +119,36 @@ Every version 0.1 candidate must satisfy all of these:
 - At least one Flatpak, Fedora RPM, and official vendor-source path has been exercised.
 - No office suite appears in the default image; office applications are not a launch priority.
 
+## PM shell-surfaces review
+
+### Evidence
+
+- Matched 1920×1080 and 200% screenshots for the taskbar, tray, notifications,
+  OSDs, network, Bluetooth, audio, power, clock/calendar, clipboard,
+  authentication prompts, task switching, Overview, Desktop Grid, and
+  workspace switching
+- Blur-enabled and blur-disabled views
+- Pointer and keyboard interaction captures for every promoted surface
+- Normal, empty, busy, action, cancellation, and error states where applicable
+- A keep/theme/replace decision for each surface, including source, licence,
+  update method, and maintenance owner for every non-Fedora asset
+
+### Pass criteria
+
+- Persistent and transient surfaces share a coherent hierarchy, spacing,
+  colour, icon, focus, and motion language.
+- Every ordinary operation remains available by pointer and the existing
+  upstream accessibility and authentication paths still function.
+- Disabling blur, using 200% scaling, or opening a surface on another display
+  does not make it illegible or misplaced.
+- Network, Bluetooth, audio, power, notification delivery, clipboard, and
+  authentication remain upstream components unless a documented acceptance
+  failure and explicit PM decision justify maintained code.
+- Every custom Plasma Style asset or component is packaged reproducibly and
+  survives an upstream package update without resetting user choices.
+- The PM approves which surfaces remain Breeze-derived and which receive
+  Proper-owned visual assets or targeted implementation work.
+
 ## PM checkpoint 5 — Final installed system
 
 ### Journey
