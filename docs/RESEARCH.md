@@ -329,3 +329,27 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
   behaviour, pointer and Vicinae discovery, the shortcut-reference filter,
   Tesseract extraction, and a Wayland clipboard round trip passed. The
   evidence is recorded under `docs/evidence/phase11-workflows`.
+
+## Fedora 44 installed first-boot ownership audit — 2026-08-31
+
+- A clean graphical installation from the Phase 12 candidate produced no human
+  account, as expected, but enabled both `initial-setup.service` and
+  `plasma-setup.service`. The image contained `initial-setup-0.3.101-7.fc44`,
+  `initial-setup-gui-0.3.101-7.fc44`,
+  `initial-setup-gui-wayland-plasma-44.0-1.fc44`, and
+  `plasma-setup-6.7.4-1.fc44`.
+- The installed journal showed Plasma Setup successfully writing
+  `/etc/plasmalogin.conf.d/99-plasma-setup.conf` for the temporary
+  `plasma-setup` autologin. Legacy Initial Setup separately started KWin on
+  `tty7`, failed DRM authentication and output configuration with permission
+  errors, and left the first boot black.
+- Fedora's pinned KDE description already ignores `initial-setup` with the
+  comment “redundant with plasma-setup”. Proper had overridden that ownership
+  twice: `proper.xml` explicitly installed the Wayland Initial Setup GUI, and
+  `scripts/build-iso` deleted Fedora's ignore rule. Both overrides are removed.
+- On a disposable copy-on-write disk, disabling only the two legacy Initial
+  Setup target links made the same installed system boot through Plasma Setup's
+  welcome, British English, keyboard, dark-theme, and administrator-account
+  pages. The production fix excludes `initial-setup*` at image resolution and
+  checks the generated package manifest for absent legacy packages and present
+  `plasma-setup` before accepting an ISO.

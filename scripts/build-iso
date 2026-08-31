@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the pinned, unmodified Fedora KDE 44 live ISO with KIWI.
+# Build the pinned Fedora KDE 44 live ISO with Proper's reviewed overlay.
 set -Eeuo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -40,12 +40,6 @@ mkdir -p "$build_source_dir"
     "$build_source_dir/components/desktops/common.xml"
   sed -i '/<package name="plasma-welcome-fedora"\/>/d' \
     "$build_source_dir/teams/kde.xml"
-  sed -i '/<ignore name="initial-setup"\/>/a\		<ignore name="plasma-welcome"/>' \
-    "$build_source_dir/components/desktops/kde.xml"
-  # Retain Fedora's graphical initial-setup for the installed first boot so
-  # a real user account is created instead of carrying the temporary liveuser.
-  sed -i '/<ignore name="initial-setup"\/>/d; /<ignore name="plasma-welcome"\/>/d' \
-    "$build_source_dir/components/desktops/kde.xml"
 if [[ "${PROPER_BASELINE:-0}" == 1 ]]; then
   kiwi_file=/source/Fedora.kiwi
 else
@@ -104,5 +98,20 @@ fi
 
 mapfile -t images < <(find "$iso_dir" -maxdepth 3 -type f -name '*.iso' -print)
 (( ${#images[@]} == 1 )) || { printf 'Expected exactly one ISO in %s; found %d.\n' "$iso_dir" "${#images[@]}" >&2; exit 1; }
+if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
+  mapfile -t package_manifests < <(find "$iso_dir" -maxdepth 3 -type f -name '*.packages' -print)
+  (( ${#package_manifests[@]} == 1 )) || {
+    printf 'Expected exactly one package manifest in %s; found %d.\n' "$iso_dir" "${#package_manifests[@]}" >&2
+    exit 1
+  }
+  if grep -Eq '^initial-setup(\||-)' "${package_manifests[0]}"; then
+    printf 'Legacy initial-setup packages entered the Proper image; Fedora KDE must use plasma-setup.\n' >&2
+    exit 1
+  fi
+  grep -Eq '^plasma-setup\|' "${package_manifests[0]}" || {
+    printf 'Fedora plasma-setup is missing from the Proper image package manifest.\n' >&2
+    exit 1
+  }
+fi
 sha256sum "${images[0]}" >"${images[0]}.sha256"
 printf 'Built %s\nChecksum: %s.sha256\n' "${images[0]}" "${images[0]}"

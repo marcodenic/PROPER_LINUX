@@ -551,3 +551,17 @@ Status values:
   10-pixel nine-slices and did not ask Plasma to compose the translucent centre
   through its rounded mask. Plasma therefore exposed rectangular shadow and
   contrast tiles around both the taskbar and its tooltips.
+
+## D054 — Use Fedora's native Plasma Setup for installed first boot
+
+- **Status:** Accepted after Phase 12 first-boot defect review
+- **Date:** 2026-08-31
+- **Decision:** Let Fedora 44's `plasma-setup` own the installed first-boot
+  language, keyboard, appearance, and administrator-account flow. Explicitly
+  exclude every legacy `initial-setup` package from the Proper image and fail
+  the ISO build if legacy Initial Setup returns or Plasma Setup is absent.
+- **Reason:** Enabling both systems made legacy Initial Setup take `tty7` while
+  Plasma Login Manager configured its supported `plasma-setup` autologin.
+  Initial Setup then failed to acquire the VM's DRM device and left a black
+  first boot. Removing that redundant package restored Fedora's maintained
+  Plasma-native setup flow through the administrator-account page.

@@ -18,7 +18,6 @@
 		<package name="proper-apps"/>
 		<package name="proper-appearance"/>
 		<package name="chromium"/>
-		<package name="initial-setup-gui-wayland-plasma"/>
 		<package name="kamoso"/>
 		<package name="krdc"/>
 		<package name="krfb"/>
@@ -42,6 +41,10 @@
 		<ignore name="kpat"/>
 		<ignore name="kmahjongg"/>
 		<ignore name="neochat"/>
+		<!-- Fedora 44 KDE owns installed first boot through plasma-setup.
+		     Legacy initial-setup conflicts with Plasma Login Manager's setup
+		     autologin and must not enter the image. -->
+		<ignore name="initial-setup*"/>
 		<ignore name="plasma-welcome*"/>
 		<ignore name="fedora-media-writer*"/>
 		<ignore name="mediawriter*"/>
