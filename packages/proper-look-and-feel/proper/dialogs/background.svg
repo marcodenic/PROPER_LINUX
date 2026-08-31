@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: 2026 Proper Linux contributors -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<svg xmlns="http://www.w3.org/2000/svg" width="190" height="80" viewBox="0 0 190 80">
+  <defs>
+    <style id="current-color-scheme" type="text/css">
+      .ColorScheme-Background { color: #181d25; }
+      .ColorScheme-Frame { color: #a6afbd; }
+    </style>
+    <linearGradient id="shadow-top-gradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.30"/>
+    </linearGradient>
+    <linearGradient id="shadow-bottom-gradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="shadow-left-gradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.30"/>
+    </linearGradient>
+    <linearGradient id="shadow-right-gradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="shadow-tl-gradient" cx="1" cy="1" r="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="shadow-tr-gradient" cx="0" cy="1" r="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="shadow-bl-gradient" cx="1" cy="0" r="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="shadow-br-gradient" cx="0" cy="0" r="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <g id="top" transform="translate(14 0)">
+    <rect width="32" height="14" fill="#181d25" fill-opacity="0.94"/>
+    <rect width="32" height="1" fill="#a6afbd" fill-opacity="0.18"/>
+  </g>
+  <g id="bottom" transform="translate(14 46)">
+    <rect width="32" height="14" fill="#181d25" fill-opacity="0.94"/>
+    <rect y="13" width="32" height="1" fill="#a6afbd" fill-opacity="0.18"/>
+  </g>
+  <g id="left" transform="translate(0 14)">
+    <rect width="14" height="32" fill="#181d25" fill-opacity="0.94"/>
+    <rect width="1" height="32" fill="#a6afbd" fill-opacity="0.18"/>
+  </g>
+  <g id="right" transform="translate(46 14)">
+    <rect width="14" height="32" fill="#181d25" fill-opacity="0.94"/>
+    <rect x="13" width="1" height="32" fill="#a6afbd" fill-opacity="0.18"/>
+  </g>
+  <rect id="center" x="14" y="14" width="32" height="32" fill="#181d25" fill-opacity="0.94"/>
+  <g id="topleft">
+    <path d="M14 0v14H0v-1C0 5.82 5.82 0 13 0h1z" fill="#181d25" fill-opacity="0.94"/>
+    <path d="M14 .5h-1C6.1.5.5 6.1.5 13v1" fill="none" stroke="#a6afbd" stroke-opacity="0.18"/>
+  </g>
+  <g id="topright" transform="translate(46 0)">
+    <path d="M0 0v14h14v-1C14 5.82 8.18 0 1 0H0z" fill="#181d25" fill-opacity="0.94"/>
+    <path d="M0 .5h1c6.9 0 12.5 5.6 12.5 12.5v1" fill="none" stroke="#a6afbd" stroke-opacity="0.18"/>
+  </g>
+  <g id="bottomleft" transform="translate(0 46)">
+    <path d="M14 14V0H0v1c0 7.18 5.82 13 13 13h1z" fill="#181d25" fill-opacity="0.94"/>
+    <path d="M14 13.5h-1C6.1 13.5.5 7.9.5 1V0" fill="none" stroke="#a6afbd" stroke-opacity="0.18"/>
+  </g>
+  <g id="bottomright" transform="translate(46 46)">
+    <path d="M0 14V0h14v1c0 7.18-5.82 13-13 13H0z" fill="#181d25" fill-opacity="0.94"/>
+    <path d="M0 13.5h1c6.9 0 12.5-5.6 12.5-12.5V0" fill="none" stroke="#a6afbd" stroke-opacity="0.18"/>
+  </g>
+
+  <rect id="hint-top-margin" x="29" width="2" height="12" fill="#f0f"/>
+  <rect id="hint-bottom-margin" x="29" y="48" width="2" height="12" fill="#f0f"/>
+  <rect id="hint-left-margin" y="29" width="12" height="2" fill="#f0f"/>
+  <rect id="hint-right-margin" x="48" y="29" width="12" height="2" fill="#f0f"/>
+  <rect id="hint-stretch-borders" x="61" width="1" height="1" fill="#f60"/>
+
+  <rect id="mask-top" x="84" width="32" height="14" fill="#000"/>
+  <rect id="mask-bottom" x="84" y="46" width="32" height="14" fill="#000"/>
+  <rect id="mask-left" x="70" y="14" width="14" height="32" fill="#000"/>
+  <rect id="mask-right" x="116" y="14" width="14" height="32" fill="#000"/>
+  <rect id="mask-center" x="84" y="14" width="32" height="32" fill="#000"/>
+  <path id="mask-topleft" d="M84 0v14H70v-1c0-7.18 5.82-13 13-13h1z" fill="#000"/>
+  <path id="mask-topright" d="M116 0v14h14v-1c0-7.18-5.82-13-13-13h-1z" fill="#000"/>
+  <path id="mask-bottomleft" d="M84 60V46H70v1c0 7.18 5.82 13 13 13h1z" fill="#000"/>
+  <path id="mask-bottomright" d="M116 60V46h14v1c0 7.18-5.82 13-13 13h-1z" fill="#000"/>
+
+  <rect id="shadow-center" x="150" y="10" width="20" height="20" fill="#000" fill-opacity="0.001"/>
+  <rect id="shadow-top" x="150" width="20" height="10" fill="url(#shadow-top-gradient)"/>
+  <rect id="shadow-bottom" x="150" y="30" width="20" height="10" fill="url(#shadow-bottom-gradient)"/>
+  <rect id="shadow-left" x="140" y="10" width="10" height="20" fill="url(#shadow-left-gradient)"/>
+  <rect id="shadow-right" x="170" y="10" width="10" height="20" fill="url(#shadow-right-gradient)"/>
+  <rect id="shadow-topleft" x="140" width="10" height="10" fill="url(#shadow-tl-gradient)"/>
+  <rect id="shadow-topright" x="170" width="10" height="10" fill="url(#shadow-tr-gradient)"/>
+  <rect id="shadow-bottomleft" x="140" y="30" width="10" height="10" fill="url(#shadow-bl-gradient)"/>
+  <rect id="shadow-bottomright" x="170" y="30" width="10" height="10" fill="url(#shadow-br-gradient)"/>
+  <rect id="shadow-hint-top-margin" x="159" width="2" height="10" fill="#f0f"/>
+  <rect id="shadow-hint-bottom-margin" x="159" y="30" width="2" height="10" fill="#f0f"/>
+  <rect id="shadow-hint-left-margin" x="140" y="19" width="10" height="2" fill="#f0f"/>
+  <rect id="shadow-hint-right-margin" x="170" y="19" width="10" height="2" fill="#f0f"/>
+</svg>

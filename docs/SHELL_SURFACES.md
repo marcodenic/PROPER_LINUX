@@ -123,21 +123,27 @@ new-user layout and a one-time empty-layout migration. The installed review VM
 shows the intended centred, floating, translucent panel with Proper's three
 promoted launchers and upstream status widgets.
 
-The installed screenshot and interaction comparison is now recorded, with
-labelled contact sheets, in `docs/evidence/phase9-shell-surfaces`. It has not
-found a functional acceptance failure that justifies a widget fork. The
-provisional version 0.1 boundary for PM review is therefore:
+The installed screenshot and interaction comparison is recorded, with labelled
+contact sheets, in `docs/evidence/phase9-shell-surfaces`. It did not find a
+functional acceptance failure that justifies a widget fork. The PM approved
+the following version 0.1 boundary:
 
 - **configure** the upstream panel and task manager with Proper's small layout;
-- **keep** Vicinae as the promoted launcher;
-- **keep Breeze-derived** tray, popup, notification, OSD, clipboard,
-  authentication, task-switcher, Overview, and Desktop Grid surfaces;
+- **keep** Vicinae as the promoted launcher, presented through a quiet Proper
+  **Applications & Search** button with a semantic search icon;
+- **theme** the panel, popup, notification, tooltip, and OSD containers with a
+  narrow Proper Plasma Style and let every unowned asset fall back to Breeze;
+- **keep Breeze-derived** clipboard, authentication, task-switcher, Overview,
+  Desktop Grid, and the internal controls of upstream applets;
 - **keep upstream-owned** network, Bluetooth, audio, battery, and power
   applets; and
 - **replace no Plasma component** in Phase 9.
 
-This set is ready for the PM shell-surfaces checkpoint; it is not yet approved.
-The evidence also records a Vicinae Bluetooth-search mismatch, conflicting
+The PM selected bar variant D—the single centred soft shelf—and approved the
+calmer charcoal popup direction. The first installed-VM implementation and
+pointer-opened Vicinae result are in
+`docs/evidence/phase9-shell-implementation`. The evidence also records a
+Vicinae Bluetooth-search mismatch, conflicting
 Proper/Breeze wording in the brightness panel, and the absence of a true
 brightness-key OSD capture. Bluetooth pairing/connected, battery-present,
 real-audio-device, and second-display states are not representable in the

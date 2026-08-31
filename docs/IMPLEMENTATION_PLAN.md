@@ -316,10 +316,13 @@ ordinary surface with the pointer, and approve which surfaces remain
 Breeze-derived, which gain Proper theme assets, and which—if any—justify
 targeted widget work.
 
-The installed-VM baseline, contact sheets, and provisional keep/theme
-recommendations are ready in `docs/evidence/phase9-shell-surfaces`. PM review
-is pending. Phase 9 is not complete until the PM decides which surfaces are
-sufficient, which receive Proper theme assets, and which require deeper work.
+The installed-VM baseline and contact sheets are in
+`docs/evidence/phase9-shell-surfaces`. The PM approved the calmer popup system,
+bar variant D, a semantic Proper search launcher backed by Vicinae, and the
+upstream component boundary. The first installed-VM implementation is in
+`docs/evidence/phase9-shell-implementation`. Phase 9 remains open for the full
+package/scale/blur/interaction regression matrix; it is no longer waiting on a
+visual-direction decision.
 
 ## Phase 10 — Proper Apps 2
 

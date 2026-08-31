@@ -121,8 +121,11 @@ Every version 0.1 candidate must satisfy all of these:
 
 ## PM shell-surfaces review
 
-Status: awaiting PM visual review. Installed-VM evidence and contact sheets are
-preserved in `docs/evidence/phase9-shell-surfaces`.
+Status: PM visual direction approved; implementation validation in progress.
+Baseline contact sheets are preserved in
+`docs/evidence/phase9-shell-surfaces`, the approved mockup direction in
+`docs/evidence/phase9-shell-mockups`, and the first installed-VM implementation
+in `docs/evidence/phase9-shell-implementation`.
 
 ### Evidence
 

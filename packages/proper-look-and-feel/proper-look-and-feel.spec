@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -32,6 +32,16 @@ install -Dpm 0644 %{_sourcedir}/proper-wallpaper.conf %{buildroot}%{_sysconfdir}
 install -Dpm 0644 %{_sourcedir}/plasmalogin.conf %{buildroot}%{_datadir}/proper-linux/plasmalogin.conf
 install -Dpm 0644 %{_sourcedir}/tokens.yaml %{buildroot}%{_datadir}/proper-linux/tokens.yaml
 install -Dpm 0644 %{_sourcedir}/Proper.colors %{buildroot}%{_datadir}/color-schemes/Proper.colors
+style_root=%{buildroot}%{_datadir}/plasma/desktoptheme/proper
+install -Dpm 0644 %{_sourcedir}/proper/metadata.json "$style_root/metadata.json"
+install -Dpm 0644 %{_sourcedir}/proper/colors "$style_root/colors"
+install -Dpm 0644 %{_sourcedir}/proper/dialogs/background.svg "$style_root/dialogs/background.svg"
+install -Dpm 0644 %{_sourcedir}/proper/widgets/panel-background.svg "$style_root/widgets/panel-background.svg"
+install -Dpm 0644 %{_sourcedir}/proper/widgets/plasmoidheading.svg "$style_root/widgets/plasmoidheading.svg"
+# Notifications, tooltips, and workspace OSDs use the same approved surface
+# recipe. Everything else remains an explicit Breeze fallback.
+install -Dpm 0644 %{_sourcedir}/proper/dialogs/background.svg "$style_root/widgets/tooltip.svg"
+install -Dpm 0644 %{_sourcedir}/proper/dialogs/background.svg "$style_root/widgets/translucentbackground.svg"
 install -Dpm 0644 %{_sourcedir}/LICENSES/CC-BY-SA-4.0.txt %{buildroot}%{_licensedir}/%{name}/CC-BY-SA-4.0.txt
 install -Dpm 0644 %{_sourcedir}/LICENSES/LGPL-3.0-only.txt %{buildroot}%{_licensedir}/%{name}/LGPL-3.0-only.txt
 install -Dpm 0644 %{_sourcedir}/LICENSES/GPL-2.0-or-later.txt %{buildroot}%{_licensedir}/%{name}/GPL-2.0-or-later.txt
@@ -55,6 +65,7 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-ensu
 %{_datadir}/wallpapers/Volna/
 %{_datadir}/wallpapers/summer_1am/
 %{_datadir}/plasma/look-and-feel/com.properlinux.dark.desktop/
+%{_datadir}/plasma/desktoptheme/proper/
 %{_datadir}/plasma/shells/com.properlinux.desktop/
 %config(noreplace) %{_sysconfdir}/xdg/plasma-workspace/env/proper-wallpaper.conf
 %{_datadir}/proper-linux/plasmalogin.conf
@@ -71,6 +82,10 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-ensu
 install -m 0644 %{_datadir}/proper-linux/plasmalogin.conf %{_prefix}/lib/plasmalogin/defaults.conf || :
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-11
+- Add the approved narrow Proper Plasma Style for shell surfaces
+- Use charcoal popup, panel, heading, tooltip, and OSD assets with Breeze fallback
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-10
 - Match the panel's Ghostty launcher to the application's Wayland identity
 

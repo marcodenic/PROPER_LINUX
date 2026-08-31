@@ -1,10 +1,11 @@
 [Desktop Entry]
-Name=Vicinae
+Name=Applications & Search
 Comment=Search applications, files, commands and actions
 Exec=/usr/bin/proper-launcher
-Icon=vicinae
+Icon=edit-find
 Terminal=false
 Type=Application
-Categories=Utility;System;
+Categories=Utility;
+Keywords=applications;launcher;search;commands;Vicinae;
 StartupNotify=true
 X-KDE-GlobalAccel-CommandShortcut=true

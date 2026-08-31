@@ -427,19 +427,19 @@ Status values:
   seeding the store and narrowly migrating only the empty state fixes arrival
   while preserving upstream interaction code and later user customisation.
 
-## D046 — Proposed upstream Plasma boundary for PM shell review
+## D046 — Keep the upstream Plasma component boundary
 
-- **Status:** Proposed; PM shell-surfaces decision pending
+- **Status:** Accepted at PM shell-surfaces review
 - **Date:** 2026-08-31
-- **Proposal:** Keep the dark translucent floating Proper panel and its task
+- **Decision:** Keep the dark translucent floating Proper panel and its task
   identity defaults. Retain Plasma's upstream tray, notifications, OSDs,
   network, Bluetooth, audio, power, clipboard, authentication, Alt+Tab,
   Overview, and Desktop Grid implementations, then apply only the Proper theme
   and configuration changes approved at the visual checkpoint.
-- **Reason:** Installed-VM review has not found a functional acceptance failure
-  that justifies owning those applets. Their current appearance is still a PM
-  decision: the evidence identifies several theme-level opportunities and two
-  configuration defects without presuming visual approval.
+- **Reason:** Installed-VM review found no functional acceptance failure that
+  justifies owning those applets. The PM approved resolving the visual
+  opportunities through a narrow Proper Plasma Style rather than replacing the
+  applets.
 
 ## D047 — Add reversible workspace arrangement without mandatory auto-tiling
 
@@ -453,3 +453,22 @@ Status values:
 - **Reason:** This gives the PM the requested instant tiled/floating workflow
   without continuous auto-reflow, mandatory tiling, or a replacement window
   manager. Pointer, Vicinae, and keyboard paths remain peers.
+
+## D048 — Approve the soft shelf, calmer popups, and semantic pointer launcher
+
+- **Status:** Accepted at PM shell-surfaces review
+- **Date:** 2026-08-31
+- **Decision:** Use bar variant D as one centred, fit-content upstream Plasma
+  panel with Proper's soft shelf asset. Apply a narrow Proper Plasma Style to
+  panel, dialog, heading, tooltip, and translucent/OSD backgrounds, reserving
+  desaturated blue for selection, focus, and progress. Present the first panel
+  slot as a quiet **Applications & Search** button with a semantic search icon;
+  clicking it opens Vicinae. Enable and pin Vicinae's built-in **Browse Apps**
+  view so a pointer user can reach an alphabetical all-apps list without typing.
+  Retain variant B only as a future visual reference.
+- **Reason:** The PM approved the calmer Vicinae-adjacent surfaces and preferred
+  D for version 0.1. The semantic button removes the poor upstream Vicinae brand
+  mark while preserving an obvious pointer path. Vicinae indexes installed
+  desktop applications and settings entries and supplies system power commands,
+  so a second promoted application menu is unnecessary. KRunner remains an
+  unobtrusive fallback.
