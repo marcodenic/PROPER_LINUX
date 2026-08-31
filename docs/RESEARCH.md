@@ -51,6 +51,12 @@ Proper Linux may use its own name and visual identity, but a public derivative m
 
 Plasma Global Themes can collect layouts, colours, styles, decorations, cursors, splash/lock assets, and related defaults. KWin and Plasma scripting provide supported seams for window and panel behaviour.
 
+The Phase 10 application audit used Omarchy Quattro commit
+`b686ed892d9c3020c3336203f6d34cc75b544e2b`. Its useful install-menu breadth
+maps well to a Fedora catalogue, but the Arch/AUR provider commands, shell
+internals, development-environment scripts, and hardware-specific installers
+do not. Proper's reviewed mapping is in `docs/PROPER_APPS_AUDIT.md`.
+
 ### Plasma Login Manager
 
 - Fedora 44 Plasma Login Manager change: <https://fedoraproject.org/wiki/Changes/PlasmaLoginManager>
@@ -206,8 +212,16 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
 
 ## Phase 5 provider audit — 2026-08-25
 
-- `apps/catalogue-v1.json` is schema version 1 and records provider, status, licence, architecture, install and launch metadata.
+- The original `catalogue-v1` schema recorded provider, status, licence,
+  architecture, install, and launch metadata. Phase 10 supersedes that file
+  with `apps/catalogue-v2.json`, explicit removal/source/icon/recommendation
+  fields, and the audit in `docs/PROPER_APPS_AUDIT.md`.
 - Fedora RPM, Flathub, and official vendor paths are represented. Proprietary binaries are not redistributed. GitHub Desktop is labelled community-maintained. Codex deliberately opens the official installation/authentication flow without storing credentials.
+- Google's 2026 transition ended Gemini CLI service for free and individual
+  Pro/Ultra accounts on 18 June. Enterprise and API-key access remain. Proper
+  keeps that package unpromoted with an explicit caveat and defers Antigravity
+  CLI because its current official Linux path is a remote shell installer,
+  which is outside the catalogue command allow-list.
 
 ## Vicinae source-build audit — 2026-08-26
 

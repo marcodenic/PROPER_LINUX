@@ -175,6 +175,17 @@ Each entry must record:
 
 Provider facts must live in data rather than being buried in UI code.
 
+Phase 10 implements these requirements in `apps/catalogue-v2.json`. The
+Omarchy comparison, accepted mappings, and deliberate exclusions are recorded
+in `docs/PROPER_APPS_AUDIT.md`; they must be re-audited when that upstream list
+or a selected provider changes materially.
+
+Recognisable product artwork is shipped separately under
+`packages/proper-apps/icons`. `apps/icon-sources.json` is the authoritative
+source, rights, transformation, retrieval-date, and checksum ledger. Generic
+system-capability cards may use a maintained Plasma theme icon; named products
+must not fall back to generated initials in a release build.
+
 ## User experience
 
 Normal application cards show:

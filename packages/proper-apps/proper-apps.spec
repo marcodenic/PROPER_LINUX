@@ -1,9 +1,11 @@
 Name: proper-apps
 Version: 0.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Proper Linux curated application catalogue
 License: GPL-3.0-or-later
 BuildRequires: qt6-qtbase-devel
+Requires: flatpak
+Requires: polkit
 %description
 Small catalogue front end delegating installs to Fedora, Flatpak, and official vendor paths.
 %prep
@@ -14,13 +16,20 @@ make %{?_smp_mflags}
 %install
 install -Dpm 0755 proper-apps %{buildroot}%{_bindir}/proper-apps
 install -Dpm 0644 %{_sourcedir}/proper-apps.desktop %{buildroot}%{_datadir}/applications/proper-apps.desktop
-install -Dpm 0644 %{_sourcedir}/../../apps/catalogue-v1.json %{buildroot}%{_datadir}/proper-apps/catalogue-v1.json
+install -Dpm 0644 %{_sourcedir}/../../apps/catalogue-v2.json %{buildroot}%{_datadir}/proper-apps/catalogue-v2.json
+install -d %{buildroot}%{_datadir}/proper-apps/icons
+install -pm 0644 %{_sourcedir}/icons/* %{buildroot}%{_datadir}/proper-apps/icons/
 %files
 %{_bindir}/proper-apps
 %{_datadir}/applications/proper-apps.desktop
-%{_datadir}/proper-apps/catalogue-v1.json
+%{_datadir}/proper-apps/catalogue-v2.json
+%{_datadir}/proper-apps/icons/
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-6
+- Add the responsive Proper Apps 2 catalogue and user-created web apps.
+- Expand the audited optional catalogue and make install/remove metadata explicit.
+- Ship pinned upstream application artwork instead of placeholder letter tiles.
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-5
 - Offer optional Fedora container tools and printer compatibility stacks.
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-4

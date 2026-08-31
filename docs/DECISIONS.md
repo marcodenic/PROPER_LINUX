@@ -472,3 +472,18 @@ Status values:
   desktop applications and settings entries and supplies system power commands,
   so a second promoted application menu is unnecessary. KRunner remains an
   unobtrusive fallback.
+
+## D049 — Ship recognisable, checked product artwork in Proper Apps
+
+- **Status:** Implemented pending Phase 10 PM catalogue review
+- **Date:** 2026-08-31
+- **Decision:** Show named applications with their current AppStream,
+  upstream-project, or official publisher artwork. Pin the shipped assets and
+  record their source, rights note, transformation, retrieval date, and
+  SHA-256 in `apps/icon-sources.json`. Reserve Plasma theme glyphs for generic
+  system capabilities such as printer compatibility; do not use generated
+  letter tiles as the normal product identity.
+- **Reason:** Application recognition depends on familiar visual identity, and
+  host icon themes cannot be assumed to contain optional software. A checked
+  local asset set keeps the catalogue coherent and reproducible while the
+  provenance ledger makes upstream updates and trademark review explicit.

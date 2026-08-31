@@ -98,6 +98,11 @@ Every version 0.1 candidate must satisfy all of these:
 
 ## PM checkpoint 4 — Proper Apps
 
+Status: the original version 0.1 provider path was approved before Phase 6.
+The broader Phase 10 catalogue redesign is implemented and validated in the
+installed VM; refreshed visual approval is pending against
+`docs/evidence/phase10-proper-apps`.
+
 ### Evidence
 
 - Catalogue home and category view

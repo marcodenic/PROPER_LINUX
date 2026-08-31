@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """Validate the catalogue against the repository's JSON Schema subset."""
-import json, re, sys
+import hashlib, json, re, sys
 from pathlib import Path
 from urllib.parse import urlparse
 
 root = Path(__file__).resolve().parents[1]
-schema = json.loads((root / "apps/catalogue-v1.schema.json").read_text())
-data = json.loads((root / "apps/catalogue-v1.json").read_text())
+schema = json.loads((root / "apps/catalogue-v2.schema.json").read_text())
+data = json.loads((root / "apps/catalogue-v2.json").read_text())
+icon_ledger = json.loads((root / "apps/icon-sources.json").read_text())
 
 def fail(path, message):
     raise ValueError(f"{path}: {message}")
 
 def validate(value, rule, path="$"):
+    if rule.get("$ref") == "#/$defs/step":
+        rule = schema["$defs"]["step"]
     kind = rule.get("type")
     if kind == "object":
         if not isinstance(value, dict): fail(path, "expected object")
@@ -37,6 +40,49 @@ try:
     validate(data, schema)
     encoded = json.dumps(data)
     if "sudo" in encoded or "shell=True" in encoded: fail("$", "forbidden command execution marker")
+    ids = [entry["id"] for entry in data["entries"]]
+    if len(ids) != len(set(ids)): fail("$.entries", "application IDs must be unique")
+    icon_entries = icon_ledger.get("entries", [])
+    icon_ids = [entry.get("id") for entry in icon_entries]
+    if len(icon_ids) != len(set(icon_ids)):
+        fail("icon-sources.entries", "icon IDs must be unique")
+    # The printer bundle intentionally uses Plasma's system printer glyph;
+    # every named product or product family ships its recognisable artwork.
+    branded_ids = {entry["id"] for entry in data["entries"] if entry["id"] != "printer-compatibility"}
+    if set(icon_ids) != branded_ids:
+        missing = sorted(branded_ids - set(icon_ids))
+        extra = sorted(set(icon_ids) - branded_ids)
+        fail("icon-sources.entries", f"icon coverage differs (missing={missing}, extra={extra})")
+    icon_root = root / "packages/proper-apps/icons"
+    for index, record in enumerate(icon_entries):
+        asset_name = record.get("asset", "")
+        if Path(asset_name).name != asset_name:
+            fail(f"icon-sources.entries[{index}].asset", "must be a plain filename")
+        asset = icon_root / asset_name
+        if not asset.is_file():
+            fail(f"icon-sources.entries[{index}].asset", "asset is missing")
+        digest = hashlib.sha256(asset.read_bytes()).hexdigest()
+        if digest != record.get("sha256"):
+            fail(f"icon-sources.entries[{index}].sha256", "does not match the checked-in asset")
+        if urlparse(record.get("source_url", "")).scheme != "https":
+            fail(f"icon-sources.entries[{index}].source_url", "expected an HTTPS source")
+    allowed_programs = {"dnf", "flatpak", "npm"}
+    forbidden_fragments = ("|", ";", "`", "$(", "\n", "\r")
+    for index, entry in enumerate(data["entries"]):
+        path = f"$.entries[{index}]"
+        if entry["provider"] == "flatpak" and "." not in entry["provider_id"]:
+            fail(f"{path}.provider_id", "expected a Flatpak application ID")
+        if entry["provider"] == "vendor" and not entry.get("install_steps"):
+            fail(path, "vendor entries require explicit install steps")
+        for field in ("install_steps", "uninstall_steps"):
+            for step_index, step in enumerate(entry.get(field, [])):
+                if step["program"] not in allowed_programs:
+                    fail(f"{path}.{field}[{step_index}].program", "program is not allow-listed")
+                if step["privileged"] and step["program"] not in {"dnf"}:
+                    fail(f"{path}.{field}[{step_index}]", "only Fedora package operations may be privileged")
+                for arg in step["args"]:
+                    if any(marker in arg for marker in forbidden_fragments):
+                        fail(f"{path}.{field}[{step_index}].args", "contains a shell control marker")
 except (ValueError, json.JSONDecodeError) as error:
     print(f"catalogue invalid: {error}", file=sys.stderr)
     raise SystemExit(1)

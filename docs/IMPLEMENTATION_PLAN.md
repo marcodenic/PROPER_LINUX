@@ -349,6 +349,9 @@ preinstalling the optional applications it presents.
 Browse, search, install, launch, and remove representative entries entirely
 with the pointer at 1920x1080 and 200% scaling.
 
+Status: implementation and installed-VM validation complete; awaiting PM
+visual approval. Evidence is in `docs/evidence/phase10-proper-apps`.
+
 ## Phase 11 — Window organisation and desktop utilities
 
 ### Objective
