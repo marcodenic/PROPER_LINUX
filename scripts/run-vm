@@ -18,9 +18,10 @@ disk_path="${2:-"$project_root/../proper-linux-build/vm/proper-linux.qcow2"}"
 firmware_code="${OVMF_CODE:-/usr/share/edk2/ovmf/OVMF_CODE.fd}"
 firmware_vars_template="${OVMF_VARS:-/usr/share/edk2/ovmf/OVMF_VARS.fd}"
 vm_dir="$(dirname "$disk_path")"
-firmware_vars="$vm_dir/OVMF_VARS.fd"
-monitor_socket="$vm_dir/$(basename "${disk_path%.*}").monitor.sock"
-qmp_socket="$vm_dir/$(basename "${disk_path%.*}").qmp.sock"
+disk_stem="$(basename "${disk_path%.*}")"
+firmware_vars="$vm_dir/$disk_stem.OVMF_VARS.fd"
+monitor_socket="$vm_dir/$disk_stem.monitor.sock"
+qmp_socket="$vm_dir/$disk_stem.qmp.sock"
 vm_profile="${PROPER_VM_PROFILE:-fullhd}"
 case "$vm_profile" in
   hidpi|retina|macbook)
