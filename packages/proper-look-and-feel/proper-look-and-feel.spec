@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -60,18 +60,26 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/qmld
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-ensure-proper-panel.js "$shell_root/contents/updates/00-ensure-proper-panel.js"
 
 %check
-# Proper's rounded shell surfaces use nine neutral slices to stop Plasma from
-# falling back to visible Breeze shadows. Reject any visible replacement when
-# this spec is built outside the repository's normal wrapper.
+# Proper's rounded shell surfaces use a mask-composed centre and nine neutral
+# slices to stop Plasma from exposing rectangular contrast or fallback-shadow
+# layers. Keep the check here for builds outside the repository wrapper.
 for asset in \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/tooltip.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/translucentbackground.svg; do
   xmllint --noout "$asset"
+  for element in \
+    center top bottom left right \
+    topleft topright bottomleft bottomright \
+    mask-center mask-top mask-bottom mask-left mask-right \
+    mask-topleft mask-topright mask-bottomleft mask-bottomright; do
+    test "$(xmllint --xpath "count(//*[@id = '$element'])" "$asset")" = 1
+  done
   shadow_selector="//*[starts-with(@id, 'shadow-') and not(starts-with(@id, 'shadow-hint-'))]"
   test "$(xmllint --xpath "count($shadow_selector)" "$asset")" = 9
   test "$(xmllint --xpath "count(${shadow_selector}[@fill-opacity and number(@fill-opacity) <= 0.001])" "$asset")" = 9
+  test "$(xmllint --xpath "count(//*[@id = 'hint-compose-over-border'])" "$asset")" = 1
 done
 
 %files
@@ -98,6 +106,10 @@ done
 install -m 0644 %{_datadir}/proper-linux/plasmalogin.conf %{_prefix}/lib/plasmalogin/defaults.conf || :
 
 %changelog
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-14
+- Mask the translucent contrast and blur layer to every rounded shell surface
+- Add package checks that prevent rectangular compositor regions returning
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-13
 - Remove square shadow frames from the panel and shared shell surfaces
 - Retain depth through translucency, blur, and restrained rounded edges

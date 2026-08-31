@@ -51,6 +51,10 @@
   <rect id="hint-left-margin" y="33" width="10" height="2" fill="#f0f"/>
   <rect id="hint-right-margin" x="58" y="33" width="10" height="2" fill="#f0f"/>
   <rect id="hint-stretch-borders" x="69" width="1" height="1" fill="#f60"/>
+  <!-- Compose the translucent centre beneath the border and clip it through
+       the mask frame. Without this hint Plasma's contrast/blur pass treats
+       each rounded corner slice as an opaque rectangle. -->
+  <rect id="hint-compose-over-border" x="70" width="1" height="1" fill="#f60"/>
 
   <rect id="mask-top" x="98" width="32" height="18" fill="#000"/>
   <rect id="mask-bottom" x="98" y="50" width="32" height="18" fill="#000"/>

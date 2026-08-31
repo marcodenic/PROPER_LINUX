@@ -534,7 +534,7 @@ Status values:
   remove retired binary evidence before public launch, but requires explicit
   PM approval because it rewrites published commit identities.
 
-## D053 — Do not ship unmasked shell-surface shadow slices
+## D053 — Mask every rounded shell surface and suppress square fallbacks
 
 - **Status:** Accepted after installed-VM defect review
 - **Date:** 2026-08-31
@@ -544,9 +544,10 @@ Status values:
   Plasma's Breeze fallback, but do not ship visible shadow slices in
   Proper-owned shell assets unless a future implementation matches every
   surface radius and has installed-render regression tests. Validate this rule
-  before every RPM build, and bump the Plasma Style metadata version whenever
-  cached visual assets change.
-- **Reason:** The first Proper Plasma Style described its shadows as square
-  10-pixel nine-slices around rounded frames. Plasma stretched those valid but
-  geometrically incompatible assets exactly as authored, leaving visible
-  rectangular halos around both the taskbar and its tooltips.
+  before every RPM build. Require `hint-compose-over-border` plus a complete
+  rounded `mask-*` frame so Plasma clips its translucent contrast and blur pass,
+  and bump the Plasma Style metadata version whenever cached assets change.
+- **Reason:** The first Proper Plasma Style described shadows as square
+  10-pixel nine-slices and did not ask Plasma to compose the translucent centre
+  through its rounded mask. Plasma therefore exposed rectangular shadow and
+  contrast tiles around both the taskbar and its tooltips.

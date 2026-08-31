@@ -51,6 +51,9 @@
   <rect id="hint-left-margin" y="29" width="12" height="2" fill="#f0f"/>
   <rect id="hint-right-margin" x="48" y="29" width="12" height="2" fill="#f0f"/>
   <rect id="hint-stretch-borders" x="61" width="1" height="1" fill="#f60"/>
+  <!-- Compose the translucent centre beneath the border and clip it through
+       the mask frame. This keeps Plasma's contrast/blur pass rounded. -->
+  <rect id="hint-compose-over-border" x="62" width="1" height="1" fill="#f60"/>
 
   <rect id="mask-top" x="84" width="32" height="14" fill="#000"/>
   <rect id="mask-bottom" x="84" y="46" width="32" height="14" fill="#000"/>

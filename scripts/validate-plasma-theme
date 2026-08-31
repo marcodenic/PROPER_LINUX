@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# Reject malformed Plasma SVG assets and the rectangular panel-shadow
-# regression. The rounded shelf gets depth from translucency, background blur,
-# and its hairline frame; neutral slices suppress Plasma's Breeze fallback.
+# Reject malformed Plasma SVG assets and rectangular shell-surface regressions.
+# The compose hint makes Plasma clip contrast/blur to the rounded mask; neutral
+# shadow slices suppress Plasma's visible Breeze fallback.
 set -Eeuo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 style_root="$project_root/packages/proper-look-and-feel/proper"
-panel="$style_root/widgets/panel-background.svg"
 metadata="$style_root/metadata.json"
 spec="$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
 
@@ -20,7 +19,7 @@ while IFS= read -r -d '' asset; do
 done < <(find "$style_root" -type f -name '*.svg' -print0)
 
 shadow_assets=(
-  "$panel"
+  "$style_root/widgets/panel-background.svg"
   "$style_root/dialogs/background.svg"
 )
 
@@ -43,15 +42,15 @@ required_ids=(
   mask-topleft mask-topright mask-bottomleft mask-bottomright
 )
 
-for required_id in "${required_ids[@]}"; do
-  count="$(xmllint --xpath "count(//*[@id='$required_id'])" "$panel")"
-  [[ "$count" == 1 ]] || {
-    printf 'Panel asset must define id=%s exactly once; found %s.\n' "$required_id" "$count" >&2
-    exit 1
-  }
-done
-
 for asset in "${shadow_assets[@]}"; do
+  for required_id in "${required_ids[@]}"; do
+    count="$(xmllint --xpath "count(//*[@id='$required_id'])" "$asset")"
+    [[ "$count" == 1 ]] || {
+      printf '%s must define id=%s exactly once; found %s.\n' \
+        "$asset" "$required_id" "$count" >&2
+      exit 1
+    }
+  done
   shadow_selector="//*[starts-with(@id, 'shadow-') and not(starts-with(@id, 'shadow-hint-'))]"
   shadow_count="$(xmllint --xpath "count($shadow_selector)" "$asset")"
   neutral_shadow_count="$(xmllint --xpath "count(${shadow_selector}[@fill-opacity and number(@fill-opacity) <= 0.001])" "$asset")"
@@ -61,6 +60,13 @@ for asset in "${shadow_assets[@]}"; do
     printf 'Visible shell shadows are forbidden until their rounded alpha masks have render regression tests.\n' >&2
     exit 1
   }
+  compose_hint_count="$(xmllint --xpath "count(//*[@id = 'hint-compose-over-border'])" "$asset")"
+  [[ "$compose_hint_count" == 1 ]] || {
+    printf '%s must define hint-compose-over-border exactly once; found %s.\n' \
+      "$asset" "$compose_hint_count" >&2
+    printf 'Without it Plasma can expose square contrast and blur regions behind rounded corners.\n' >&2
+    exit 1
+  }
 done
 
-printf 'Plasma theme valid: rounded shell surfaces with neutral fallback-suppression shadows.\n'
+printf 'Plasma theme valid: mask-composed rounded surfaces with neutral fallback-suppression shadows.\n'
