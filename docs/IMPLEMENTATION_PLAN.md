@@ -419,8 +419,8 @@ Only after the installed experience is approved:
 - select final code/docs/art licences;
 - perform formal naming and trademark review;
 - establish package and ISO signing keys;
-- build a small Proper package repository;
-- add CI builds and release artefact retention;
+- configure the hosted Proper Copr project and ship its repository definition;
+- add trusted-tag package/ISO automation and release artefact retention;
 - create a public product site with screenshots rather than a wall of acronyms;
 - consider a deeper optional OS agent service;
 - consider additional architectures or specialised images based on demonstrated demand.

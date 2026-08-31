@@ -300,7 +300,17 @@ There is no privileged agent daemon, shared credential store, or automatic root 
 - Retain Fedora's Anaconda-based installation experience as supplied by the KDE live image.
 - Apply only necessary Proper product naming, artwork, package selection, and display-layout integration.
 - Retain Fedora/DNF/PackageKit/Discover update mechanisms.
-- Proper packages update through a small repository only when public distribution begins. Early prototypes may embed locally built RPMs in the image.
+- Publish Proper RPMs for each supported Fedora release through a hosted Fedora
+  Copr project. Install its repository configuration through `proper-release`
+  so Proper package updates appear in the ordinary DNF/Discover flow without a
+  Proper-operated update server.
+- Treat the ISO as a fresh-install snapshot, not as the update mechanism.
+  Existing installations normally receive Fedora and Proper package updates
+  without downloading another ISO.
+- Early prototypes may continue embedding locally built RPMs in the image.
+
+The release cadence, automation boundary, ISO hosting model, and repository
+artifact policy are defined in `docs/RELEASES_AND_UPDATES.md`.
 
 ## Test architecture
 

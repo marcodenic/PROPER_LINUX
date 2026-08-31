@@ -501,3 +501,35 @@ Status values:
   host icon themes cannot be assumed to contain optional software. A checked
   local asset set keeps the catalogue coherent and reproducible while the
   provenance ledger makes upstream updates and trademark review explicit.
+
+## D051 — Use hosted RPM updates and release-snapshot ISOs
+
+- **Status:** Accepted for public distribution
+- **Date:** 2026-08-31
+- **Decision:** Publish Proper-owned RPMs for each supported Fedora release
+  through Fedora Copr and enable that hosted repository through
+  `proper-release`. Keep Fedora packages on Fedora's normal repositories and
+  let DNF/PackageKit/Discover update both sets. Rebuild the Proper ISO for
+  tested release snapshots, installer or image-composition changes, and Fedora
+  major-version rebases—not for every Proper package update.
+- **Reason:** Existing installations need a signed RPM repository, not a new
+  installer image. Copr supplies hosted builds and repository metadata without
+  requiring Proper Linux to operate a package server, while the ISO remains the
+  reproducible path for new installations.
+
+## D052 — Keep source-of-truth documents and bound binary evidence
+
+- **Status:** Accepted
+- **Date:** 2026-08-31
+- **Decision:** Keep product, architecture, plan, decision, source-audit, and
+  acceptance documents in Git alongside package sources, tests, shipped art,
+  application icons, licences, and provenance. Keep ISOs, RPMs, VM disks,
+  downloaded upstream archives, raw captures, videos, caches, and logs outside
+  Git. During development, retain only compressed, curated checkpoint images
+  that are needed to record a PM decision; move complete public-release media
+  sets to release or website storage.
+- **Reason:** The documents make the product and build reproducible, while raw
+  review media and downloaded build inputs create permanent repository bloat
+  without becoming configuration input. A later one-time history rewrite may
+  remove retired binary evidence before public launch, but requires explicit
+  PM approval because it rewrites published commit identities.

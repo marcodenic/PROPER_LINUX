@@ -8,10 +8,10 @@ The project takes inspiration from Omarchy's strong curation, aesthetics, shortc
 
 ## Status
 
-Proper Linux is in active pre-release development. An installed QEMU/KVM review
-system exists, but there is not yet a public release candidate.
-
-The first engineering objective is a Fedora KDE-based live ISO that installs into a QEMU/KVM virtual machine and presents the approved Proper Linux login and desktop experience.
+Proper Linux is in active pre-release development. Phases 9–11 are integrated
+and have installed-VM evidence; the next engineering milestone is the clean
+Phase 12 ISO, installation, and final acceptance journey. There is not yet a
+public release candidate.
 
 ## Version 0.1
 
@@ -43,6 +43,7 @@ The first engineering objective is a Fedora KDE-based live ISO that installs int
 - [Research and upstream references](docs/RESEARCH.md)
 - [UX strategy and competitive position](docs/UX_STRATEGY.md)
 - [UI iteration workflow](docs/UI_ITERATION.md)
+- [Releases, updates, and repository policy](docs/RELEASES_AND_UPDATES.md)
 - [BOX continuation guide](docs/BOX_KICKOFF.md)
 
 ## Product rule

@@ -24,6 +24,11 @@
 # Build caches and logs
 /.cache/
 *.log
+__pycache__/
+*.py[cod]
+
+# Downloaded, checksum-verified package sources
+packages/proper-launchers/*.tar.gz
 
 # Credentials and signing material
 *.key
@@ -33,6 +38,8 @@ packages/proper-terminal/ghostty-*.tar.gz
 packages/proper-terminal/ghostty-*.minisig
 packages/proper-terminal/zig-*.tar.xz
 packages/proper-terminal/zig-*.minisig
-packages/proper-launchers/vicinae-*.tar.gz
 socket,json,sys,time
 .build/
+
+# Raw visual-review captures; keep only selected compressed checkpoint evidence
+/docs/evidence/raw/
