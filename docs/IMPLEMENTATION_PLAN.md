@@ -320,9 +320,12 @@ The installed-VM baseline and contact sheets are in
 `docs/evidence/phase9-shell-surfaces`. The PM approved the calmer popup system,
 bar variant D, a semantic Proper search launcher backed by Vicinae, and the
 upstream component boundary. The first installed-VM implementation is in
-`docs/evidence/phase9-shell-implementation`. Phase 9 remains open for the full
-package/scale/blur/interaction regression matrix; it is no longer waiting on a
-visual-direction decision.
+`docs/evidence/phase9-shell-implementation`. The packaged 100%/200% scale,
+blur, reduced-motion, third-party tray, notification-action, authentication,
+and workspace regression matrix is complete in
+`docs/evidence/phase9-shell-regression`. Phase 12 retains the focused
+two-display and rotated-output checks; Phase 9 is no longer waiting on an
+implementation or visual-direction decision.
 
 ## Phase 10 — Proper Apps 2
 

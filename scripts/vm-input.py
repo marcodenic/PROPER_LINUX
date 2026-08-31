@@ -9,6 +9,7 @@ import argparse
 import json
 import socket
 import sys
+import time
 
 
 def qmp(sock: socket.socket, request: dict) -> dict:
@@ -49,6 +50,7 @@ def main() -> int:
     button_up.add_argument("name", choices=("left", "right", "middle"), default="left")
     args = parser.parse_args()
 
+    followup_events = None
     if args.action == "key":
         events = [
             {"type": "key", "data": {"down": True, "key": {"type": "qcode", "data": args.qcode}}},
@@ -74,11 +76,14 @@ def main() -> int:
         events = [{"type": "abs", "data": {"axis": "x", "value": round(args.x * 32767 / (args.width - 1))}},
                   {"type": "abs", "data": {"axis": "y", "value": round(args.y * 32767 / (args.height - 1))}}]
         if args.action == "click":
-            events += [{"type": "btn", "data": {"button": "left", "down": True}},
-                       {"type": "btn", "data": {"button": "left", "down": False}}]
+            # Keep press and release in separate QMP input frames. Sending both
+            # in one frame moves the absolute pointer but libinput can collapse
+            # the zero-duration button transition and never deliver a click.
+            events.append({"type": "btn", "data": {"button": "left", "down": True}})
+            followup_events = [{"type": "btn", "data": {"button": "left", "down": False}}]
     elif args.action == "button":
-        events = [{"type": "btn", "data": {"button": args.name, "down": True}},
-                  {"type": "btn", "data": {"button": args.name, "down": False}}]
+        events = [{"type": "btn", "data": {"button": args.name, "down": True}}]
+        followup_events = [{"type": "btn", "data": {"button": args.name, "down": False}}]
     elif args.action in ("button-down", "button-up"):
         events = [{"type": "btn", "data": {
             "button": args.name,
@@ -98,6 +103,14 @@ def main() -> int:
             response = qmp(sock, {"execute": "input-send-event", "arguments": {"events": events}})
             if "error" in response:
                 raise RuntimeError(response["error"])
+            if followup_events:
+                time.sleep(0.08)
+                response = qmp(sock, {
+                    "execute": "input-send-event",
+                    "arguments": {"events": followup_events},
+                })
+                if "error" in response:
+                    raise RuntimeError(response["error"])
     except (OSError, TimeoutError, json.JSONDecodeError, RuntimeError) as exc:
         print(f"VM input failed: {exc}", file=sys.stderr)
         return 1

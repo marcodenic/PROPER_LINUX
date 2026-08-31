@@ -6,6 +6,15 @@ The implementation and installed-VM checks are complete. The interaction and
 visual direction remain ready for the PM workflow review defined in
 `docs/ACCEPTANCE.md`.
 
+## PM review sheet
+
+[![Floating, arranged, restored, chooser, launcher, OCR, and shortcut-guide states](contact-sheet.webp)](contact-sheet.webp)
+
+Read left to right, top to bottom: floating baseline, primary layout, restored
+geometry, a newly opened floating window, pointer chooser, Vicinae arrangement,
+Vicinae OCR, and the searchable shortcut guide. The runtime checks and evidence
+limits are recorded below.
+
 ## Environment
 
 - Installed Fedora 44 Proper reference VM, not a container or HTML mock-up

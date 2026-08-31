@@ -5,6 +5,14 @@
 Implementation and installed-VM validation are complete. This directory is
 the PM catalogue-review checkpoint; visual approval is pending.
 
+## PM review sheet
+
+[![Proper Apps home, search, and 200% scale](contact-sheet.webp)](contact-sheet.webp)
+
+Review the home-to-search hierarchy, product artwork, install-state clarity,
+and the responsive 200% layout. The exercised provider journeys and exact
+package hashes are recorded below.
+
 ## Environment
 
 - Installed Fedora 44 Proper review VM under QEMU/KVM

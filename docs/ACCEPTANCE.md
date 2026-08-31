@@ -128,11 +128,14 @@ installed VM; refreshed visual approval is pending against
 
 ## PM shell-surfaces review
 
-Status: PM visual direction approved; implementation validation in progress.
+Status: PM visual direction approved; package, scale, blur, reduced-motion, and
+interaction validation complete. Focused two-display and rotated-output
+coverage remains in the Phase 12 final-candidate run.
 Baseline contact sheets are preserved in
 `docs/evidence/phase9-shell-surfaces`, the approved mockup direction in
 `docs/evidence/phase9-shell-mockups`, and the first installed-VM implementation
-in `docs/evidence/phase9-shell-implementation`.
+in `docs/evidence/phase9-shell-implementation`. The final installed regression
+matrix is in `docs/evidence/phase9-shell-regression`.
 
 ### Evidence
 
