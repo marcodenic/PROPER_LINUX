@@ -292,7 +292,7 @@ function toggleLastLayout() {
 registerShortcut(
     "ProperArrangeWorkspace",
     "Arrange or restore the current workspace",
-    "Meta+Shift+T",
+    "Meta+Z",
     toggleLastLayout
 );
 registerShortcut(

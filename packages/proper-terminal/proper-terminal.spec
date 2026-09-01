@@ -1,6 +1,6 @@
 Name: proper-terminal
 Version: 1.3.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Ghostty terminal and Proper developer essentials
 License: MIT
 URL: https://ghostty.org/
@@ -66,6 +66,10 @@ install -Dpm 0644 %{SOURCE3} %{buildroot}%{_datadir}/kio/servicemenus/proper-ter
 %config(noreplace) %{_sysconfdir}/skel/.config/ghostty/config
 %config(noreplace) %{_sysconfdir}/xdg/ghostty/config
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 1.3.1-4
+- Make the desktop clearly visible through Ghostty at 50 percent opacity
+- Disable terminal blur so the wallpaper remains legible behind the window
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 1.3.1-3
 - Require the Fedora JetBrains Mono package used by the terminal configuration
 

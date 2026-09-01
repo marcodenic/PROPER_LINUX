@@ -15,15 +15,99 @@ default_kdeglobals="$project_root/packages/proper-defaults/kdeglobals"
 task_asset="$style_root/widgets/tasks.svg"
 panel_asset="$style_root/widgets/panel-background.svg"
 task_loading_patch="$project_root/packages/plasma-desktop/proper-task-loading-indicator.patch"
+control_generator="$project_root/packages/proper-look-and-feel/generate-plasma-controls.py"
+generated_controls="$(mktemp -d /tmp/proper-plasma-controls.XXXXXX)"
+trap 'rm -rf -- "$generated_controls"' EXIT
 
-command -v xmllint >/dev/null 2>&1 || {
-  printf 'Required command missing: xmllint\n' >&2
-  exit 1
-}
+for binary in python3 xmllint; do
+  command -v "$binary" >/dev/null 2>&1 || {
+    printf 'Required command missing: %s\n' "$binary" >&2
+    exit 1
+  }
+done
+
+python3 "$control_generator" "$tokens" "$generated_controls"
 
 while IFS= read -r -d '' asset; do
   xmllint --noout "$asset"
 done < <(find "$style_root" -type f -name '*.svg' -print0)
+
+while IFS= read -r -d '' asset; do
+  xmllint --noout "$asset"
+done < <(find "$generated_controls" -type f -name '*.svg' -print0)
+
+for asset in button line lineedit listitem slider switch tabbar viewitem; do
+  [[ -f "$generated_controls/$asset.svg" ]] || {
+    printf 'Generated Plasma control is missing: %s.svg\n' "$asset" >&2
+    exit 1
+  }
+done
+
+for state in normal hover pressed section; do
+  for slice in center top bottom left right topleft topright bottomleft bottomright; do
+    [[ "$(xmllint --xpath "count(//*[@id='$state-$slice'])" "$generated_controls/listitem.svg")" == 1 ]] || {
+      printf 'Proper listitem is missing %s-%s.\n' "$state" "$slice" >&2
+      exit 1
+    }
+  done
+done
+
+for state in normal hover selected selected+hover; do
+  for slice in center top bottom left right topleft topright bottomleft bottomright; do
+    [[ "$(xmllint --xpath "count(//*[@id='$state-$slice'])" "$generated_controls/viewitem.svg")" == 1 ]] || {
+      printf 'Proper viewitem is missing %s-%s.\n' "$state" "$slice" >&2
+      exit 1
+    }
+  done
+done
+
+for state in normal hover pressed focus toolbutton-hover toolbutton-pressed toolbutton-focus; do
+  for slice in center top bottom left right topleft topright bottomleft bottomright; do
+    [[ "$(xmllint --xpath "count(//*[@id='$state-$slice'])" "$generated_controls/button.svg")" == 1 ]] || {
+      printf 'Proper button is missing %s-%s.\n' "$state" "$slice" >&2
+      exit 1
+    }
+  done
+done
+
+for state in base hover focus focusframe; do
+  for slice in center top bottom left right topleft topright bottomleft bottomright; do
+    [[ "$(xmllint --xpath "count(//*[@id='$state-$slice'])" "$generated_controls/lineedit.svg")" == 1 ]] || {
+      printf 'Proper line edit is missing %s-%s.\n' "$state" "$slice" >&2
+      exit 1
+    }
+  done
+done
+
+for state in groove groove-highlight; do
+  for slice in center top bottom left right topleft topright bottomleft bottomright; do
+    [[ "$(xmllint --xpath "count(//*[@id='$state-$slice'])" "$generated_controls/slider.svg")" == 1 ]] || {
+      printf 'Proper slider is missing %s-%s.\n' "$state" "$slice" >&2
+      exit 1
+    }
+  done
+done
+
+for element in inactive-left inactive-center inactive-right active-left active-center active-right handle handle-hover handle-focus handle-pressed; do
+  [[ "$(xmllint --xpath "count(//*[@id='$element'])" "$generated_controls/switch.svg")" == 1 ]] || {
+    printf 'Proper switch is missing %s.\n' "$element" >&2
+    exit 1
+  }
+done
+
+for direction in north south east west; do
+  for slice in center top bottom left right topleft topright bottomleft bottomright; do
+    [[ "$(xmllint --xpath "count(//*[@id='$direction-active-tab-$slice'])" "$generated_controls/tabbar.svg")" == 1 ]] || {
+      printf 'Proper tabbar is missing %s-active-tab-%s.\n' "$direction" "$slice" >&2
+      exit 1
+    }
+  done
+done
+
+[[ "$(xmllint --xpath "string(//*[@id='pressed-center']/@fill-opacity)" "$generated_controls/listitem.svg")" == 0.150 ]] || {
+  printf 'Proper selected list rows must retain the reviewed restrained fill.\n' >&2
+  exit 1
+}
 
 shadow_assets=(
   "$style_root/widgets/panel-background.svg"

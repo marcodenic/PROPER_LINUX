@@ -77,9 +77,11 @@ Every version 0.1 candidate must satisfy all of these:
 
 ### Keyboard path
 
-1. Press `Meta+Space` and launch an application through Vicinae.
-2. Press `Alt+F2` and confirm KRunner remains available.
-3. Use the documented quick-tile shortcuts.
+1. Tap `Meta`, then press `Meta+Space`, and confirm both launch Vicinae.
+2. Press `Meta+Z` and confirm only workspace arrangement runs; Vicinae must not
+   also appear.
+3. Press `Alt+F2` and confirm KRunner remains available.
+4. Use the documented quick-tile shortcuts.
 
 ### Window path
 
@@ -124,6 +126,10 @@ installed VM; refreshed visual approval is pending against
 - One Install action initiates the selected maintained provider.
 - Authentication prompts come from expected system mechanisms.
 - Progress and errors are understandable.
+- Cancelling authorization is reported as cancellation, not a provider failure.
+- After any provider exit, the card reflects detected system state; an installed
+  package with a configuration error is presented as installed with diagnostics,
+  while a multi-step partial result names the completed steps.
 - Source, licence, and maintenance status are still inspectable.
 - At least one Flatpak, Fedora RPM, and official vendor-source path has been exercised.
 - No agent is selected silently: a choice is saved only after its command is
@@ -133,9 +139,10 @@ installed VM; refreshed visual approval is pending against
 
 ## PM shell-surfaces review
 
-Status: PM visual direction approved; package, scale, blur, reduced-motion, and
-interaction validation complete. Focused two-display and rotated-output
-coverage remains in the Phase 12 final-candidate run.
+Status: PM style-only system-control direction approved; package, scale, blur,
+reduced-motion, and interaction validation is being refreshed for the final
+candidate. Focused two-display and rotated-output coverage remains in the
+Phase 12 final-candidate run.
 Baseline contact sheets are preserved in
 `docs/evidence/phase9-shell-surfaces`, the approved mockup direction in
 `docs/evidence/phase9-shell-mockups`, and the first installed-VM implementation
@@ -169,6 +176,12 @@ matrix is in `docs/evidence/phase9-shell-regression`.
   failure and explicit PM decision justify maintained code.
 - Every custom Plasma Style asset or component is packaged reproducibly and
   survives an upstream package update without resetting user choices.
+- The installed image contains Fedora's unmodified `plasma-nm`, `bluedevil`,
+  `plasma-pa`, `powerdevil`, and `kscreen` releases; Proper's system-control
+  treatment is supplied only by the supported Plasma Style package.
+- Wi-Fi, Bluetooth, audio, brightness/colour, display configuration, and power
+  retain their upstream hierarchy and pointer/keyboard behaviour while using
+  the approved Proper control, selection, tab, and popup language.
 - The PM approves which surfaces remain Breeze-derived and which receive
   Proper-owned visual assets or targeted implementation work.
 

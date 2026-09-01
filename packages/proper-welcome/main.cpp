@@ -254,7 +254,7 @@ public:
         setObjectName("properRoot");
         setWindowTitle("Start Here · Proper Linux");
         setWindowIcon(properIcon("proper-logo-icon"));
-        resize(900, 640);
+        resize(900, 720);
         setMinimumSize(680, 500);
 
         auto *root = new QVBoxLayout(this);
@@ -297,13 +297,17 @@ public:
                 "system-software-update", [this] { launch("/usr/bin/proper-tool", {"updates"}); });
         addCard(grid, 1, 1, "Learn shortcuts", "Fast paths with an ordinary pointer route too",
                 "proper-shortcuts", [this] { launch("/usr/bin/proper-tool", {"shortcuts"}); });
-        addCard(grid, 2, 0, "System Settings", "Hardware, accounts, networking, and the rest",
+        addCard(grid, 2, 0, "Arrange windows", "Choose halves, columns, a grid, or restore floating positions",
+                "view-grid", [this] { launch("/usr/bin/proper-arrange-workspace"); });
+        addCard(grid, 2, 1, "System Settings", "Hardware, accounts, networking, and the rest",
                 "systemsettings", [this] { launch("/usr/bin/systemsettings"); });
-        addCard(grid, 2, 1, "Project and support", "Read the project or report something that feels off",
+        addCard(grid, 3, 0, "Project and support", "Read the project or report something that feels off",
                 "help-about", [this] {
                     if (!QDesktopServices::openUrl(QUrl("https://github.com/marcodenic/PROPER_LINUX")))
                         showFailure("The project page could not be opened in your browser.");
                 });
+        addCard(grid, 3, 1, "Search everything", "Apps, files, commands, and actions in Vicinae",
+                "proper-vicinae", [this] { launch("/usr/bin/proper-launcher"); });
         grid->setColumnStretch(0, 1);
         grid->setColumnStretch(1, 1);
         root->addLayout(grid, 1);

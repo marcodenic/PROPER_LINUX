@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        21%{?dist}
+Release:        24%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -19,6 +19,7 @@ wallpapers are installed as a compact, fully attributed Plasma gallery.
 
 %build
 python3 %{_sourcedir}/generate-ui-assets.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-ui
+python3 %{_sourcedir}/generate-plasma-controls.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-controls
 
 %install
 install -Dpm 0644 %{_sourcedir}/proper-blue-hour.png %{buildroot}%{_datadir}/wallpapers/ProperBlueHour/contents/images/1920x1080.png
@@ -59,6 +60,11 @@ install -Dpm 0644 %{_sourcedir}/proper/dialogs/background.svg "$style_root/dialo
 install -Dpm 0644 %{_sourcedir}/proper/widgets/panel-background.svg "$style_root/widgets/panel-background.svg"
 install -Dpm 0644 %{_sourcedir}/proper/widgets/plasmoidheading.svg "$style_root/widgets/plasmoidheading.svg"
 install -Dpm 0644 %{_sourcedir}/proper/widgets/tasks.svg "$style_root/widgets/tasks.svg"
+# Keep all five system applets on their upstream QML and RPM update path.
+# These generated files use Plasma's supported Style element contract only.
+for asset in button line lineedit listitem slider switch tabbar viewitem; do
+  install -Dpm 0644 "%{_builddir}/proper-controls/$asset.svg" "$style_root/widgets/$asset.svg"
+done
 # Notifications, tooltips, and workspace OSDs use the same approved surface
 # recipe. Everything else remains an explicit Breeze fallback.
 install -Dpm 0644 %{_sourcedir}/proper/dialogs/background.svg "$style_root/widgets/tooltip.svg"
@@ -79,6 +85,7 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/Pass
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/qmldir "$shell_root/contents/lockscreen/qmldir"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-ensure-proper-panel.js "$shell_root/contents/updates/00-ensure-proper-panel.js"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/01-refine-proper-panel.js "$shell_root/contents/updates/01-refine-proper-panel.js"
+install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/02-expand-proper-panel.js "$shell_root/contents/updates/02-expand-proper-panel.js"
 
 %check
 # Proper's rounded shell surfaces use a mask-composed centre and nine neutral
@@ -123,6 +130,22 @@ done
 test "$(xmllint --xpath "count(//*[@id = 'focus-bottom']//*[contains(@class, 'ColorScheme-ButtonFocus')])" "$task_asset")" = 1
 test "$(xmllint --xpath "count(//*[@id = 'normal-bottom']//*[contains(@class, 'ColorScheme-Text')])" "$task_asset")" = 1
 
+# The system surfaces are a Plasma Style, not applet forks. Validate the
+# generated supported control payload independently of the upstream QML.
+for asset in button line lineedit listitem slider switch tabbar viewitem; do
+  control_asset=%{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/$asset.svg
+  xmllint --noout "$control_asset"
+  test "$(xmllint --xpath "count(//*[@id = 'current-color-scheme'])" "$control_asset")" = 1
+done
+test "$(xmllint --xpath "count(//*[@id = 'pressed-center'])" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/listitem.svg)" = 1
+test "$(xmllint --xpath "count(//*[@id = 'selected-center'])" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/viewitem.svg)" = 1
+test "$(xmllint --xpath "count(//*[@id = 'active-center'])" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/switch.svg)" = 1
+test "$(xmllint --xpath "count(//*[@id = 'groove-highlight-center'])" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/slider.svg)" = 1
+
 %files
 %{_datadir}/wallpapers/ProperBlueHour/
 %{_datadir}/wallpapers/ProperHorizon/
@@ -152,6 +175,17 @@ test "$(xmllint --xpath "count(//*[@id = 'normal-bottom']//*[contains(@class, 'C
 install -m 0644 %{_datadir}/proper-linux/plasmalogin.conf %{_prefix}/lib/plasmalogin/defaults.conf || :
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-24
+- Restyle upstream Plasma system applets through supported control assets only
+- Keep network, Bluetooth, audio, display, brightness, and power QML untouched
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-23
+- Enforce the fit-content shelf's visual floor through its fixed task-to-tray spacer
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-22
+- Raise the legacy Proper shelf minimum to 560 pixels without overriding user widths
+- Keep a fixed gap between application tasks and the system tray
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-21
 - Make Inter 4 the canonical first-party and lock-screen UI family
 - Retain Noto Sans as the explicit fallback in generated Qt and web styles

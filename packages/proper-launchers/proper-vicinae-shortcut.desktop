@@ -5,3 +5,4 @@ NoDisplay=true
 StartupNotify=false
 Type=Application
 X-KDE-GlobalAccel-CommandShortcut=true
+X-KDE-Shortcuts=Meta,Meta+Space

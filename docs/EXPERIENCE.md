@@ -74,12 +74,22 @@ After login, the user sees the wallpaper and bottom taskbar. No welcome carousel
 - Visually floating rather than attached edge-to-edge to the viewport.
 - Translucent, blurred, rounded, and restrained.
 - Visible by default.
+- At least 560 pixels wide at the reference 1920×1080 layout, while retaining
+  fit-content growth.
 - User-selectable intelligent hide and auto-hide modes remain available.
 - Pinned and running applications are centred or visually central.
+- A small fixed gap separates application tasks from the system tray even when
+  the shelf becomes busy.
 - The Proper launcher affordance and system status have obvious locations without forcing a full-width slab.
 - Running, focused, urgent, and pinned states must be distinguishable without noise.
 
 The first implementation should use supported Plasma panel and widget facilities. Replace the shell only if those facilities cannot achieve the approved result.
+
+System control popups retain their upstream Plasma hierarchy and functionality.
+Proper styles their shared popup, heading, search, list, button, switch, slider,
+tab, focus, and selection states without combining or forking applets. In
+particular, Brightness and Color remains separate from Display Configuration,
+and Audio retains its upstream Devices and Applications tabs.
 
 ### Desktop surface
 
@@ -94,7 +104,8 @@ The first implementation should use supported Plasma panel and widget facilities
 
 Vicinae is the single promoted launch and command surface:
 
-- opened by clicking the Proper launcher affordance or pressing `Meta+Space`;
+- opened by clicking the Proper launcher affordance, tapping `Meta`, or
+  pressing `Meta+Space`; Meta chords do not also open it;
 - presents a useful mouse-accessible home state with pinned applications, recent items, and common actions before the user types;
 - searches applications, files, commands, clipboard history, and supported extensions;
 - ships with a useful empty state and initial favourites so it is not a blank search box;
@@ -175,6 +186,8 @@ The curated software directory:
 - selects a maintained source according to the policy in `APPLICATIONS.md`;
 - shows source and licence information under an advanced disclosure;
 - reports progress and failure in plain language;
+- distinguishes authentication, download, installation, configuration,
+  cancellation, partial completion, and confirmed final state;
 - hands actual package operations to supported Fedora, PackageKit, Flatpak, Discover, or vendor mechanisms;
 - never becomes its own package manager.
 

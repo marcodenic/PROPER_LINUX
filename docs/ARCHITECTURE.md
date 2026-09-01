@@ -179,7 +179,8 @@ Owns integration rather than upstream launcher source where possible:
 
 - Vicinae package/repository or pinned build
 - Proper taskbar launcher action
-- `Meta+Space` and fallback shortcut bindings
+- bare-`Meta`, `Meta+Space`, and fallback shortcut bindings through KDE's
+  native modifier-only/global-shortcut service
 - initial Vicinae favourites, theme, and script commands
 
 If either upstream component requires a patch, carry it separately with an upstream reference and exit plan.
@@ -215,6 +216,11 @@ Use supported Plasma 6 extension points:
 - Plasma widgets
 - KWin shortcuts and scripts
 - KDE defaults and configuration modules
+
+System-control presentation is owned by `proper-look-and-feel` through Plasma
+Style SVG contracts. Fedora's `plasma-nm`, `bluedevil`, `plasma-pa`,
+`powerdevil`, and `kscreen` packages remain unmodified and independently
+updatable; their QML hierarchy is not a theme surface.
 
 Do not replace Plasma or KWin for version 0.1. A shell replacement would discard exactly the mature mouse and floating-window behaviour Proper Linux wants to preserve.
 
@@ -357,6 +363,9 @@ This is targeted product verification, not a promise of broad hardware certifica
 - Prefer signed upstream repositories and verified Flatpak publishers.
 - Never run opaque remote shell installers from Proper Apps.
 - Installation actions use existing privilege mechanisms and display the expected authentication prompt.
+- Provider completion is advisory until Proper Apps reconciles it against RPM,
+  Flatpak, or command detection; partial and configuration-error states remain
+  visible instead of being collapsed into success or failure.
 - AI tools run with normal user permissions unless the user explicitly approves escalation.
 - Public ISO releases require checksums and signatures; local prototypes require checksums.
 

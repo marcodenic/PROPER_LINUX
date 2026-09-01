@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QButtonGroup>
 #include <QComboBox>
+#include <QCloseEvent>
 #include <QDesktopServices>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -325,6 +326,40 @@ public:
     }
 
 private:
+    void setOperationControlsEnabled(bool enabled) {
+        search->setEnabled(enabled);
+        navBar->setEnabled(enabled);
+        catalogueGrid->setEnabled(enabled);
+        webGrid->setEnabled(enabled);
+        addWebAppButton->setEnabled(enabled);
+        agentButton->setEnabled(enabled);
+        agentCancelButton->setEnabled(enabled);
+    }
+
+    QString operationLabel(const QString &phase) const {
+        const auto entry = entryFor(activeEntryId);
+        const QString name = entry.value("name").toString();
+        return QString("%1 %2 · step %3 of %4")
+            .arg(phase, name)
+            .arg(activeStep + 1)
+            .arg(activeSteps.size());
+    }
+
+    void updateOperationPhase(const QString &output) {
+        const QString text = output.toLower();
+        QString phase;
+        if (text.contains("configur") || text.contains("%post") || text.contains("scriptlet"))
+            phase = activeVerb == "install" ? "Configuring" : "Cleaning up";
+        else if (text.contains("download") || text.contains("fetch") || text.contains("pulling"))
+            phase = "Downloading";
+        else if (text.contains("install") || text.contains("transaction") || text.contains("deploy"))
+            phase = activeVerb == "install" ? "Installing" : "Removing";
+        if (!phase.isEmpty()) {
+            banner->setText(operationLabel(phase));
+            banner->setVisible(true);
+        }
+    }
+
     void buildUi() {
         auto *root = new QVBoxLayout(this);
         root->setContentsMargins(28, 24, 28, 20);
@@ -927,9 +962,9 @@ private:
         activeStep = 0;
         activeVerb = verb;
         activeOutput.clear();
-        operationProgress->setRange(0, steps.size());
-        operationProgress->setValue(0);
+        operationProgress->setRange(0, 0);
         operationProgress->setVisible(true);
+        setOperationControlsEnabled(false);
         runActiveStep();
     }
 
@@ -938,13 +973,27 @@ private:
         if (activeStep >= activeSteps.size()) {
             const QString completedId = activeEntryId;
             const QString completedVerb = activeVerb;
+            const QString completedOutput = activeOutput;
             operationProgress->setVisible(false);
-            showBanner((activeVerb == "install" ? "Installed " : "Removed ") + entry.value("name").toString() + ".");
             activeSteps = {};
             activeEntryId.clear();
             activeVerb.clear();
             refreshInstalledState();
             refresh();
+            setOperationControlsEnabled(true);
+            const bool reachedRequestedState = completedVerb == "install"
+                ? isInstalled(entry)
+                : !isInstalled(entry);
+            if (!reachedRequestedState) {
+                showFailure(
+                    "The provider finished, but Proper Apps could not confirm the requested result.",
+                    completedOutput.right(1800),
+                    "The catalogue has been refreshed from the actual system state. Retry once; if it still fails, open the technical details and report them."
+                );
+                pendingDefaultAgent.clear();
+                return;
+            }
+            showBanner((completedVerb == "install" ? "Installed " : "Removed ") + entry.value("name").toString() + ".");
             if (agentChooser && completedVerb == "install" && pendingDefaultAgent == completedId) {
                 pendingDefaultAgent.clear();
                 const auto installedEntry = entryFor(completedId);
@@ -965,34 +1014,54 @@ private:
         QStringList arguments = jsonStrings(current.value("args").toArray());
         const QString program = resolveProgram(programName);
         if (program.isEmpty()) { operationFailed("Required installer component was not found.", "Missing executable: " + programName); return; }
-        banner->setText((activeVerb == "install" ? "Installing " : "Removing ") + entry.value("name").toString() + QString(" · step %1 of %2").arg(activeStep + 1).arg(activeSteps.size()));
+        const bool privileged = current.value("privileged").toBool();
+        banner->setText(operationLabel(privileged
+            ? "Waiting for authentication to continue with"
+            : (activeVerb == "install" ? "Starting installation of" : "Starting removal of")));
         banner->setVisible(true);
+        activeOutput += QString("\n== Step %1 of %2: %3 ==\n")
+            .arg(activeStep + 1)
+            .arg(activeSteps.size())
+            .arg(programName);
         process = new QProcess(this);
         process->setProcessChannelMode(QProcess::MergedChannels);
         auto environment = QProcessEnvironment::systemEnvironment();
         environment.insert("PATH", homePath() + "/.local/bin:" + environment.value("PATH"));
         process->setProcessEnvironment(environment);
         connect(process, &QProcess::readyRead, this, [this] {
-            activeOutput += QString::fromLocal8Bit(process->readAll());
+            const QString output = QString::fromLocal8Bit(process->readAll());
+            activeOutput += output;
             if (activeOutput.size() > 6000) activeOutput = activeOutput.right(6000);
+            updateOperationPhase(output);
         });
         connect(process, &QProcess::errorOccurred, this, [this, programName](QProcess::ProcessError error) {
             if (process && error == QProcess::FailedToStart) operationFailed("The installer could not be started.", programName + ": " + process->errorString());
         });
-        connect(process, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this, [this, programName](int exitCode, QProcess::ExitStatus status) {
+        connect(process, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this, [this, programName, privileged](int exitCode, QProcess::ExitStatus status) {
             if (!process) return;
-            activeOutput += QString::fromLocal8Bit(process->readAll());
+            const QString finalOutput = QString::fromLocal8Bit(process->readAll());
+            activeOutput += finalOutput;
+            updateOperationPhase(finalOutput);
             process->deleteLater();
             process = nullptr;
             if (status != QProcess::NormalExit || exitCode != 0) {
+                if (privileged && exitCode == 126) {
+                    operationFailed("Authentication was cancelled, so the request did not continue.",
+                                    programName + " exited with status 126.", true);
+                    return;
+                }
+                if (privileged && exitCode == 127) {
+                    operationFailed("Authentication failed or the desktop authorization service was unavailable.",
+                                    programName + QString(" exited with status %1.\n\n").arg(exitCode) + activeOutput.right(1800));
+                    return;
+                }
                 operationFailed("The provider could not complete that request.", programName + QString(" exited with status %1.\n\n").arg(exitCode) + activeOutput.right(1800));
                 return;
             }
-            operationProgress->setValue(activeStep + 1);
             ++activeStep;
             runActiveStep();
         });
-        if (current.value("privileged").toBool()) {
+        if (privileged) {
             const QString pkexec = resolveProgram("pkexec");
             if (pkexec.isEmpty()) {
                 process->deleteLater();
@@ -1007,7 +1076,12 @@ private:
         }
     }
 
-    void operationFailed(const QString &message, const QString &details) {
+    void operationFailed(const QString &message, const QString &details, bool cancelled = false) {
+        const QString failedId = activeEntryId;
+        const QString failedVerb = activeVerb;
+        const int completedSteps = activeStep;
+        const int totalSteps = activeSteps.size();
+        const auto entry = entryFor(failedId);
         if (process) {
             process->disconnect(this);
             process->deleteLater();
@@ -1017,17 +1091,58 @@ private:
         activeSteps = {};
         activeEntryId.clear();
         activeVerb.clear();
-        pendingDefaultAgent.clear();
-        showFailure(message, details);
         refreshInstalledState();
         refresh();
+        setOperationControlsEnabled(true);
+
+        const bool installed = !entry.isEmpty() && isInstalled(entry);
+        const bool reachedRequestedState = failedVerb == "install" ? installed : !installed;
+        if (cancelled) {
+            pendingDefaultAgent.clear();
+            if (reachedRequestedState && !entry.isEmpty())
+                showBanner((failedVerb == "install" ? "Installed " : "Removed ") + entry.value("name").toString() + " before cancellation was reported.");
+            else
+                showBanner("Cancelled. Proper Apps refreshed the catalogue and did not assume anything changed.");
+            return;
+        }
+
+        if (reachedRequestedState && !entry.isEmpty()) {
+            pendingDefaultAgent.clear();
+            const QString outcome = failedVerb == "install" ? "installed" : "removed";
+            const QString summary = entry.value("name").toString() + " is " + outcome + ", but the provider reported a configuration error.";
+            banner->setText(summary + " The catalogue now shows the confirmed system state.");
+            banner->setVisible(true);
+            QMessageBox box(QMessageBox::Warning, "Proper Apps", summary, QMessageBox::Ok, this);
+            box.setInformativeText(failedVerb == "install"
+                ? "The application is present and can be opened. The technical details identify the configuration step that needs attention."
+                : "The application is no longer detected. The technical details identify the cleanup step that needs attention.");
+            QPushButton *openButton = nullptr;
+            if (failedVerb == "install" && !entry.value("launch_args").toArray().isEmpty())
+                openButton = box.addButton("Open", QMessageBox::AcceptRole);
+            if (!details.trimmed().isEmpty()) box.setDetailedText(details.right(1800));
+            box.exec();
+            if (openButton && box.clickedButton() == openButton)
+                launchEntry(failedId);
+            return;
+        }
+
+        pendingDefaultAgent.clear();
+        QString informative = "Check your connection and retry. The catalogue has been refreshed from the actual system state.";
+        if (completedSteps > 0) {
+            informative = QString("Installation stopped after %1 of %2 steps. Supporting components from completed steps may remain installed; retrying is safe and resumes from the detected state.")
+                .arg(completedSteps)
+                .arg(totalSteps);
+        }
+        showFailure(message, details, informative);
     }
 
-    void showFailure(const QString &message, const QString &details) {
-        banner->setText(message + " Nothing was assumed to be installed; you can safely try again.");
+    void showFailure(const QString &message, const QString &details, const QString &informative = {}) {
+        banner->setText(message);
         banner->setVisible(true);
         QMessageBox box(QMessageBox::Critical, "Proper Apps", message, QMessageBox::Ok, this);
-        box.setInformativeText("Check your connection and try again. Provider details are available on the application's details page.");
+        box.setInformativeText(informative.isEmpty()
+            ? "Review the technical details when available, then try again."
+            : informative);
         if (!details.trimmed().isEmpty()) box.setDetailedText(details.right(1800));
         box.exec();
     }
@@ -1036,6 +1151,18 @@ private:
         banner->setText(message);
         banner->setVisible(true);
     }
+
+protected:
+    void closeEvent(QCloseEvent *event) override {
+        if (!process) {
+            QWidget::closeEvent(event);
+            return;
+        }
+        event->ignore();
+        showBanner("Installation is still in progress. Keep Proper Apps open until it confirms the result.");
+    }
+
+private:
 
     void createWebApp() {
         QDialog dialog(this);

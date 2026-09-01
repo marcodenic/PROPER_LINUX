@@ -29,7 +29,7 @@ install -Dpm 0644 /etc/skel/.config/vicinae/settings.json "$config_dir/vicinae/s
 
 # The live user is created by livesys after image composition, so the
 # accelerator daemon can already be running when the session defaults land.
-# Reload it now so the shipped Meta+Space shortcut is active immediately.
+# Reload it now so the shipped Meta tap and Meta+Space shortcuts are active immediately.
 systemctl --user try-restart plasma-kglobalaccel.service 2>/dev/null || true
 
 # livesys creates liveuser after the image is composed. Do not restart

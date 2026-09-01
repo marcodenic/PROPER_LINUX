@@ -11,7 +11,7 @@ if (panels().length === 0) {
     panel.alignment = "center"
     panel.height = 56
     panel.lengthMode = "fit"
-    panel.minimumLength = 320
+    panel.minimumLength = 560
     panel.maximumLength = 720
     panel.hiding = "normal"
     panel.floating = true
@@ -21,6 +21,11 @@ if (panels().length === 0) {
     tasks.writeConfig("launchers", "applications:vicinae.desktop,applications:org.kde.dolphin.desktop,applications:com.mitchellh.ghostty.desktop")
     tasks.writeConfig("showOnlyCurrentDesktop", false)
     tasks.writeConfig("showOnlyCurrentActivity", false)
+
+    const spacer = panel.addWidget("org.kde.plasma.panelspacer")
+    spacer.currentConfigGroup = ["General"]
+    spacer.writeConfig("expanding", false)
+    spacer.writeConfig("length", 86)
 
     panel.addWidget("org.kde.plasma.systemtray")
     panel.addWidget("org.kde.plasma.showdesktop")

@@ -1,11 +1,11 @@
 Name:           proper-defaults
 Version:        0.1
-Release:        21%{?dist}
+Release:        23%{?dist}
 Summary:        Proper Linux new-user KDE defaults
 License:        GPL-3.0-or-later
 BuildArch:      noarch
 Requires:       chromium
-Requires:       proper-look-and-feel >= 0.1-21
+Requires:       proper-look-and-feel >= 0.1-23
 Requires:       proper-launchers
 Requires:       proper-terminal
 Requires:       proper-apps
@@ -17,6 +17,13 @@ the small skel copies initialise a live/installer-created account. They do not
 overwrite an existing user's configuration.
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-23
+- Make the fit-content shelf visibly about 560 pixels wide with an 86-pixel task-to-tray spacer
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-22
+- Seed the wider Proper shelf with a fixed task-to-tray gap
+- Move reversible workspace arrangement to Meta+Z
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-21
 - Seed Inter across Plasma desktop, taskbar, menus, toolbars, titles, and GTK
 - Keep JetBrains Mono limited to fixed-width KDE and terminal surfaces

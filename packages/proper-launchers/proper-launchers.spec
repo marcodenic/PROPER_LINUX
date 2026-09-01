@@ -1,6 +1,6 @@
 Name:           proper-launchers
 Version:        0.1
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        Proper Linux launcher and window workflow defaults
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -13,7 +13,7 @@ Requires:       plasma-systemsettings
 Requires:       plasma-systemmonitor
 Requires:       proper-apps >= 0.1-7
 Requires:       proper-appearance >= 0.1-3
-Requires:       proper-look-and-feel >= 0.1-21
+Requires:       proper-look-and-feel >= 0.1-23
 Requires:       qt6-qttools
 Requires:       spectacle
 Requires:       systemd
@@ -85,6 +85,11 @@ done
 systemctl --global enable vicinae.service >/dev/null 2>&1 || :
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-14
+- Replace the off-centre launcher dot with Proper's centred four-cell mark
+- Bind a Meta tap as well as Meta+Space to Vicinae without startup feedback
+- Document Meta+Z as the reversible workspace-arrangement shortcut
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-13
 - Require the Inter-based shared stylesheet used by the shortcut reference
 

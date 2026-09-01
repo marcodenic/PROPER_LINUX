@@ -1,5 +1,5 @@
 [services][proper-vicinae-shortcut.desktop]
-_launch=Meta+Space
+_launch=Meta	Meta+Space
 
 [krunner]
 run command=Alt+F2,Alt+F2,Run command

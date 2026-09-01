@@ -1,6 +1,6 @@
 Name:           proper-welcome
 Version:        0.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Proper Linux live-session welcome
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -8,6 +8,7 @@ BuildRequires:  qt6-qtbase-devel
 Requires:       anaconda-live
 Requires:       proper-branding
 Requires:       proper-look-and-feel >= 0.1-21
+Requires:       proper-launchers >= 0.1-14
 
 %description
 A focused, pointer-accessible live-session choice between exploring the Proper
@@ -36,6 +37,9 @@ install -Dpm 0644 %{_sourcedir}/proper-start.desktop %{buildroot}%{_datadir}/app
 %{_datadir}/applications/proper-start.desktop
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-7
+- Add obvious pointer cards for workspace arrangement and Vicinae search
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-6
 - Require the Inter-based shared first-party UI token assets
 

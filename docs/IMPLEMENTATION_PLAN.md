@@ -106,7 +106,8 @@ Combine excellent pointer discovery with fast command and window shortcuts.
 ### Work
 
 - Package a pinned Vicinae release as a Proper-managed RPM if no suitable trusted Fedora package exists.
-- Configure the Proper taskbar launcher action and `Meta+Space` to open Vicinae.
+- Configure the Proper taskbar launcher action, a bare `Meta` tap, and
+  `Meta+Space` to open Vicinae without firing the tap action for Meta chords.
 - Seed useful Vicinae favourites and empty-state actions.
 - Keep `Alt+F2` mapped to KRunner.
 - Audit all primary Vicinae actions with a mouse.
@@ -168,7 +169,9 @@ Provide one clear installation surface for the applications the primary customer
 - Add the priority catalogue entries first: Chrome, GitHub Desktop, VS Code Insiders, Codex, and Docker tooling.
 - Add the reviewed secondary categories from `APPLICATIONS.md`.
 - Clearly label community-maintained software only in advanced details.
-- Add install progress, installed state, launch, and failure recovery.
+- Add explicit authentication/download/install/configuration progress, reconcile
+  installed state after every provider result, and distinguish cancellation,
+  partial completion, launch, and failure recovery.
 - Add Vicinae actions to open Proper Apps searches and launch installed agents in Ghostty.
 - Expose one generic Coding Agent action in Vicinae, the app menu, and Dolphin.
   Store a default only after explicit selection and successful command
@@ -305,6 +308,10 @@ replacing Plasma.
 - Define a narrow Proper Plasma Style only where configuration and existing
   assets cannot produce the approved result. Let unowned theme elements fall
   back to Breeze.
+- Generate the approved style-only system-control assets from `tokens.yaml`:
+  button, line, line edit, list item, slider, switch, tab bar, and view item.
+  Do not patch or rebuild the network, Bluetooth, audio, power, brightness, or
+  display applets to change their hierarchy.
 - Keep Vicinae as the promoted launcher and use stock Plasma launchers only as
   interaction/reference baselines.
 - Prefer upstream applets and supported configuration for notifications,
@@ -378,7 +385,7 @@ fast without making tiling or shortcut memorisation mandatory.
   the current workspace and monitor, applies the selected layout, and restores
   the previous floating geometry on the next toggle. New windows remain
   floating; dialogs, pop-ups, fullscreen, and picture-in-picture surfaces are
-  excluded. Expose it through a pointer path, Vicinae, and `Meta+Shift+T`.
+  excluded. Expose it through a pointer path, Vicinae, and `Meta+Z`.
 - Add a searchable, pointer-accessible shortcut reference.
 - Add Vicinae actions for appearance, wallpaper, night light, screenshots,
   updates, power, Bluetooth, display settings, and diagnostics.

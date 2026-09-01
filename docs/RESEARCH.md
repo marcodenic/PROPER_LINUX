@@ -244,9 +244,10 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
   separate from the source archive and must be dropped when the next pinned
   Ghostty release includes that upstream change.
 - Proper terminal runtime configuration is versioned in
-  `packages/proper-terminal/ghostty.conf`. It uses 88% background opacity,
-  keeps cell backgrounds opaque, and asks the compositor for background blur;
-  normal content windows remain opaque.
+  `packages/proper-terminal/ghostty.conf`. Following installed-image feedback,
+  it uses 50% background opacity, keeps cell backgrounds opaque, and disables
+  compositor blur so the desktop remains clearly visible; normal content
+  windows remain opaque.
 - Update by auditing the official release tarball and minisign signature, the
   declared Zig requirement, the blur patch's upstream status, build dependency
   changes, and the generated runtime payload before rebuilding.
@@ -338,6 +339,27 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
   Theme or maintaining a forked applet for version 0.1.
 - The exact evidence set and its hardware limits are recorded under
   `docs/evidence/phase9-shell-surfaces`.
+
+## Plasma 6 system-applet styling boundary audit — 2026-09-01
+
+- Fedora 44's Plasma 6.7.4 network, Bluetooth, audio, brightness/battery, and
+  display applets compile their QML into plugin packages. Their popup geometry,
+  section ordering, device summaries, and action placement are not Plasma Style
+  properties. Changing those structures requires rebuilding and maintaining
+  `plasma-nm`, `bluedevil`, `plasma-pa`, `powerdevil`, and `kscreen`.
+- Plasma's supported Style contract does cover the common control assets used
+  by those unchanged applets: buttons, line edits, list and view states,
+  sliders, switches, tabs, and separators. Proper generates only those assets
+  from its reviewed tokens and inherits unowned elements and icons from Breeze.
+- Style-only consequences are explicit: Brightness and Color remains separate
+  from Display Configuration; Audio retains Devices and Applications tabs;
+  Wi-Fi retains its icon switches and search toolbar; Bluetooth retains its
+  labelled switch and device sections; Power retains its profile slider,
+  battery rows, and inhibition control.
+- This boundary leaves the Fedora applet RPMs unmodified and on their normal
+  update path. A future Plasma Style schema change may require updating the
+  Proper theme package, but it does not create five package forks or block an
+  applet security/bug-fix update.
 
 ## Phase 11 workflow and OCR audit — 2026-08-31
 

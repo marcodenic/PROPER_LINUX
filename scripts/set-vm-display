@@ -65,7 +65,9 @@ emit_character() {
     ' ') emit_key_event spc ;;
     '-') emit_key_event minus ;;
     '.') emit_key_event dot ;;
-    '@') emit_key_event 2 true ;;
+    # Proper's default British layout types @ with Shift+apostrophe. QMP sends
+    # physical qcodes, so using the US Shift+2 chord would enter a quote.
+    '@') emit_key_event apostrophe true ;;
     [a-z0-9]) emit_key_event "$character" ;;
     *)
       printf 'Unsupported character in VM display command: %q\n' "$character" >&2
@@ -79,9 +81,10 @@ apply_display_mode() {
   local index
   local character
 
-  # Exact refresh spellings vary by virtual mode (for example 59.93 versus
-  # 60). Selecting by dimensions lets KScreen choose the advertised refresh.
-  command_text="kscreen-doctor output.1.mode.${display_width}x${display_height} output.1.scale.${display_scale}"
+  # KScreen 6.7 requires the refresh suffix when a connector advertises
+  # several modes with the same dimensions. QEMU exposes the requested round
+  # refresh (for example @60) even when the measured vblank is fractional.
+  command_text="kscreen-doctor output.1.mode.${display_width}x${display_height}@${display_refresh} output.1.scale.${display_scale}"
 
   {
     printf '%s\n' '{"execute":"qmp_capabilities"}'

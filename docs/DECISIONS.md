@@ -826,3 +826,60 @@ Status values:
   interface a more deliberate UI-specific voice. Explicit packaging and
   regression checks prevent a missing font from silently turning that design
   choice back into Noto Sans while retaining broad glyph fallback.
+
+## D067 — Correct the installed shelf, terminal, window, and application feedback
+
+- **Status:** Accepted from installed-image feedback
+- **Date:** 2026-09-01
+- **Decision:** Keep the bottom shelf in fit-content mode, retain a nominal
+  560-pixel minimum, and insert a fixed 86-pixel spacer between icon tasks and
+  the system tray. Plasma 6.7 applies its minimum-length clamp only to custom
+  panels, so the spacer is the supported fit-content input that produces the
+  requested visible floor of about 560 pixels while still allowing the shelf
+  to grow with additional tasks and tray items. Migrate only a panel retaining
+  the complete old Proper geometry and structure; never overwrite a user-set
+  width. Replace D064's off-centre white launcher dot with four centred cells
+  from Proper's ASCII-influenced identity and disable startup notification for
+  its idempotent opener. Bind both a bare `Meta` tap and `Meta+Space` to that
+  opener through KDE's native modifier-only shortcut support, whose state
+  machine suppresses the tap whenever Meta participates in another chord.
+  Move reversible workspace arrangement from `Meta+Shift+T` to `Meta+Z`, and
+  promote both arrangement and search as Start Here pointer cards.
+
+  Supersede D061's 88-percent blurred terminal treatment with 50-percent
+  opacity and no compositor blur so the desktop is plainly visible through
+  Ghostty. In Proper Apps, present authentication, download, install, and
+  configuration phases as active work; reconcile RPM, Flatpak, or command
+  detection after every provider exit; distinguish cancellation and partial
+  completion; and never claim that nothing changed without checking.
+- **Reason:** The latest installed ISO made the shelf collapse around its
+  icons, visually merged tasks with status controls, mis-centred the promoted
+  launcher, advertised every idempotent launcher click as a new application
+  startup, obscured the desktop behind Ghostty, hid workspace arrangement, and
+  collapsed several materially different package outcomes into one ambiguous
+  failure. These are product-state defects visible only in the installed
+  experience, so the new defaults, narrow migrations, and acceptance checks
+  must reflect the observed behaviour.
+
+## D068 — Restyle system controls without forking their applets
+
+- **Status:** Accepted at the installed-image system-surfaces review
+- **Date:** 2026-09-01
+- **Decision:** Keep Fedora's unmodified `plasma-nm`, `bluedevil`, `plasma-pa`,
+  `powerdevil`, and `kscreen` packages and their upstream popup hierarchy.
+  Extend the Proper Plasma Style only through the supported `button`, `line`,
+  `lineedit`, `listitem`, `slider`, `switch`, `tabbar`, and `viewitem` SVG
+  element contracts. Use Proper's restrained blue selection, dark heading and
+  popup surfaces, nine-pixel controls, Inter typography, and Breeze-derived
+  system icons. Brightness and Display Configuration remain separate upstream
+  applets; audio retains its Devices and Applications tabs; no device summary
+  cards, new footer actions, or reordered controls are introduced.
+- **Update method:** Fedora continues updating all five applet RPMs normally.
+  On a Plasma major update, rebuild the generated Style assets from
+  `tokens.yaml`, validate every required SVG element, and exercise the unchanged
+  applets at normal and 200% scale. Do not add an applet patch merely to retain
+  the approved appearance.
+- **Reason:** Plasma Style can change supported control presentation but cannot
+  safely alter applet information hierarchy. A proposed richer device-first
+  composition would have required five maintained downstream package patches.
+  The PM rejected that update burden and approved the honest style-only result.
