@@ -1,0 +1,22 @@
+--- a/plasma-desktop.spec
++++ b/plasma-desktop.spec
+@@ -6,7 +6,7 @@
+ Name:    plasma-desktop
+ Summary: Plasma Desktop shell
+ Version: 6.7.4
+-Release: 1%{?dist}
++Release: 1%{?dist}.proper1
+ 
+ License: BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND (GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only)
+ URL:     https://invent.kde.org/plasma/%{name}
+@@ -27,6 +27,10 @@
+ # Hide virtual keyboard indicator on sddm.
+ # Do not remove this as it breaks Fedora's QA policy
+ Patch101:       hide-virtual-keyboard-indicator-on-sddm.patch
++# Proper's task shelf uses a restrained travelling-dot launch state instead
++# of Plasma's circular busy indicator. Keep this as a narrow downstream patch
++# until the task manager exposes a supported launch-indicator theme hook.
++Patch102:       proper-task-loading-indicator.patch
+ 
+ ## upstreamable patches
+ 

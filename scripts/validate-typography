@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# Reject missing Inter payloads and regressions to Noto Sans as the primary UI face.
+set -Eeuo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+tokens="$project_root/packages/proper-look-and-feel/tokens.yaml"
+generator="$project_root/packages/proper-look-and-feel/generate-ui-assets.py"
+kdeglobals="$project_root/packages/proper-defaults/kdeglobals"
+gtk_settings="$project_root/packages/proper-defaults/gtk-settings.ini"
+appearance="$project_root/packages/proper-appearance/proper-appearance.cpp"
+lock_qml="$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml"
+login_qml="$project_root/packages/plasma-login-manager/ProperMain.qml"
+image_packages="$project_root/image/descriptions/proper.xml"
+
+grep -Fqx "typography: {ui: 'Inter', fallback: 'Noto Sans', mono: 'JetBrains Mono', body_size: 10}" "$tokens"
+
+for package in rsms-inter-fonts google-noto-sans-fonts jetbrains-mono-fonts; do
+  grep -Fq "<package name=\"$package\"/>" "$image_packages" || {
+    printf 'Required typography package is absent from the image: %s\n' "$package" >&2
+    exit 1
+  }
+done
+grep -Fq 'Requires:       rsms-inter-fonts = 4.1-3%{?dist}' \
+  "$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
+grep -Fq 'Requires:       google-noto-sans-fonts' \
+  "$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
+grep -Fq 'Requires: jetbrains-mono-fonts' \
+  "$project_root/packages/proper-terminal/proper-terminal.spec"
+grep -Fq '+Requires:       rsms-inter-fonts = 4.1-3%{?dist}' \
+  "$project_root/packages/plasma-login-manager/plasma-login-manager.spec.patch"
+
+for entry in \
+  'desktopFont=Inter,10,-1,5,50,0,0,0,0,0' \
+  'font=Inter,10,-1,5,50,0,0,0,0,0' \
+  'menuFont=Inter,10,-1,5,50,0,0,0,0,0' \
+  'smallestReadableFont=Inter,8,-1,5,50,0,0,0,0,0' \
+  'toolBarFont=Inter,9,-1,5,50,0,0,0,0,0' \
+  'activeFont=Inter,9,-1,5,50,0,0,0,0,0'; do
+  grep -Fqx "$entry" "$kdeglobals" || {
+    printf 'KDE typography default is missing: %s\n' "$entry" >&2
+    exit 1
+  }
+done
+grep -Fqx 'fixed=JetBrains Mono,10,-1,5,50,0,0,0,0,0' "$kdeglobals"
+grep -Fqx 'gtk-font-name=Inter 10' "$gtk_settings"
+
+grep -Fq 'QString("Inter %1")' "$appearance"
+grep -Fq 'QString("Inter,%1,-1,5,50,0,0,0,0,0")' "$appearance"
+grep -Fq 'QString("desktopFont")' "$appearance"
+grep -Fq 'runConfigWrite("WM", "activeFont", title)' "$appearance"
+if rg -n 'Noto Sans' "$appearance"; then
+  printf 'Proper Appearance would restore Noto Sans as a primary UI font.\n' >&2
+  exit 1
+fi
+
+grep -Fq 'readonly property string uiFontFamily: "Inter"' "$lock_qml"
+grep -Fq 'readonly property string uiFontFamily: "Inter"' "$login_qml"
+[[ "$(rg -c 'font[.]family: lockScreenUi[.]uiFontFamily' "$lock_qml")" -ge 5 ]]
+[[ "$(rg -c 'font[.]family: root[.]uiFontFamily' "$login_qml")" -ge 9 ]]
+
+generated_root="$(mktemp -d /tmp/proper-typography.XXXXXX)"
+trap 'rm -rf -- "$generated_root"' EXIT
+python3 "$generator" "$tokens" "$generated_root"
+for qss in "$generated_root/proper-widgets-dark.qss" \
+           "$generated_root/proper-widgets-light.qss" \
+           "$generated_root/proper-welcome.qss"; do
+  grep -Fq 'font-family: "Inter";' "$qss"
+  ! grep -Fq 'font-family: "Noto Sans"' "$qss"
+done
+grep -Fq 'font-family: Inter, "Noto Sans", sans-serif;' "$generated_root/proper-web.css"
+grep -Fq 'font: 600 .88rem "JetBrains Mono", monospace;' "$generated_root/proper-web.css"
+
+grep -Fqx 'font-family = JetBrains Mono' "$project_root/packages/proper-terminal/ghostty.conf"
+grep -Fqx 'Font=Inter 12' "$project_root/packages/proper-branding/proper.plymouth"
+grep -Fqx 'TitleFont=Inter 28' "$project_root/packages/proper-branding/proper.plymouth"
+
+grep -Fq 'proper-widgets-' "$project_root/packages/proper-apps/main.cpp"
+grep -Fq 'proper-widgets-' "$project_root/packages/proper-appearance/proper-appearance.cpp"
+grep -Fq 'proper-widgets-' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'proper-welcome.qss' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'proper-web.css' "$project_root/packages/proper-launchers/proper-shortcuts.html"
+
+printf 'Typography valid: Inter 4 primary, Noto Sans fallback, and JetBrains Mono restricted to fixed-width surfaces.\n'

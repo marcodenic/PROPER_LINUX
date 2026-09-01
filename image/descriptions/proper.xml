@@ -23,6 +23,11 @@
 		<package name="proper-terminal"/>
 		<package name="proper-apps"/>
 		<package name="proper-appearance"/>
+		<!-- Inter 4 is the desktop face; Noto Sans supplies international
+		     fallback coverage and JetBrains Mono remains code/terminal-only. -->
+		<package name="rsms-inter-fonts"/>
+		<package name="google-noto-sans-fonts"/>
+		<package name="jetbrains-mono-fonts"/>
 		<package name="chromium"/>
 		<package name="kamoso"/>
 		<package name="krdc"/>

@@ -4,8 +4,8 @@ Description=Proper Linux grid identity with a quiet five-cell progress pulse
 ModuleName=two-step
 
 [two-step]
-Font=Noto Sans 12
-TitleFont=Noto Sans 28
+Font=Inter 12
+TitleFont=Inter 28
 ImageDir=/usr/share/plymouth/themes/proper
 DialogHorizontalAlignment=.5
 DialogVerticalAlignment=.5

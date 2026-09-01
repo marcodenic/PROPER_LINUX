@@ -100,6 +100,18 @@
       "sha256": "8d5575ee667ff715cd3e3074d5296edc68d5aadd89720d203e13131b68b22a04"
     },
     {
+      "id": "codex-desktop",
+      "asset": "codex-desktop.svg",
+      "source_url": "https://developers.openai.com/favicon.svg",
+      "source_kind": "Official publisher artwork",
+      "source_ref": "OpenAI developer site favicon",
+      "application_licence": "Proprietary desktop client; provider terms apply",
+      "artwork_rights": "Upstream application artwork; upstream copyright and trademark terms apply.",
+      "transform": "Indented only; paths and colours are unchanged.",
+      "retrieved": "2026-09-01",
+      "sha256": "1b838dbe8fcfdbe12d4bc264edb56b5f5f20f365bf9272323eda5c8bee066ea3"
+    },
+    {
       "id": "discord",
       "asset": "discord.png",
       "source_url": "https://dl.flathub.org/media/com/discordapp/Discord/6a6d8b5d4b4cb4271dc7c554e6d913ff/icons/128x128/com.discordapp.Discord.png",
@@ -230,6 +242,18 @@
       "transform": "None",
       "retrieved": "2026-08-31",
       "sha256": "670c43c2e4464a9832b41c7e62d0b5fc2bd9e704084f782f9d2b2fa70fdd8dd9"
+    },
+    {
+      "id": "helium",
+      "asset": "helium.svg",
+      "source_url": "https://raw.githubusercontent.com/imputnet/helium/6fb6afe47b2eee928311541539ab999ce048986e/resources/branding/product_logo.svg",
+      "source_kind": "Pinned upstream repository artwork",
+      "source_ref": "imputnet/helium@6fb6afe47b2eee928311541539ab999ce048986e",
+      "application_licence": "GPL-3.0-only and Chromium component licences",
+      "artwork_rights": "Upstream application artwork; upstream copyright and trademark terms apply.",
+      "transform": "None",
+      "retrieved": "2026-09-01",
+      "sha256": "de835ce289a29864efef11cba50e87697ad46868f927872091a3b7eaafb31d62"
     },
     {
       "id": "helix",

@@ -8,4 +8,4 @@ radius: {panel: 16, popup: 14, control: 9}
 blur: {panel: 24, popup: 32}
 spacing: {unit: 4, panel: 10, panel_end: 14, item: 8, section: 16}
 animation: {fast: 120, normal: 180, slow: 260}
-typography: {ui: 'Noto Sans', mono: 'JetBrains Mono', body_size: 10}
+typography: {ui: 'Inter', fallback: 'Noto Sans', mono: 'JetBrains Mono', body_size: 10}

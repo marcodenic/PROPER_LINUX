@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPalette>
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QProgressBar>
@@ -101,6 +102,22 @@ private:
 
 static QString homePath() {
     return QDir::homePath();
+}
+
+static void applyProperWidgetStyle(QApplication &application) {
+    const QString requested = qEnvironmentVariable("PROPER_UI_VARIANT").toLower();
+    const bool light = requested == "light"
+        || (requested != "dark" && application.palette().color(QPalette::Window).lightness() > 128);
+    const QString root = qEnvironmentVariable("PROPER_UI_STYLE_DIR", "/usr/share/proper-linux/ui");
+    QFile style(root + QStringLiteral("/proper-widgets-")
+                + (light ? QStringLiteral("light.qss") : QStringLiteral("dark.qss")));
+    if (style.open(QIODevice::ReadOnly | QIODevice::Text))
+        application.setStyleSheet(QString::fromUtf8(style.readAll()));
+}
+
+static QIcon properIcon(const QString &name) {
+    const QString root = qEnvironmentVariable("PROPER_ICON_DIR", "/usr/share/icons/hicolor/scalable/apps");
+    return QIcon::fromTheme(name, QIcon(root + "/" + name + ".svg"));
 }
 
 static QString expandToken(QString value) {
@@ -293,9 +310,9 @@ class ProperApps final : public QWidget {
 public:
     ProperApps(bool chooseAgent = false, const QString &directory = {}, const QString &missing = {})
         : agentChooser(chooseAgent), agentDirectory(directory), missingAgent(missing) {
-        setObjectName("root");
+        setObjectName("properRoot");
         setWindowTitle("Proper Apps");
-        setWindowIcon(QIcon::fromTheme("system-software-install"));
+        setWindowIcon(properIcon("proper-apps"));
         resize(1180, 760);
         setMinimumSize(720, 500);
         buildUi();
@@ -309,42 +326,6 @@ public:
 
 private:
     void buildUi() {
-        setStyleSheet(R"CSS(
-            QWidget#root { background: #0f151c; color: #edf3f7; }
-            QLabel { color: #edf3f7; }
-            QLabel#subtitle, QLabel#countLabel, QLabel#cardDescription { color: #9cacb9; }
-            QLabel#cardTitle { font-size: 16px; font-weight: 650; }
-            QLabel#categoryPill { color: #a9bdd0; background: #26333f; border: 1px solid #334555; border-radius: 8px; padding: 3px 7px; font-size: 9px; font-weight: 700; }
-            QLineEdit, QComboBox { background: #18212a; color: #edf3f7; border: 1px solid #2b3a47; border-radius: 10px; padding: 9px 12px; selection-background-color: #3978c5; }
-            QLineEdit:focus, QComboBox:focus { border: 1px solid #5b9be7; }
-            QComboBox QAbstractItemView { background: #18212a; color: #edf3f7; selection-background-color: #294d70; }
-            QToolButton#navButton { color: #aebbc6; background: transparent; border: 0; border-radius: 9px; padding: 9px 15px; font-weight: 600; }
-            QToolButton#navButton:hover { background: #1d2832; color: #ffffff; }
-            QToolButton#navButton:checked { background: #263a4d; color: #ffffff; }
-            QFrame#appCard { background: #18212a; border: 1px solid #263541; border-radius: 16px; }
-            QFrame#appCard:hover { background: #1c2731; border-color: #3b5367; }
-            QPushButton { border-radius: 9px; padding: 7px 14px; font-weight: 650; }
-            QPushButton#primaryButton { background: #f0f5f8; color: #111820; border: 0; }
-            QPushButton#primaryButton:hover { background: #ffffff; }
-            QPushButton#secondaryButton { background: #2a3a48; color: #edf3f7; border: 1px solid #3a4e60; }
-            QPushButton#secondaryButton:hover { background: #34495a; }
-            QPushButton:disabled { color: #71808d; background: #202a33; border-color: #2b3741; }
-            QToolButton#quietButton { color: #9fb4c6; background: transparent; border: 0; padding: 6px 2px; }
-            QToolButton#quietButton:hover { color: #ffffff; text-decoration: underline; }
-            QScrollArea { border: 0; background: transparent; }
-            QScrollArea > QWidget > QWidget { background: transparent; }
-            QScrollBar:vertical { background: transparent; width: 10px; margin: 2px; }
-            QScrollBar::handle:vertical { background: #334656; min-height: 34px; border-radius: 4px; }
-            QScrollBar::handle:vertical:hover { background: #476176; }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: transparent; }
-            QProgressBar { border: 0; border-radius: 3px; background: #26323d; min-height: 6px; max-height: 6px; }
-            QProgressBar::chunk { border-radius: 3px; background: #5b9be7; }
-            QLabel#banner { background: #182b3b; color: #dcecff; border: 1px solid #315271; border-radius: 10px; padding: 10px 13px; }
-            QTextBrowser { background: #111820; color: #dce5eb; border: 1px solid #293845; border-radius: 10px; padding: 8px; }
-            QDialog, QMessageBox { background: #0f151c; color: #edf3f7; }
-        )CSS");
-
         auto *root = new QVBoxLayout(this);
         root->setContentsMargins(28, 24, 28, 20);
         root->setSpacing(14);
@@ -1218,8 +1199,11 @@ static int launchWebAppFromCommandLine(const QString &id) {
 
 int main(int argc, char **argv) {
     QApplication app(argc, argv);
+    if (QIcon::themeName().isEmpty())
+        QIcon::setThemeName("breeze");
     QApplication::setOrganizationName("Proper Linux");
     QApplication::setApplicationName("Proper Apps");
+    QApplication::setDesktopFileName("proper-apps");
     if (argc == 3 && QString::fromLocal8Bit(argv[1]) == "--launch-web-app")
         return launchWebAppFromCommandLine(QString::fromLocal8Bit(argv[2]));
     bool chooseAgent = false;
@@ -1233,6 +1217,7 @@ int main(int argc, char **argv) {
         else if (argument == "--missing" && index + 1 < argc)
             missing = QString::fromLocal8Bit(argv[++index]);
     }
+    applyProperWidgetStyle(app);
     ProperApps window(chooseAgent, directory, missing);
     window.show();
     return app.exec();

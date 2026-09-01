@@ -2,7 +2,7 @@
 Type=Application
 Name=Welcome to Proper Linux
 Comment=Choose whether to try or install Proper Linux
-Exec=/usr/bin/proper-welcome
+Exec=/usr/bin/proper-welcome-launch
 Icon=proper-logo-icon
 OnlyShowIn=KDE;
 Terminal=false

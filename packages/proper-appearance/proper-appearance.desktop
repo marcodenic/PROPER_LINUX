@@ -3,6 +3,6 @@ Type=Application
 Name=Appearance
 Comment=Preview desktop styles, choose text size, and manage wallpapers
 Exec=proper-appearance
-Icon=preferences-desktop-theme
+Icon=proper-appearance
 Categories=Settings;DesktopSettings;
 StartupNotify=true

@@ -3,8 +3,9 @@
 #
 # The HMP socket is retained for observation (including screendump), while the
 # QMP socket is the supported input/control path for graphical acceptance.
-# Set PROPER_VM_POINTER=relative when using VNC/RFB clients that emit relative
-# mouse events; the default tablet mode provides QEMU's absolute pointer.
+# Relative mouse input is the PM-review default because QEMU's absolute pointer
+# is mis-scaled by XWayland on the BOX host's HiDPI display. Set
+# PROPER_VM_POINTER=tablet only for controlled absolute-input automation.
 # The default PM-review presentation uses a normal resizable local GTK window
 # with a 1920x1080 framebuffer at 100% scaling. The guest is zoomed to fit the
 # client area, so maximising the window fills it instead of leaving a small
@@ -85,7 +86,7 @@ if [[ -n "${PROPER_VM_FULLSCREEN:-}" && ! "${PROPER_VM_FULLSCREEN}" =~ ^(0|off|f
   printf 'Forced full-screen VM launch is unsupported; maximise the normal review window instead.\n' >&2
   exit 1
 fi
-vm_pointer="${PROPER_VM_POINTER:-tablet}"
+vm_pointer="${PROPER_VM_POINTER:-relative}"
 case "$vm_pointer" in
   tablet) pointer_args=(-device qemu-xhci -device usb-tablet,id=proper_tablet) ;;
   relative) pointer_args=(-device qemu-xhci) ;;

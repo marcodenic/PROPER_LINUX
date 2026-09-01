@@ -1,6 +1,6 @@
 Name: proper-apps
 Version: 0.1
-Release: 7%{?dist}
+Release: 9%{?dist}
 Summary: Proper Linux curated application catalogue
 License: GPL-3.0-or-later
 BuildRequires: qt6-qtbase-devel
@@ -8,6 +8,7 @@ Requires: flatpak
 Requires: kdialog
 Requires: polkit
 Requires: proper-terminal >= 1.3.1
+Requires: proper-look-and-feel >= 0.1-21
 %description
 Small catalogue front end delegating installs to Fedora, Flatpak, and official vendor paths.
 %prep
@@ -34,6 +35,13 @@ install -pm 0644 %{_sourcedir}/icons/* %{buildroot}%{_datadir}/proper-apps/icons
 %{_datadir}/proper-apps/icons/
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-9
+- Require the Inter-based shared first-party UI token assets
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-8
+- Use the shared token-generated Proper widget style and first-party icon
+- Keep Recommended decisive while retaining the broad categorised catalogue
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-7
 - Add one generic Coding Agent action for the launcher, app menu, and Dolphin
 - Choose, install, and save Codex, Claude Code, or OpenCode only after success

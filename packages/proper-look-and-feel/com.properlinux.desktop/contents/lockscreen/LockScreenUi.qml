@@ -22,7 +22,9 @@ Item {
     property bool systemMenuOpen: false
     property bool authenticationFailed: false
     property bool noPasswordConfirmation: false
-    readonly property bool passwordVisible: passwordBox.text.length > 0 || authenticationFailed || root.notification.length > 0
+    property bool authenticationVisible: false
+    readonly property bool passwordVisible: authenticationVisible || passwordBox.text.length > 0 || authenticationFailed || root.notification.length > 0
+    readonly property string uiFontFamily: "Inter"
 
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
@@ -30,6 +32,14 @@ Item {
     function clearEntry() {
         root.clearPassword()
         passwordBox.forceActiveFocus()
+    }
+
+    function revealAuthentication() {
+        authenticationVisible = true
+        Window.window.requestActivate()
+        passwordBox.forceActiveFocus()
+        authenticator.startAuthenticating()
+        revealTimer.restart()
     }
 
     function recordMessage(message) {
@@ -117,6 +127,25 @@ Item {
         onTriggered: root.notification = ""
     }
 
+    Timer {
+        id: revealTimer
+        interval: 10000
+        onTriggered: {
+            if (passwordBox.text.length === 0 && !lockScreenUi.authenticationFailed && !lockScreenUi.systemMenuOpen) {
+                lockScreenUi.authenticationVisible = false
+            }
+        }
+    }
+
+    // The quiet clock view is the idle state. Any blank-screen click must
+    // reveal the authentication controls; interactive children remain above
+    // this first sibling and continue to receive their own pointer events.
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        onPressed: lockScreenUi.revealAuthentication()
+    }
+
     Column {
         id: clock
         anchors {
@@ -129,6 +158,7 @@ Item {
         PlasmaComponents3.Label {
             anchors.horizontalCenter: parent.horizontalCenter
             color: "#f3f8ff"
+            font.family: lockScreenUi.uiFontFamily
             font.pixelSize: Math.min(96, Math.max(52, lockScreenUi.height * 0.09))
             font.weight: Font.Normal
             text: Qt.formatTime(lockScreenUi.currentDate, "hh:mm")
@@ -139,6 +169,7 @@ Item {
         PlasmaComponents3.Label {
             anchors.horizontalCenter: parent.horizontalCenter
             color: Qt.rgba(0.93, 0.97, 1, 0.72)
+            font.family: lockScreenUi.uiFontFamily
             font.pixelSize: Math.min(18, Math.max(13, lockScreenUi.height * 0.016))
             font.weight: Font.Normal
             text: Qt.formatDate(lockScreenUi.currentDate, "dddd, d MMMM")
@@ -170,6 +201,7 @@ Item {
             echoMode: TextInput.Password
             enabled: !authenticator.graceLocked && !lockScreenUi.noPasswordConfirmation
             focus: true
+            font.family: lockScreenUi.uiFontFamily
             font.pixelSize: 17
             horizontalAlignment: TextInput.AlignHCenter
             opacity: lockScreenUi.passwordVisible && !lockScreenUi.noPasswordConfirmation ? 1 : 0
@@ -194,6 +226,13 @@ Item {
             onAccepted: {
                 if (root.viewVisible && text.length > 0) {
                     authenticator.respond(text)
+                }
+            }
+
+            onTextChanged: {
+                if (text.length > 0) {
+                    lockScreenUi.authenticationVisible = true
+                    revealTimer.restart()
                 }
             }
 
@@ -229,6 +268,7 @@ Item {
             color: lockScreenUi.authenticationFailed
                 ? Qt.rgba(1, 0.72, 0.7, 0.92)
                 : Qt.rgba(0.93, 0.97, 1, 0.75)
+            font.family: lockScreenUi.uiFontFamily
             font.pixelSize: 13
             text: capsLockState.locked
                 ? i18ndc("plasma_shell_org.kde.plasma.desktop", "@info:status", "Caps Lock is on")
@@ -329,6 +369,7 @@ Item {
 
             contentItem: PlasmaComponents3.Label {
                 color: Qt.rgba(0.94, 0.97, 1, 0.8)
+                font.family: lockScreenUi.uiFontFamily
                 horizontalAlignment: Text.AlignHCenter
                 text: moreButton.text
                 verticalAlignment: Text.AlignVCenter

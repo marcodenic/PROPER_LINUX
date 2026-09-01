@@ -21,6 +21,10 @@ xmllint --noout \
   "$wordmark" \
   "$project_root/packages/proper-branding/proper-wordmark-dark.svg" \
   "$project_root/packages/proper-branding/proper-logo-icon.svg" \
+  "$project_root/packages/proper-branding/proper-apps.svg" \
+  "$project_root/packages/proper-branding/proper-appearance.svg" \
+  "$project_root/packages/proper-branding/proper-shortcuts.svg" \
+  "$project_root/packages/proper-branding/proper-agent.svg" \
   "$project_root/packages/proper-release/org.properlinux.ProperLinux-0.1.swidtag"
 
 cell_count="$(rg -o '<use ' "$wordmark" | wc -l)"
@@ -40,6 +44,7 @@ grep -q 'publisher="Proper Linux"' "$media_patch"
 grep -q 'menuentry "Start Proper Linux"' "$media_patch"
 grep -q 'set default="0"' "$media_patch"
 grep -q 'proper-welcome.desktop' "$live_hook"
+! grep -q 'proper-start.desktop' "$live_hook"
 grep -q 'Hidden=true' "$live_hook"
 grep -q 'Install\\ Proper\\ Linux.desktop' "$live_hook"
 grep -q '<package name="generic-logos"/>' "$project_root/image/descriptions/proper.xml"
@@ -54,14 +59,34 @@ grep -q 'proper-ovmf-logo.bmp' "$project_root/scripts/build-vm-firmware"
 grep -q -- '-compress none "BMP3:$logo"' "$project_root/scripts/build-vm-firmware"
 grep -q 'firmware_profile="${PROPER_VM_FIRMWARE:-proper}"' "$project_root/scripts/run-vm"
 grep -q '/EFI/fedora/shimx64.efi' "$project_root/image/firmware/quiet-successful-boot.patch"
+grep -qx 'background-opacity = 0.88' "$project_root/packages/proper-terminal/ghostty.conf"
+grep -q 'org.freedesktop.ScreenSaver' "$project_root/packages/proper-welcome/main.cpp"
+grep -q 'org.freedesktop.PowerManagement.Inhibit' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'new QLabel("Proper Linux 0.1")' "$project_root/packages/proper-welcome/main.cpp"
+! grep -Fq 'Built on Fedora Linux' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'centre->setMinimumWidth(680)' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'headline->setMinimumHeight(56)' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'output.1.mode.1920x1080' "$project_root/packages/proper-welcome/proper-welcome-launch"
 grep -q 'QProcess::startDetached("/usr/bin/liveinst"' "$project_root/packages/proper-welcome/main.cpp"
+grep -q 'application.arguments().contains("--guide")' "$project_root/packages/proper-welcome/main.cpp"
+grep -q 'Exec=/usr/bin/proper-welcome --guide' "$project_root/packages/proper-welcome/proper-start.desktop"
+grep -q 'applications:proper-start' "$project_root/packages/proper-launchers/settings.json"
+grep -q 'proper-web.css' "$project_root/packages/proper-launchers/proper-shortcuts.html"
+grep -q 'generate-ui-assets.py' "$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
+grep -q 'function revealAuthentication()' "$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml"
+grep -q 'onPressed: lockScreenUi.revealAuthentication()' "$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml"
+grep -q 'proper-logo-icon.svg' "$project_root/packages/proper-look-and-feel/Splash.qml"
+grep -qx 'Theme=com.properlinux.dark.desktop' "$project_root/packages/proper-defaults/ksplashrc"
+! rg -q 'Theme=org[.]fedoraproject' "$project_root/packages/proper-look-and-feel" "$project_root/packages/proper-defaults"
 
 desktop-file-validate \
   "$project_root/packages/proper-welcome/proper-welcome.desktop" \
-  "$project_root/packages/proper-welcome/proper-install.desktop"
+  "$project_root/packages/proper-welcome/proper-install.desktop" \
+  "$project_root/packages/proper-welcome/proper-start.desktop"
 
 bash -n \
   "$project_root/packages/proper-branding/generate-plymouth-assets.sh" \
+  "$project_root/packages/proper-welcome/proper-welcome-launch" \
   "$project_root/scripts/build-vm-firmware" \
   "$project_root/scripts/run-vm" \
   "$live_hook"

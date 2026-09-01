@@ -1,0 +1,79 @@
+--- a/applets/taskmanager/qml/main.qml
++++ b/applets/taskmanager/qml/main.qml
+@@ -9,7 +9,6 @@
+ import QtQuick.Layouts
+ 
+ import org.kde.plasma.plasmoid
+-import org.kde.plasma.components as PlasmaComponents3
+ import org.kde.plasma.core as PlasmaCore
+ import org.kde.ksvg as KSvg
+ import org.kde.plasma.private.mpris as Mpris
+@@ -338,7 +337,67 @@
+ 
+         Component {
+             id: busyIndicator
+-            PlasmaComponents3.BusyIndicator {}
++
++            // Proper's launch state deliberately shares the shelf's existing
++            // indicator language: moving dot while launching, solid line when
++            // active, and a static dot when running in the background.  Keep
++            // the motion under the icon so it never obscures the artwork.
++            Item {
++                id: launchIndicator
++
++                property real travel: 0
++
++                implicitWidth: Kirigami.Units.gridUnit * 2
++                implicitHeight: Kirigami.Units.gridUnit * 2
++
++                Rectangle {
++                    id: launchTrack
++
++                    anchors {
++                        horizontalCenter: parent.horizontalCenter
++                        bottom: parent.bottom
++                    }
++                    width: Math.min(parent.width * 0.55, Kirigami.Units.gridUnit * 1.25)
++                    height: 2
++                    radius: 1
++                    color: Kirigami.Theme.highlightColor
++                    opacity: 0.30
++
++                    Rectangle {
++                        width: 4
++                        height: 4
++                        radius: 2
++                        x: (launchTrack.width - width)
++                            * (launchMotion.running ? launchIndicator.travel : 0.5)
++                        anchors.verticalCenter: parent.verticalCenter
++                        color: Kirigami.Theme.highlightColor
++                    }
++                }
++
++                SequentialAnimation {
++                    id: launchMotion
++
++                    running: launchIndicator.visible && Kirigami.Units.longDuration > 1
++                    loops: Animation.Infinite
++
++                    NumberAnimation {
++                        target: launchIndicator
++                        property: "travel"
++                        from: 0
++                        to: 1
++                        duration: 700
++                        easing.type: Easing.InOutSine
++                    }
++                    NumberAnimation {
++                        target: launchIndicator
++                        property: "travel"
++                        from: 1
++                        to: 0
++                        duration: 700
++                        easing.type: Easing.InOutSine
++                    }
++                }
++            }
+         }
+ 
+         // Save drag data

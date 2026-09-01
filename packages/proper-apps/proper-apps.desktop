@@ -3,5 +3,5 @@ Type=Application
 Name=Proper Apps
 Comment=Curated software catalogue
 Exec=proper-apps
-Icon=system-software-install
+Icon=proper-apps
 Categories=System;PackageManager;

@@ -3,6 +3,6 @@ Type=Application
 Name=Proper Terminal
 Comment=Open Ghostty
 Exec=ghostty
-Icon=utilities-terminal
+Icon=com.mitchellh.ghostty
 Categories=System;TerminalEmulator;
 StartupNotify=true

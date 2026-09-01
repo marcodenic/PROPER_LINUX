@@ -1,14 +1,14 @@
 {
   "schema": "org.properlinux.catalogue",
   "version": 2,
-  "generated": "2026-08-31",
+  "generated": "2026-09-01",
   "entries": [
     {
       "id": "chromium", "name": "Chromium", "kind": "application", "category": "Browsers",
       "description": "Proper's fast, open-source default web browser.", "homepage": "https://www.chromium.org/",
       "source_url": "https://packages.fedoraproject.org/pkgs/chromium/chromium/", "provider": "fedora", "provider_id": "chromium",
       "status": "Fedora-maintained", "license": "BSD-3-Clause and component licences", "architectures": ["x86_64"],
-      "icon": "chromium-browser", "accent": "#4C8BF5", "recommended": true, "removable": false, "validated": "2026-08-31",
+      "icon": "chromium-browser", "accent": "#4C8BF5", "recommended": false, "removable": false, "validated": "2026-08-31",
       "tags": ["web", "default", "browser"], "detection": {"type": "rpm", "value": "chromium"}, "launch_args": ["chromium-browser"]
     },
     {
@@ -21,6 +21,24 @@
       "install_steps": [{"program": "dnf", "args": ["install", "-y", "https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm"], "privileged": true}],
       "uninstall_steps": [{"program": "dnf", "args": ["remove", "-y", "google-chrome-stable"], "privileged": true}],
       "launch_args": ["google-chrome"]
+    },
+    {
+      "id": "helium", "name": "Helium", "kind": "application", "category": "Browsers",
+      "description": "A fast, private Chromium browser with a deliberately minimal product experience.", "homepage": "https://helium.computer/",
+      "source_url": "https://github.com/imputnet/helium-linux", "provider": "vendor", "provider_id": "imput/helium",
+      "status": "Official Helium COPR", "license": "GPL-3.0-only and Chromium component licences", "architectures": ["x86_64"],
+      "icon": "helium", "accent": "#3450D1", "recommended": true, "removable": true, "validated": "2026-09-01",
+      "caveat": "The official package is maintained by Helium in COPR rather than by Fedora.",
+      "detection": {"type": "rpm", "value": "helium-bin"},
+      "install_steps": [
+        {"program": "dnf", "args": ["copr", "enable", "-y", "imput/helium"], "privileged": true},
+        {"program": "dnf", "args": ["install", "-y", "helium-bin"], "privileged": true}
+      ],
+      "uninstall_steps": [
+        {"program": "dnf", "args": ["remove", "-y", "helium-bin"], "privileged": true},
+        {"program": "dnf", "args": ["copr", "disable", "-y", "imput/helium"], "privileged": true}
+      ],
+      "launch_args": ["helium"]
     },
     {
       "id": "brave", "name": "Brave", "kind": "application", "category": "Browsers",
@@ -52,7 +70,7 @@
       "description": "A calm Firefox-based browser with vertical tabs and split views.", "homepage": "https://zen-browser.app/",
       "source_url": "https://flathub.org/apps/app.zen_browser.zen", "provider": "flatpak", "provider_id": "app.zen_browser.zen",
       "status": "Flathub catalogue", "license": "MPL-2.0 and component licences", "architectures": ["x86_64"],
-      "icon": "app.zen_browser.zen", "accent": "#7B70F5", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "app.zen_browser.zen", "accent": "#7B70F5", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "app.zen_browser.zen"}, "launch_args": ["flatpak", "run", "app.zen_browser.zen"]
     },
     {
@@ -60,7 +78,7 @@
       "description": "Voice, video, and community chat.", "homepage": "https://discord.com/",
       "source_url": "https://flathub.org/apps/com.discordapp.Discord", "provider": "flatpak", "provider_id": "com.discordapp.Discord",
       "status": "Community-maintained Flathub package", "license": "Proprietary", "architectures": ["x86_64"],
-      "icon": "com.discordapp.Discord", "accent": "#5865F2", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "com.discordapp.Discord", "accent": "#5865F2", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "com.discordapp.Discord"}, "launch_args": ["flatpak", "run", "com.discordapp.Discord"]
     },
     {
@@ -116,7 +134,7 @@
       "description": "Record and stream your screen, camera, and audio.", "homepage": "https://obsproject.com/",
       "source_url": "https://flathub.org/apps/com.obsproject.Studio", "provider": "flatpak", "provider_id": "com.obsproject.Studio",
       "status": "Flathub catalogue", "license": "GPL-2.0-or-later", "architectures": ["x86_64"],
-      "icon": "com.obsproject.Studio", "accent": "#4A4A4A", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "com.obsproject.Studio", "accent": "#4A4A4A", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "com.obsproject.Studio"}, "launch_args": ["flatpak", "run", "com.obsproject.Studio"]
     },
     {
@@ -124,7 +142,7 @@
       "description": "An open-source password manager with cross-device sync.", "homepage": "https://bitwarden.com/download/",
       "source_url": "https://flathub.org/apps/com.bitwarden.desktop", "provider": "flatpak", "provider_id": "com.bitwarden.desktop",
       "status": "Flathub catalogue", "license": "GPL-3.0-only client", "architectures": ["x86_64"],
-      "icon": "com.bitwarden.desktop", "accent": "#175DDC", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "com.bitwarden.desktop", "accent": "#175DDC", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "com.bitwarden.desktop"}, "launch_args": ["flatpak", "run", "com.bitwarden.desktop"]
     },
     {
@@ -140,7 +158,7 @@
       "description": "A local Markdown knowledge base with links, plugins, and canvas.", "homepage": "https://obsidian.md/",
       "source_url": "https://flathub.org/apps/md.obsidian.Obsidian", "provider": "flatpak", "provider_id": "md.obsidian.Obsidian",
       "status": "Community-maintained Flathub package", "license": "Proprietary application", "architectures": ["x86_64"],
-      "icon": "md.obsidian.Obsidian", "accent": "#8B5CF6", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "md.obsidian.Obsidian", "accent": "#8B5CF6", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "md.obsidian.Obsidian"}, "launch_args": ["flatpak", "run", "md.obsidian.Obsidian"]
     },
     {
@@ -165,7 +183,7 @@
       "description": "Microsoft's stable code editor with a large extension ecosystem.", "homepage": "https://code.visualstudio.com/",
       "source_url": "https://code.visualstudio.com/docs/setup/linux", "provider": "vendor", "provider_id": "code",
       "status": "Official Microsoft repository", "license": "Microsoft proprietary distribution", "architectures": ["x86_64"],
-      "icon": "visual-studio-code", "accent": "#23A8F2", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "visual-studio-code", "accent": "#23A8F2", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "command", "value": "code"},
       "install_steps": [
         {"program": "dnf", "args": ["config-manager", "addrepo", "--overwrite", "--from-repofile=https://packages.microsoft.com/yumrepos/vscode/config.repo"], "privileged": true},
@@ -191,7 +209,7 @@
       "description": "A fast collaborative editor built in Rust.", "homepage": "https://zed.dev/linux",
       "source_url": "https://flathub.org/apps/dev.zed.Zed", "provider": "flatpak", "provider_id": "dev.zed.Zed",
       "status": "Flathub catalogue", "license": "GPL-3.0-or-later and AGPL-3.0-or-later components", "architectures": ["x86_64"],
-      "icon": "dev.zed.Zed", "accent": "#0C7C59", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "dev.zed.Zed", "accent": "#0C7C59", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "dev.zed.Zed"}, "launch_args": ["flatpak", "run", "dev.zed.Zed"]
     },
     {
@@ -215,7 +233,7 @@
       "description": "Docker Engine, Compose, Buildx, and containerd from Docker's Fedora repository.", "homepage": "https://docs.docker.com/engine/install/fedora/",
       "source_url": "https://docs.docker.com/engine/install/fedora/", "provider": "vendor", "provider_id": "docker-ce",
       "status": "Official Docker repository", "license": "Apache-2.0 client and component licences", "architectures": ["x86_64"],
-      "icon": "docker", "accent": "#2496ED", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "docker", "accent": "#2496ED", "recommended": false, "removable": true, "validated": "2026-08-31",
       "caveat": "The engine service and non-root group access remain explicit system choices after installation.",
       "detection": {"type": "command", "value": "docker"},
       "install_steps": [
@@ -230,7 +248,7 @@
       "description": "Fedora's rootless Podman, Skopeo, and Toolbox environment tools.", "homepage": "https://podman.io/",
       "source_url": "https://packages.fedoraproject.org/pkgs/podman/podman/", "provider": "fedora", "provider_id": "podman",
       "status": "Fedora-maintained capability set", "license": "Apache-2.0 and component licences", "architectures": ["x86_64"],
-      "icon": "podman", "accent": "#892CA0", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "podman", "accent": "#892CA0", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "rpm", "value": "podman"},
       "install_steps": [{"program": "dnf", "args": ["install", "-y", "podman", "skopeo", "toolbox"], "privileged": true}],
       "uninstall_steps": [{"program": "dnf", "args": ["remove", "-y", "podman", "skopeo", "toolbox"], "privileged": true}], "launch_args": []
@@ -260,7 +278,21 @@
       "detection": {"type": "rpm", "value": "emacs"}, "launch_args": ["emacs"]
     },
     {
-      "id": "codex", "name": "Codex", "kind": "application", "category": "AI",
+      "id": "codex-desktop", "name": "Codex desktop", "kind": "application", "category": "AI",
+      "description": "The Codex workspace inside OpenAI's official ChatGPT desktop app for Linux.", "homepage": "https://openai.com/codex/",
+      "source_url": "https://chatgpt.com/download/", "provider": "vendor", "provider_id": "chatgpt",
+      "status": "Official OpenAI Linux preview", "license": "Proprietary; provider terms apply", "architectures": ["x86_64"],
+      "icon": "chatgpt", "accent": "#0080F7", "recommended": true, "removable": true, "validated": "2026-09-01",
+      "caveat": "OpenAI currently labels the Linux app a public preview. The pinned bootstrap RPM configures OpenAI's repository for later updates.",
+      "detection": {"type": "rpm", "value": "chatgpt"},
+      "install_steps": [
+        {"program": "dnf", "args": ["install", "-y", "https://persistent.oaistatic.com/codex-app-prod/linux/rpm/x86_64/chatgpt-26.825.51511-1.x86_64.rpm"], "privileged": true}
+      ],
+      "uninstall_steps": [{"program": "dnf", "args": ["remove", "-y", "chatgpt"], "privileged": true}],
+      "launch_args": ["chatgpt"]
+    },
+    {
+      "id": "codex", "name": "Codex CLI", "kind": "application", "category": "AI",
       "description": "OpenAI's coding agent, launched in Ghostty with provider-managed sign-in.", "homepage": "https://developers.openai.com/codex/",
       "source_url": "https://www.npmjs.com/package/@openai/codex", "provider": "vendor", "provider_id": "@openai/codex",
       "status": "Official OpenAI npm package", "license": "Apache-2.0 client; provider terms apply", "architectures": ["x86_64"],
@@ -274,7 +306,7 @@
       "launch_args": ["ghostty", "-e", "codex"]
     },
     {
-      "id": "claude-code", "name": "Claude Code", "kind": "application", "category": "AI",
+      "id": "claude-code", "name": "Claude Code CLI", "kind": "application", "category": "AI",
       "description": "Anthropic's coding agent, installed for your user and launched in Ghostty.", "homepage": "https://docs.anthropic.com/en/docs/claude-code/overview",
       "source_url": "https://www.npmjs.com/package/@anthropic-ai/claude-code", "provider": "vendor", "provider_id": "@anthropic-ai/claude-code",
       "status": "Official Anthropic npm package", "license": "Proprietary client; provider terms apply", "architectures": ["x86_64"],
@@ -292,7 +324,7 @@
       "description": "An open-source terminal coding agent with many model providers.", "homepage": "https://opencode.ai/",
       "source_url": "https://www.npmjs.com/package/opencode-ai", "provider": "vendor", "provider_id": "opencode-ai",
       "status": "Official OpenCode npm package", "license": "MIT", "architectures": ["x86_64"],
-      "icon": "applications-development", "accent": "#111111", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "applications-development", "accent": "#111111", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "command", "value": "opencode"},
       "install_steps": [
         {"program": "dnf", "args": ["install", "-y", "nodejs24", "nodejs24-npm"], "privileged": true},
@@ -338,7 +370,7 @@
       "description": "Professional 3D modelling, animation, rendering, and compositing.", "homepage": "https://www.blender.org/",
       "source_url": "https://flathub.org/apps/org.blender.Blender", "provider": "flatpak", "provider_id": "org.blender.Blender",
       "status": "Flathub catalogue", "license": "GPL-3.0-or-later", "architectures": ["x86_64"],
-      "icon": "org.blender.Blender", "accent": "#E87D0D", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "org.blender.Blender", "accent": "#E87D0D", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "org.blender.Blender"}, "launch_args": ["flatpak", "run", "org.blender.Blender"]
     },
     {
@@ -346,7 +378,7 @@
       "description": "A powerful painting and illustration studio.", "homepage": "https://krita.org/",
       "source_url": "https://flathub.org/apps/org.kde.krita", "provider": "flatpak", "provider_id": "org.kde.krita",
       "status": "Flathub catalogue", "license": "GPL-3.0-or-later", "architectures": ["x86_64"],
-      "icon": "org.kde.krita", "accent": "#3BABFF", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "org.kde.krita", "accent": "#3BABFF", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "org.kde.krita"}, "launch_args": ["flatpak", "run", "org.kde.krita"]
     },
     {
@@ -370,7 +402,7 @@
       "description": "A capable non-linear video editor from KDE.", "homepage": "https://kdenlive.org/",
       "source_url": "https://flathub.org/apps/org.kde.kdenlive", "provider": "flatpak", "provider_id": "org.kde.kdenlive",
       "status": "Flathub catalogue", "license": "GPL-3.0-or-later", "architectures": ["x86_64"],
-      "icon": "org.kde.kdenlive", "accent": "#527EB2", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "org.kde.kdenlive", "accent": "#527EB2", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "org.kde.kdenlive"}, "launch_args": ["flatpak", "run", "org.kde.kdenlive"]
     },
     {
@@ -378,7 +410,7 @@
       "description": "Valve's PC game library, store, and Proton compatibility platform.", "homepage": "https://store.steampowered.com/about/",
       "source_url": "https://flathub.org/apps/com.valvesoftware.Steam", "provider": "flatpak", "provider_id": "com.valvesoftware.Steam",
       "status": "Flathub catalogue", "license": "Proprietary client and redistributable components", "architectures": ["x86_64"],
-      "icon": "com.valvesoftware.Steam", "accent": "#1B2838", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "com.valvesoftware.Steam", "accent": "#1B2838", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "com.valvesoftware.Steam"}, "launch_args": ["flatpak", "run", "com.valvesoftware.Steam"]
     },
     {
@@ -386,7 +418,7 @@
       "description": "A launcher for Epic, GOG, and Amazon game libraries.", "homepage": "https://heroicgameslauncher.com/",
       "source_url": "https://flathub.org/apps/com.heroicgameslauncher.hgl", "provider": "flatpak", "provider_id": "com.heroicgameslauncher.hgl",
       "status": "Flathub catalogue", "license": "GPL-3.0-only", "architectures": ["x86_64"],
-      "icon": "com.heroicgameslauncher.hgl", "accent": "#6F46C1", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "com.heroicgameslauncher.hgl", "accent": "#6F46C1", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "com.heroicgameslauncher.hgl"}, "launch_args": ["flatpak", "run", "com.heroicgameslauncher.hgl"]
     },
     {
@@ -418,7 +450,7 @@
       "description": "Review and adjust permissions granted to installed Flatpak applications.", "homepage": "https://github.com/tchx84/Flatseal",
       "source_url": "https://flathub.org/apps/com.github.tchx84.Flatseal", "provider": "flatpak", "provider_id": "com.github.tchx84.Flatseal",
       "status": "Flathub catalogue", "license": "GPL-3.0-or-later", "architectures": ["x86_64"],
-      "icon": "com.github.tchx84.Flatseal", "accent": "#3584E4", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "com.github.tchx84.Flatseal", "accent": "#3584E4", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "com.github.tchx84.Flatseal"}, "launch_args": ["flatpak", "run", "com.github.tchx84.Flatseal"]
     },
     {
@@ -426,7 +458,7 @@
       "description": "Send files securely between nearby devices without a cloud account.", "homepage": "https://localsend.org/",
       "source_url": "https://flathub.org/apps/org.localsend.localsend_app", "provider": "flatpak", "provider_id": "org.localsend.localsend_app",
       "status": "Flathub catalogue", "license": "Apache-2.0", "architectures": ["x86_64"],
-      "icon": "org.localsend.localsend_app", "accent": "#3F51B5", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "org.localsend.localsend_app", "accent": "#3F51B5", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "org.localsend.localsend_app"}, "launch_args": ["flatpak", "run", "org.localsend.localsend_app"]
     },
     {
@@ -442,7 +474,7 @@
       "description": "Proper's readable terminal system monitor.", "homepage": "https://github.com/aristocratos/btop",
       "source_url": "https://packages.fedoraproject.org/pkgs/btop/btop/", "provider": "fedora", "provider_id": "btop",
       "status": "Fedora-maintained", "license": "Apache-2.0 and bundled component licences", "architectures": ["x86_64"],
-      "icon": "utilities-system-monitor", "accent": "#E86A92", "recommended": true, "removable": false, "validated": "2026-08-31",
+      "icon": "utilities-system-monitor", "accent": "#E86A92", "recommended": false, "removable": false, "validated": "2026-08-31",
       "detection": {"type": "rpm", "value": "btop"}, "launch_args": ["ghostty", "-e", "btop"]
     },
     {
@@ -450,7 +482,7 @@
       "description": "A private mesh network for reaching your computers and services securely.", "homepage": "https://tailscale.com/",
       "source_url": "https://packages.fedoraproject.org/pkgs/tailscale/tailscale/", "provider": "fedora", "provider_id": "tailscale",
       "status": "Fedora-maintained", "license": "BSD-3-Clause", "architectures": ["x86_64"],
-      "icon": "network-vpn", "accent": "#202020", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "network-vpn", "accent": "#202020", "recommended": false, "removable": true, "validated": "2026-08-31",
       "caveat": "Connecting a tailnet still requires Tailscale authentication and enabling its service.",
       "detection": {"type": "rpm", "value": "tailscale"}, "launch_args": []
     },

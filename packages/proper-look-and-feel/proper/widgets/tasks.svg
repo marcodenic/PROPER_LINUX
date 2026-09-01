@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: 2026 Proper Linux contributors -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Proper's icon-task states follow the PM-approved shelf language:
+     active/focused = short line, running/inactive = dot. Transparent geometry
+     is deliberately non-zero-alpha so Plasma does not fall back to Breeze. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="72" viewBox="0 0 260 72">
+  <defs>
+    <style id="current-color-scheme" type="text/css">
+      .ColorScheme-Text { color: #aeb9c5; }
+      .ColorScheme-ButtonFocus { color: #79c8ff; }
+      .ColorScheme-NeutralText { color: #f07b91; }
+    </style>
+  </defs>
+
+  <!-- Running, inactive: a quiet centred dot. -->
+  <g id="normal-topleft"><rect width="17" height="29" fill="#000" fill-opacity="0.001"/></g>
+  <g id="normal-top" transform="translate(17)"><rect width="2" height="29" fill="#000" fill-opacity="0.001"/></g>
+  <g id="normal-topright" transform="translate(19)"><rect width="17" height="29" fill="#000" fill-opacity="0.001"/></g>
+  <g id="normal-left" transform="translate(0 29)"><rect width="17" height="1" fill="#000" fill-opacity="0.001"/></g>
+  <g id="normal-center" transform="translate(17 29)"><rect width="2" height="1" fill="#000" fill-opacity="0.001"/></g>
+  <g id="normal-right" transform="translate(19 29)"><rect width="17" height="1" fill="#000" fill-opacity="0.001"/></g>
+  <g id="normal-bottomleft" transform="translate(0 30)"><rect width="17" height="6" fill="#000" fill-opacity="0.001"/></g>
+  <g id="normal-bottom" transform="translate(17 30)">
+    <rect width="2" height="6" fill="#000" fill-opacity="0.001"/>
+    <rect y="1" width="2" height="4" rx="1" class="ColorScheme-Text" fill="currentColor" opacity="0.88"/>
+  </g>
+  <g id="normal-bottomright" transform="translate(19 30)"><rect width="17" height="6" fill="#000" fill-opacity="0.001"/></g>
+
+  <!-- Active/focused: a short cool line, with no filled tile behind the icon. -->
+  <g id="focus-topleft" transform="translate(44)"><rect width="7" height="28" fill="#000" fill-opacity="0.001"/></g>
+  <g id="focus-top" transform="translate(51)"><rect width="22" height="28" fill="#000" fill-opacity="0.001"/></g>
+  <g id="focus-topright" transform="translate(73)"><rect width="7" height="28" fill="#000" fill-opacity="0.001"/></g>
+  <g id="focus-left" transform="translate(44 28)"><rect width="7" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="focus-center" transform="translate(51 28)"><rect width="22" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="focus-right" transform="translate(73 28)"><rect width="7" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="focus-bottomleft" transform="translate(44 32)"><rect width="7" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="focus-bottom" transform="translate(51 32)">
+    <rect width="22" height="4" rx="2" class="ColorScheme-ButtonFocus" fill="currentColor"/>
+  </g>
+  <g id="focus-bottomright" transform="translate(73 32)"><rect width="7" height="4" fill="#000" fill-opacity="0.001"/></g>
+
+  <!-- Hover is intentionally shape-free: no halo, circle, or filled square. -->
+  <g id="hover-topleft" transform="translate(88)"><rect width="4" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="hover-top" transform="translate(92)"><rect width="28" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="hover-topright" transform="translate(120)"><rect width="4" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="hover-left" transform="translate(88 4)"><rect width="4" height="28" fill="#000" fill-opacity="0.001"/></g>
+  <g id="hover-center" transform="translate(92 4)"><rect width="28" height="28" fill="#000" fill-opacity="0.001"/></g>
+  <g id="hover-right" transform="translate(120 4)"><rect width="4" height="28" fill="#000" fill-opacity="0.001"/></g>
+  <g id="hover-bottomleft" transform="translate(88 32)"><rect width="4" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="hover-bottom" transform="translate(92 32)"><rect width="28" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="hover-bottomright" transform="translate(120 32)"><rect width="4" height="4" fill="#000" fill-opacity="0.001"/></g>
+
+  <!-- Minimized windows retain the running dot at lower emphasis. -->
+  <g id="minimized-topleft" transform="translate(132)"><rect width="17" height="29" fill="#000" fill-opacity="0.001"/></g>
+  <g id="minimized-top" transform="translate(149)"><rect width="2" height="29" fill="#000" fill-opacity="0.001"/></g>
+  <g id="minimized-topright" transform="translate(151)"><rect width="17" height="29" fill="#000" fill-opacity="0.001"/></g>
+  <g id="minimized-left" transform="translate(132 29)"><rect width="17" height="1" fill="#000" fill-opacity="0.001"/></g>
+  <g id="minimized-center" transform="translate(149 29)"><rect width="2" height="1" fill="#000" fill-opacity="0.001"/></g>
+  <g id="minimized-right" transform="translate(151 29)"><rect width="17" height="1" fill="#000" fill-opacity="0.001"/></g>
+  <g id="minimized-bottomleft" transform="translate(132 30)"><rect width="17" height="6" fill="#000" fill-opacity="0.001"/></g>
+  <g id="minimized-bottom" transform="translate(149 30)">
+    <rect width="2" height="6" fill="#000" fill-opacity="0.001"/>
+    <rect y="1" width="2" height="4" rx="1" class="ColorScheme-Text" fill="currentColor" opacity="0.58"/>
+  </g>
+  <g id="minimized-bottomright" transform="translate(151 30)"><rect width="17" height="6" fill="#000" fill-opacity="0.001"/></g>
+
+  <!-- Attention remains a dot, changing only to the restrained alert colour. -->
+  <g id="attention-topleft" transform="translate(176)"><rect width="16" height="29" fill="#000" fill-opacity="0.001"/></g>
+  <g id="attention-top" transform="translate(192)"><rect width="4" height="29" fill="#000" fill-opacity="0.001"/></g>
+  <g id="attention-topright" transform="translate(196)"><rect width="16" height="29" fill="#000" fill-opacity="0.001"/></g>
+  <g id="attention-left" transform="translate(176 29)"><rect width="16" height="1" fill="#000" fill-opacity="0.001"/></g>
+  <g id="attention-center" transform="translate(192 29)"><rect width="4" height="1" fill="#000" fill-opacity="0.001"/></g>
+  <g id="attention-right" transform="translate(196 29)"><rect width="16" height="1" fill="#000" fill-opacity="0.001"/></g>
+  <g id="attention-bottomleft" transform="translate(176 30)"><rect width="16" height="6" fill="#000" fill-opacity="0.001"/></g>
+  <g id="attention-bottom" transform="translate(192 30)">
+    <rect width="4" height="6" fill="#000" fill-opacity="0.001"/>
+    <circle cx="2" cy="3" r="2" class="ColorScheme-NeutralText" fill="currentColor"/>
+  </g>
+  <g id="attention-bottomright" transform="translate(196 30)"><rect width="16" height="6" fill="#000" fill-opacity="0.001"/></g>
+
+  <!-- Launch progress uses the active line language without a background. -->
+  <g id="progress-topleft" transform="translate(220)"><rect width="7" height="28" fill="#000" fill-opacity="0.001"/></g>
+  <g id="progress-top" transform="translate(227)"><rect width="22" height="28" fill="#000" fill-opacity="0.001"/></g>
+  <g id="progress-topright" transform="translate(249)"><rect width="7" height="28" fill="#000" fill-opacity="0.001"/></g>
+  <g id="progress-left" transform="translate(220 28)"><rect width="7" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="progress-center" transform="translate(227 28)"><rect width="22" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="progress-right" transform="translate(249 28)"><rect width="7" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="progress-bottomleft" transform="translate(220 32)"><rect width="7" height="4" fill="#000" fill-opacity="0.001"/></g>
+  <g id="progress-bottom" transform="translate(227 32)"><rect width="22" height="4" rx="2" class="ColorScheme-ButtonFocus" fill="currentColor" opacity="0.72"/></g>
+  <g id="progress-bottomright" transform="translate(249 32)"><rect width="7" height="4" fill="#000" fill-opacity="0.001"/></g>
+
+  <!-- Symmetric content margins keep every state centred on its task icon. -->
+  <g fill="#f0f">
+    <rect id="normal-hint-top-margin" x="2" y="48" width="1" height="2"/>
+    <rect id="normal-hint-bottom-margin" x="4" y="48" width="1" height="2"/>
+    <rect id="normal-hint-left-margin" x="6" y="48" width="2" height="1"/>
+    <rect id="normal-hint-right-margin" x="6" y="50" width="2" height="1"/>
+    <rect id="focus-hint-top-margin" x="46" y="48" width="1" height="2"/>
+    <rect id="focus-hint-bottom-margin" x="48" y="48" width="1" height="2"/>
+    <rect id="focus-hint-left-margin" x="50" y="48" width="2" height="1"/>
+    <rect id="focus-hint-right-margin" x="50" y="50" width="2" height="1"/>
+  </g>
+</svg>

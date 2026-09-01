@@ -1,6 +1,6 @@
 Name: proper-terminal
 Version: 1.3.1
-Release: 1%{?dist}
+Release: 3%{?dist}
 Summary: Ghostty terminal and Proper developer essentials
 License: MIT
 URL: https://ghostty.org/
@@ -27,6 +27,7 @@ Requires: git
 Requires: ripgrep
 Requires: fd-find
 Requires: fzf
+Requires: jetbrains-mono-fonts
 Requires: wl-clipboard
 BuildArch: x86_64
 %global debug_package %{nil}
@@ -65,6 +66,13 @@ install -Dpm 0644 %{SOURCE3} %{buildroot}%{_datadir}/kio/servicemenus/proper-ter
 %config(noreplace) %{_sysconfdir}/skel/.config/ghostty/config
 %config(noreplace) %{_sysconfdir}/xdg/ghostty/config
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 1.3.1-3
+- Require the Fedora JetBrains Mono package used by the terminal configuration
+
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 1.3.1-2
+- Rebuild the finalized ext-background-effect protocol backport
+- Increase restrained terminal translucency to a visibly distinct 88 percent
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 1.3.1-1
 - Update to the signed Ghostty 1.3.1 release and Zig 0.15.2 toolchain
 - Add restrained 92 percent background opacity aligned to Proper Horizon tokens

@@ -14,7 +14,7 @@ else
 fi
 build_source_dir="$iso_dir/source"
 
-for binary in git lsinitrd patch sha256sum xorriso; do
+for binary in fc-scan git lsinitrd patch sha256sum xmllint xorriso; do
   command -v "$binary" >/dev/null 2>&1 || { printf 'Required command missing: %s\n' "$binary" >&2; exit 1; }
 done
 [[ -n "$UPSTREAM_COMMIT" ]] || { printf 'Fedora input is not pinned. Run scripts/pin-fedora-base, review the lock, then rerun.\n' >&2; exit 1; }
@@ -43,9 +43,9 @@ mkdir -p "$build_source_dir"
 if [[ "${PROPER_BASELINE:-0}" == 1 ]]; then
   kiwi_file=/source/Fedora.kiwi
 else
-  if [[ ! -d "$output_root/repo/repodata" ]]; then
-    PROPER_OUTPUT_DIR="$output_root" "$project_root/scripts/build-rpms"
-  fi
+  # Repository existence does not prove that its RPM payloads match the
+  # current source tree. Rebuild the curated set for every product image.
+  PROPER_OUTPUT_DIR="$output_root" "$project_root/scripts/build-rpms"
   cp -a "$project_root/image/descriptions/proper.xml" "$build_source_dir/proper.xml"
   patch --batch --forward -d "$build_source_dir" -p1 < "$project_root/image/descriptions/proper-media.patch"
   # Fedora's upstream hook ends with `exit 0`.  Insert our live-session hook
@@ -119,6 +119,58 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       exit 1
     }
   done
+  grep -Eq '^proper-look-and-feel\|\(none\)\|0[.]1\|21[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the Inter-based Proper shell package release.\n' >&2
+    exit 1
+  }
+  grep -Eq '^proper-defaults\|\(none\)\|0[.]1\|21[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the Inter-based desktop defaults release.\n' >&2
+    exit 1
+  }
+  grep -Eq '^plasma-desktop\|\(none\)\|6[.]7[.]4\|1[.]fc44[.]proper1\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the pinned Proper task-launch indicator patch.\n' >&2
+    exit 1
+  }
+  grep -Eq '^plasma-login-manager\|\(none\)\|6[.]7[.]4\|1[.]proper3[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the Inter-based Proper login composition.\n' >&2
+    exit 1
+  }
+  grep -Eq '^proper-branding\|\(none\)\|0[.]1\|3[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the Inter-based Proper boot branding release.\n' >&2
+    exit 1
+  }
+  grep -Eq '^proper-terminal\|\(none\)\|1[.]3[.]1\|3[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the JetBrains-Mono-declared Ghostty package release.\n' >&2
+    exit 1
+  }
+  grep -Eq '^proper-welcome\|\(none\)\|0[.]1\|6[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the Inter-token welcome and Start Here release.\n' >&2
+    exit 1
+  }
+  grep -Eq '^proper-apps\|\(none\)\|0[.]1\|9[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the Inter-token Proper Apps release.\n' >&2
+    exit 1
+  }
+  grep -Eq '^proper-appearance\|\(none\)\|0[.]1\|5[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the Inter-preserving Appearance release.\n' >&2
+    exit 1
+  }
+  grep -Eq '^proper-launchers\|\(none\)\|0[.]1\|13[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the Inter-token shortcut reference release.\n' >&2
+    exit 1
+  }
+  grep -Eq '^rsms-inter-fonts\|\(none\)\|4[.]1\|3[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Fedora Inter 4.1 package is missing or changed without review.\n' >&2
+    exit 1
+  }
+  grep -Eq '^google-noto-sans-fonts\|' "${package_manifests[0]}" || {
+    printf 'Noto Sans fallback package is missing from the Proper image.\n' >&2
+    exit 1
+  }
+  grep -Eq '^jetbrains-mono-fonts\|' "${package_manifests[0]}" || {
+    printf 'JetBrains Mono terminal font package is missing from the Proper image.\n' >&2
+    exit 1
+  }
   if grep -Eq '^fedora-release-identity-kde-desktop\|' "${package_manifests[0]}"; then
     printf 'Fedora KDE edition identity remained installed beside proper-release.\n' >&2
     exit 1
@@ -141,6 +193,131 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image does not select the Proper Plymouth theme: %s\n' "$image_plymouth_config" >&2
     exit 1
   }
+  image_dark_scheme="$iso_dir/image-build/build/image-root/usr/share/color-schemes/Proper.colors"
+  image_kdeglobals="$iso_dir/image-build/build/image-root/etc/xdg/kdeglobals"
+  image_root="$iso_dir/image-build/build/image-root"
+  dark_window_rgb="$(awk '
+    /^\[Colors:Window\]$/ { in_window = 1; next }
+    /^\[/ { in_window = 0 }
+    in_window && /^BackgroundNormal=/ { sub(/^BackgroundNormal=/, ""); print; exit }
+  ' "$image_dark_scheme")"
+  IFS=, read -r dark_red dark_green dark_blue <<<"$dark_window_rgb"
+  [[ "$dark_red" =~ ^[0-9]+$ && "$dark_green" =~ ^[0-9]+$ && "$dark_blue" =~ ^[0-9]+$ ]] &&
+    (( dark_red < 80 && dark_green < 80 && dark_blue < 80 )) || {
+      printf 'Proper Dark image palette is not dark: %s\n' "${dark_window_rgb:-missing}" >&2
+      exit 1
+    }
+  grep -q '^\[Colors:View\]$' "$image_kdeglobals" &&
+    grep -qx 'BackgroundNormal=21,26,34' "$image_kdeglobals" || {
+      printf 'Built image does not seed the complete dark Proper application palette.\n' >&2
+      exit 1
+    }
+  for font_default in \
+    'desktopFont=Inter,10,-1,5,50,0,0,0,0,0' \
+    'font=Inter,10,-1,5,50,0,0,0,0,0' \
+    'menuFont=Inter,10,-1,5,50,0,0,0,0,0' \
+    'smallestReadableFont=Inter,8,-1,5,50,0,0,0,0,0' \
+    'toolBarFont=Inter,9,-1,5,50,0,0,0,0,0' \
+    'activeFont=Inter,9,-1,5,50,0,0,0,0,0'; do
+    grep -Fqx "$font_default" "$image_kdeglobals" || {
+      printf 'Built image is missing an Inter KDE default: %s\n' "$font_default" >&2
+      exit 1
+    }
+  done
+  grep -Fqx 'fixed=JetBrains Mono,10,-1,5,50,0,0,0,0,0' "$image_kdeglobals" || {
+    printf 'Built image does not retain JetBrains Mono for fixed-width KDE text.\n' >&2
+    exit 1
+  }
+  for gtk_version in 3.0 4.0; do
+    grep -Fqx 'gtk-font-name=Inter 10' "$image_root/etc/gtk-$gtk_version/settings.ini" || {
+      printf 'Built image GTK %s default is not Inter.\n' "$gtk_version" >&2
+      exit 1
+    }
+  done
+  image_inter_font="$image_root/usr/share/fonts/rsms-inter-fonts/Inter-Regular.ttf"
+  [[ -f "$image_inter_font" ]] || {
+    printf 'Built image is missing Inter-Regular.ttf.\n' >&2
+    exit 1
+  }
+  [[ "$(fc-scan --format '%{family[0]}|%{fontversion}\n' "$image_inter_font")" == 'Inter|262210' ]] || {
+    printf 'Built Inter font family or OpenType version differs from the reviewed Inter 4 payload.\n' >&2
+    exit 1
+  }
+  find "$image_root/usr/share/fonts" -type f -name 'NotoSans-Regular.ttf' -print -quit | grep -q . || {
+    printf 'Built image has no Noto Sans regular fallback file.\n' >&2
+    exit 1
+  }
+  find "$image_root/usr/share/fonts" -type f -name 'JetBrainsMono-Regular.ttf' -print -quit | grep -q . || {
+    printf 'Built image has no JetBrains Mono regular file.\n' >&2
+    exit 1
+  }
+  image_widgets="$image_root/usr/share/proper-linux/ui/proper-widgets-dark.qss"
+  image_web="$image_root/usr/share/proper-linux/ui/proper-web.css"
+  grep -Fq 'font-family: "Inter";' "$image_widgets" || {
+    printf 'Built first-party Qt UI assets do not select Inter.\n' >&2
+    exit 1
+  }
+  grep -Fq 'font-family: Inter, "Noto Sans", sans-serif;' "$image_web" || {
+    printf 'Built shortcut-reference CSS does not use the Inter/Noto fallback chain.\n' >&2
+    exit 1
+  }
+  image_lock_qml="$image_root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml"
+  grep -Fq 'readonly property string uiFontFamily: "Inter"' "$image_lock_qml" || {
+    printf 'Built lock screen does not select Inter explicitly.\n' >&2
+    exit 1
+  }
+  grep -aFq 'uiFontFamily' "$image_root/usr/libexec/plasma-login-greeter" &&
+    grep -aFq 'Inter' "$image_root/usr/libexec/plasma-login-greeter" || {
+      printf 'Built login greeter does not embed the explicit Inter family.\n' >&2
+      exit 1
+    }
+  grep -aFq 'launchIndicator' \
+    "$iso_dir/image-build/build/image-root/usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.taskmanager.so" || {
+      printf 'Built task manager plugin lacks the Proper moving-dot launch state.\n' >&2
+      exit 1
+    }
+  image_ghostty_config="$iso_dir/image-build/build/image-root/etc/xdg/ghostty/config"
+  grep -Fqx 'font-family = JetBrains Mono' "$image_ghostty_config" || {
+    printf 'Built Ghostty configuration no longer selects JetBrains Mono.\n' >&2
+    exit 1
+  }
+  grep -qx 'background-opacity = 0.88' "$image_ghostty_config" || {
+    printf 'Built image does not contain the approved visible Ghostty translucency.\n' >&2
+    exit 1
+  }
+  [[ -x "$iso_dir/image-build/build/image-root/usr/bin/proper-welcome-launch" ]] || {
+    printf 'Built image is missing the live welcome display launcher.\n' >&2
+    exit 1
+  }
+  image_task_asset="$iso_dir/image-build/build/image-root/usr/share/plasma/desktoptheme/proper/widgets/tasks.svg"
+  [[ -f "$image_task_asset" ]] &&
+    xmllint --xpath "count(//*[@id = 'focus-bottom'])" "$image_task_asset" 2>/dev/null | grep -qx 1 &&
+    xmllint --xpath "count(//*[@id = 'normal-bottom'])" "$image_task_asset" 2>/dev/null | grep -qx 1 || {
+      printf 'Built image is missing the approved active-line and running-dot task states.\n' >&2
+      exit 1
+    }
+  image_splash="$iso_dir/image-build/build/image-root/usr/share/plasma/look-and-feel/com.properlinux.dark.desktop/contents/splash/Splash.qml"
+  image_ksplash="$iso_dir/image-build/build/image-root/etc/xdg/ksplashrc"
+  [[ -f "$image_splash" ]] && grep -q 'proper-logo-icon.svg' "$image_splash" &&
+    [[ -f "$image_ksplash" ]] && grep -qx 'Theme=com.properlinux.dark.desktop' "$image_ksplash" || {
+      printf 'Built image does not select the Proper session splash.\n' >&2
+      exit 1
+    }
+  grep -q 'function revealAuthentication()' \
+    "$iso_dir/image-build/build/image-root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml" || {
+      printf 'Built image lock screen lacks the pointer authentication reveal path.\n' >&2
+      exit 1
+    }
+  if grep -aFq 'Built on Fedora Linux' \
+    "$iso_dir/image-build/build/image-root/usr/bin/proper-welcome"; then
+    printf 'Built image still exposes Fedora branding in the welcome screen.\n' >&2
+    exit 1
+  fi
+  grep -aq 'ext_background_effect_manager_v1' \
+    "$iso_dir/image-build/build/image-root/usr/bin/ghostty" || {
+      printf 'Built Ghostty lacks the Plasma 6 background-effect protocol.\n' >&2
+      exit 1
+    }
   mapfile -t image_initramfs < <(find "$iso_dir/image-build/build/image-root/boot" -maxdepth 1 -type f -name 'initramfs-*.img' ! -name 'initramfs-0-rescue-*' -print)
   (( ${#image_initramfs[@]} == 1 )) || {
     printf 'Expected exactly one normal image initramfs; found %d.\n' "${#image_initramfs[@]}" >&2

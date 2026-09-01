@@ -1,6 +1,6 @@
 Name:           proper-launchers
 Version:        0.1
-Release:        11%{?dist}
+Release:        13%{?dist}
 Summary:        Proper Linux launcher and window workflow defaults
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -13,6 +13,7 @@ Requires:       plasma-systemsettings
 Requires:       plasma-systemmonitor
 Requires:       proper-apps >= 0.1-7
 Requires:       proper-appearance >= 0.1-3
+Requires:       proper-look-and-feel >= 0.1-21
 Requires:       qt6-qttools
 Requires:       spectacle
 Requires:       systemd
@@ -84,6 +85,13 @@ done
 systemctl --global enable vicinae.service >/dev/null 2>&1 || :
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-13
+- Require the Inter-based shared stylesheet used by the shortcut reference
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-12
+- Style the shortcut reference from Proper's canonical design tokens
+- Add the passive Start Here hub to the launcher favourites
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-11
 - Add the generic Coding Agent action to Vicinae
 - Route Appearance Settings to Proper's preview-first appearance control

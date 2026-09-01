@@ -25,6 +25,7 @@ Item {
     property int selectedSessionIndex: PlasmaLogin.GreeterState.sessionIndex
     property string notificationMessage: ""
 
+    readonly property string uiFontFamily: "Inter"
     readonly property int userCount: PlasmaLogin.UserModel.rowCount()
     readonly property bool uiVisible: PlasmaLogin.GreeterState.activeWindow === loginSurface.Window.window
     readonly property string selectedUsername: userData(PlasmaLogin.UserModel.NameRole)
@@ -193,6 +194,7 @@ Item {
             PlasmaComponents.Label {
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "#f3f8ff"
+                font.family: root.uiFontFamily
                 font.pixelSize: Math.min(84, Math.max(48, root.height * 0.08))
                 font.weight: Font.Normal
                 text: Qt.formatTime(root.currentDate, "hh:mm")
@@ -203,6 +205,7 @@ Item {
             PlasmaComponents.Label {
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: Qt.rgba(0.93, 0.97, 1, 0.72)
+                font.family: root.uiFontFamily
                 font.pixelSize: Math.min(17, Math.max(12, root.height * 0.015))
                 font.weight: Font.Normal
                 text: Qt.formatDate(root.currentDate, "dddd, d MMMM")
@@ -234,6 +237,7 @@ Item {
             PlasmaComponents.Label {
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: Qt.rgba(0.94, 0.97, 1, 0.72)
+                font.family: root.uiFontFamily
                 font.pixelSize: Math.min(15, Math.max(12, root.height * 0.014))
                 text: root.manualUser
                     ? i18nd("plasma_login", "Other user")
@@ -247,6 +251,7 @@ Item {
                 height: 46
                 activeFocusOnTab: true
                 color: "#f3f8ff"
+                font.family: root.uiFontFamily
                 font.pixelSize: 16
                 horizontalAlignment: TextInput.AlignHCenter
                 placeholderText: i18nd("plasma_login", "Username")
@@ -269,6 +274,7 @@ Item {
                 activeFocusOnTab: true
                 color: "#f3f8ff"
                 echoMode: TextInput.Password
+                font.family: root.uiFontFamily
                 font.pixelSize: 17
                 horizontalAlignment: TextInput.AlignHCenter
                 passwordCharacter: "•"
@@ -305,6 +311,7 @@ Item {
                 color: root.notificationMessage.length > 0
                     ? Qt.rgba(1, 0.72, 0.7, 0.94)
                     : Qt.rgba(0.93, 0.97, 1, 0.74)
+                font.family: root.uiFontFamily
                 font.pixelSize: 13
                 text: capsLockState.locked
                     ? i18nd("plasma_login", "Caps Lock is on")
@@ -375,6 +382,7 @@ Item {
                                     required property string name
                                     required property string realName
 
+                                    font.family: root.uiFontFamily
                                     text: realName.length > 0 ? realName : name
                                     onTriggered: root.chooseUser(index)
                                 }
@@ -383,6 +391,7 @@ Item {
                             PlasmaComponents.MenuSeparator {}
 
                             PlasmaComponents.MenuItem {
+                                font.family: root.uiFontFamily
                                 icon.name: "system-user-prompt"
                                 text: i18nd("plasma_login", "Other user…")
                                 onTriggered: root.chooseManualUser()
@@ -415,6 +424,7 @@ Item {
 
                                     checkable: true
                                     checked: index === root.selectedSessionIndex
+                                    font.family: root.uiFontFamily
                                     text: displayName
                                     onTriggered: {
                                         root.selectedSessionIndex = index
@@ -476,6 +486,7 @@ Item {
 
                 contentItem: PlasmaComponents.Label {
                     color: Qt.rgba(0.94, 0.97, 1, 0.8)
+                    font.family: root.uiFontFamily
                     horizontalAlignment: Text.AlignHCenter
                     text: moreButton.text
                     verticalAlignment: Text.AlignVCenter

@@ -1,6 +1,6 @@
 # Proper Linux research and upstream references
 
-Last reviewed: 2026-08-31.
+Last reviewed: 2026-09-01.
 
 This is a working technical reference, not a substitute for checking current upstream documentation during implementation. Pin exact revisions when code enters the build.
 
@@ -179,6 +179,27 @@ Spacedrive has a visually ambitious cross-device concept, but its current Linux 
 
 Ghostty is the preferred terminal. Implementation must confirm the current Fedora packaging/source, licence, Wayland behaviour, configuration path, and best KWin technique for a retained dropdown window.
 
+## Typography
+
+- **Primary UI face:** Fedora 44 package
+  `rsms-inter-fonts-4.1-3.fc44.noarch`, sourced from
+  <https://rsms.me/inter/> and distributed by Fedora under OFL-1.1. Fedora's
+  package metadata describes it as the non-variable Inter build intended for
+  high-legibility user interfaces. `fc-scan` reports family `Inter` and
+  OpenType font version 4.001 for `Inter-Regular.ttf`.
+- **International fallback:** Fedora
+  `google-noto-sans-fonts-20251201-2.fc44.noarch`, OFL-1.1. Proper uses the
+  explicit `Inter, "Noto Sans", sans-serif` chain where the surface supports a
+  family list; fontconfig supplies the fallback for KDE, GTK, QML, and other
+  single-family settings.
+- **Fixed width:** Fedora `jetbrains-mono-fonts-2.304-10.fc44.noarch`,
+  OFL-1.1. It remains limited to Ghostty, code/fixed-width configuration, and
+  keyboard-reference key caps.
+- **Update method:** Audit the Fedora package build and upstream source, update
+  the exact Inter dependency and source/image validation together, confirm the
+  installed family and version with `fc-scan`, and require `fc-match Inter` to
+  resolve to Inter inside the exact release ISO guest.
+
 ## Applications and Flatpak
 
 - Flatpak documentation: <https://docs.flatpak.org/>
@@ -223,7 +244,7 @@ A preliminary exact-name web and GitHub search on 2026-08-24 found no prominent 
   separate from the source archive and must be dropped when the next pinned
   Ghostty release includes that upstream change.
 - Proper terminal runtime configuration is versioned in
-  `packages/proper-terminal/ghostty.conf`. It uses 92% background opacity,
+  `packages/proper-terminal/ghostty.conf`. It uses 88% background opacity,
   keeps cell backgrounds opaque, and asks the compositor for background blur;
   normal content windows remain opaque.
 - Update by auditing the official release tarball and minisign signature, the

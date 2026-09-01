@@ -24,7 +24,11 @@ Arch packages, AUR trust model, Hyprland integrations, or shell scripts.
 
 Proper also keeps its existing product-specific priorities and broadens the
 directory with communication, media, creative, utility, container, printing,
-and official coding-agent entries. Catalogue version 2 contains 53 entries.
+and official coding-agent entries. Catalogue version 2 contains 55 entries.
+The Recommended landing shelf is deliberately much narrower: Google Chrome,
+Helium, Signal, VLC, Spotify, GitHub Desktop, Visual Studio Code Insiders,
+Codex desktop, Codex CLI, and Claude Code CLI. Everything else remains
+searchable in All and its category, including Podman, printing, and Calculator.
 
 ## Deliberate exclusions
 
@@ -35,7 +39,7 @@ and official coding-agent entries. Catalogue version 2 contains 53 entries.
 - Development-runtime installers are deferred until Proper has a coherent
   version-manager policy; blindly translating Omarchy's `mise` setup would
   make the catalogue own developer environments it cannot safely remove.
-- Cursor, ChatGPT Desktop, Grok Bot, T3 Code, NordVPN, ONCE, Sunshine,
+- Cursor, Grok Bot, T3 Code, NordVPN, ONCE, Sunshine,
   Battle.net, Xbox-controller DKMS, and the Windows VM are omitted because the
   audited snapshot does not supply a low-risk Fedora path that meets Proper's
   provider and removal requirements.
@@ -46,6 +50,10 @@ and official coding-agent entries. Catalogue version 2 contains 53 entries.
   users until Antigravity has a pinned, reversible provider path.
 - Xbox Cloud Gaming and GeForce NOW do not need bespoke installers in version
   0.1; the web-app creator provides the safe general path.
+- Anthropic currently documents Claude Desktop for macOS and Windows, not
+  Linux. Proper therefore recommends the official Claude Code CLI and leaves
+  claude.ai available through the general web-app creator rather than shipping
+  an unofficial desktop wrapper.
 
 ## Provider checks
 
@@ -55,6 +63,11 @@ and official coding-agent entries. Catalogue version 2 contains 53 entries.
   the installed review VM.
 - Microsoft VS Code and Docker repository endpoints were fetched and their
   Fedora packages resolved before inclusion.
+- Helium uses the project's official Fedora COPR and `helium-bin` package; its
+  official Linux packaging repository explicitly recommends that route.
+- Codex desktop uses OpenAI's official Fedora 43/44 Linux preview RPM. Proper
+  pins the reviewed bootstrap package URL; that package configures OpenAI's
+  repository so later updates arrive through the normal system update path.
 - Agent npm installs use Fedora 44's actual `nodejs24` and `nodejs24-npm`
   package names, then install into `~/.local`; they do not run npm as root.
 - Catalogue install steps are data-only `QProcess` invocations. The validator
@@ -67,7 +80,7 @@ validation date remain visible behind the advanced disclosure for every card.
 ## Artwork audit
 
 Named products use their recognisable AppStream, upstream-project, or official
-publisher artwork. The 52 checked-in assets are mapped independently from the
+publisher artwork. The 54 checked-in assets are mapped independently from the
 theme-icon fallback so a missing host icon cannot turn a product into a letter
 tile. `apps/icon-sources.json` records the exact source URL, pinned source
 revision where available, retrieval date, rights note, any image transform,

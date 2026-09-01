@@ -49,7 +49,7 @@
   <rect id="hint-top-margin" x="33" width="2" height="10" fill="#f0f"/>
   <rect id="hint-bottom-margin" x="33" y="58" width="2" height="10" fill="#f0f"/>
   <rect id="hint-left-margin" y="33" width="10" height="2" fill="#f0f"/>
-  <rect id="hint-right-margin" x="54" y="33" width="14" height="2" fill="#f0f"/>
+  <rect id="hint-right-margin" x="58" y="33" width="10" height="2" fill="#f0f"/>
   <rect id="hint-stretch-borders" x="69" width="1" height="1" fill="#f60"/>
   <!-- Compose the translucent centre beneath the border and clip it through
        the mask frame. Without this hint Plasma's contrast/blur pass treats

@@ -6,5 +6,5 @@ Actions=open-proper-agent;
 
 [Desktop Action open-proper-agent]
 Name=Open coding agent here
-Icon=applications-development
+Icon=proper-agent
 Exec=proper-agent %f

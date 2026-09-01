@@ -1,15 +1,87 @@
 #include <QApplication>
 #include <QCloseEvent>
+#include <QDBusConnection>
+#include <QDBusMessage>
+#include <QDesktopServices>
+#include <QFile>
 #include <QFontDatabase>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLinearGradient>
+#include <QList>
 #include <QPainter>
+#include <QPalette>
 #include <QProcess>
 #include <QPushButton>
 #include <QScreen>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <functional>
+
+static void applyStyle(QApplication &application, const QString &path) {
+    QFile style(path);
+    if (style.open(QIODevice::ReadOnly | QIODevice::Text))
+        application.setStyleSheet(QString::fromUtf8(style.readAll()));
+}
+
+static void applyProperWidgetStyle(QApplication &application) {
+    const QString requested = qEnvironmentVariable("PROPER_UI_VARIANT").toLower();
+    const bool light = requested == "light"
+        || (requested != "dark" && application.palette().color(QPalette::Window).lightness() > 128);
+    const QString root = qEnvironmentVariable("PROPER_UI_STYLE_DIR", "/usr/share/proper-linux/ui");
+    applyStyle(application, root + QStringLiteral("/proper-widgets-")
+               + (light ? QStringLiteral("light.qss") : QStringLiteral("dark.qss")));
+}
+
+static QIcon properIcon(const QString &name) {
+    const QString root = qEnvironmentVariable("PROPER_ICON_DIR", "/usr/share/icons/hicolor/scalable/apps");
+    return QIcon::fromTheme(name, QIcon(root + "/" + name + ".svg"));
+}
+
+class IdleInhibitor final {
+public:
+    IdleInhibitor() {
+        acquire("org.freedesktop.ScreenSaver", "/ScreenSaver",
+                "org.freedesktop.ScreenSaver");
+        acquire("org.freedesktop.PowerManagement",
+                "/org/freedesktop/PowerManagement/Inhibit",
+                "org.freedesktop.PowerManagement.Inhibit");
+    }
+
+    ~IdleInhibitor() {
+        for (const Lease &lease : leases) {
+            QDBusMessage release = QDBusMessage::createMethodCall(
+                lease.service, lease.path, lease.interface, "UnInhibit");
+            release << lease.cookie;
+            QDBusConnection::sessionBus().call(release, QDBus::NoBlock);
+        }
+    }
+
+private:
+    struct Lease {
+        QString service;
+        QString path;
+        QString interface;
+        uint cookie;
+    };
+
+    QList<Lease> leases;
+
+    void acquire(const QString &service, const QString &path,
+                 const QString &interface) {
+        QDBusMessage request = QDBusMessage::createMethodCall(
+            service, path, interface, "Inhibit");
+        request << QStringLiteral("Proper Welcome")
+                << QStringLiteral("The live-session choice is open");
+        const QDBusMessage reply = QDBusConnection::sessionBus().call(request);
+        if (reply.type() == QDBusMessage::ReplyMessage &&
+            !reply.arguments().isEmpty()) {
+            leases.append({service, path, interface,
+                           reply.arguments().constFirst().toUInt()});
+        }
+    }
+};
 
 class Wordmark final : public QWidget {
 public:
@@ -86,37 +158,13 @@ protected:
 class Welcome final : public Backdrop {
 public:
     Welcome() {
+        setObjectName("properWelcome");
         setWindowTitle("Welcome to Proper Linux");
-        setWindowIcon(QIcon::fromTheme("proper-logo-icon"));
-        setMinimumSize(760, 540);
-        setStyleSheet(R"(
-            QWidget { color: #f3f6fa; background: transparent; font-family: "Noto Sans"; }
-            QLabel#eyebrow { color: #8e9aaa; font-size: 11px; font-weight: 700; letter-spacing: 2px; }
-            QLabel#headline { color: #f7f8fa; font-size: 31px; font-weight: 650; }
-            QLabel#body { color: #9da8b5; font-size: 15px; line-height: 1.45; }
-            QLabel#liveBadge {
-                color: #b8cee5; background: rgba(70, 108, 148, 0.18);
-                border: 1px solid rgba(145, 188, 229, 0.24); border-radius: 13px;
-                font-size: 11px; font-weight: 650; padding: 5px 10px;
-            }
-            QLabel#footer { color: rgba(206, 217, 228, 0.46); font-size: 11px; }
-            QPushButton {
-                min-height: 48px; min-width: 176px; padding: 0 24px;
-                border-radius: 12px; border: 1px solid rgba(204, 221, 238, 0.17);
-                background: rgba(25, 34, 46, 0.88); color: #f4f7fa;
-                font-family: "Noto Sans"; font-size: 14px; font-weight: 600;
-            }
-            QPushButton:hover { background: rgba(38, 51, 67, 0.96); border-color: rgba(155, 199, 241, 0.42); }
-            QPushButton:focus { border: 2px solid #9bc7f1; }
-            QPushButton#primary { background: #edf3f9; color: #111720; border-color: #ffffff; }
-            QPushButton#primary:hover { background: #ffffff; }
-            QPushButton#close {
-                min-width: 38px; max-width: 38px; min-height: 38px; max-height: 38px;
-                padding: 0; border-radius: 19px; font-size: 22px; font-weight: 400;
-                color: #aeb9c5; background: rgba(20, 28, 38, .55);
-            }
-        )");
-
+        setWindowIcon(properIcon("proper-logo-icon"));
+        // Firmware and early live-session display negotiation can briefly
+        // start at 640x480. Keep the choice usable there while KScreen moves
+        // the QEMU review session to its preferred 1920x1080 mode.
+        setMinimumSize(640, 480);
         auto *root = new QVBoxLayout(this);
         root->setContentsMargins(38, 28, 38, 28);
         root->setSpacing(0);
@@ -134,6 +182,9 @@ public:
         root->addStretch(2);
 
         auto *centre = new QWidget;
+        // Keep the approved single-line headline composition. The action row
+        // remains usable inside the transient 640px firmware fallback even
+        // when the centred visual block extends slightly beyond its margins.
         centre->setMinimumWidth(680);
         centre->setMaximumWidth(820);
         auto *content = new QVBoxLayout(centre);
@@ -155,7 +206,7 @@ public:
         headline->setObjectName("headline");
         headline->setAlignment(Qt::AlignCenter);
         headline->setWordWrap(true);
-        headline->setMinimumHeight(46);
+        headline->setMinimumHeight(56);
         content->addWidget(headline);
 
         auto *body = new QLabel("Try the complete desktop without changing this computer, or install Proper Linux when you’re ready.");
@@ -183,7 +234,7 @@ public:
         root->addWidget(centre, 0, Qt::AlignHCenter);
         root->addStretch(3);
 
-        auto *footer = new QLabel("Proper Linux 0.1  ·  Built on Fedora Linux and KDE Plasma");
+        auto *footer = new QLabel("Proper Linux 0.1");
         footer->setObjectName("footer");
         footer->setAlignment(Qt::AlignCenter);
         root->addWidget(footer);
@@ -197,16 +248,131 @@ public:
     }
 };
 
+class Guide final : public QWidget {
+public:
+    Guide() {
+        setObjectName("properRoot");
+        setWindowTitle("Start Here · Proper Linux");
+        setWindowIcon(properIcon("proper-logo-icon"));
+        resize(900, 640);
+        setMinimumSize(680, 500);
+
+        auto *root = new QVBoxLayout(this);
+        root->setContentsMargins(34, 30, 34, 26);
+        root->setSpacing(20);
+
+        auto *header = new QHBoxLayout;
+        auto *mark = new QLabel;
+        mark->setPixmap(properIcon("proper-logo-icon").pixmap(58, 58));
+        mark->setFixedSize(64, 64);
+        header->addWidget(mark, 0, Qt::AlignTop);
+        auto *copy = new QVBoxLayout;
+        auto *title = new QLabel("Start here");
+        QFont titleFont = title->font();
+        titleFont.setPixelSize(30);
+        titleFont.setBold(true);
+        title->setFont(titleFont);
+        copy->addWidget(title);
+        auto *intro = new QLabel("The useful parts of Proper Linux, gathered in one quiet place.");
+        intro->setObjectName("guideCopy");
+        intro->setWordWrap(true);
+        copy->addWidget(intro);
+        header->addLayout(copy, 1);
+        root->addLayout(header);
+
+        status = new QLabel;
+        status->setObjectName("errorBanner");
+        status->setWordWrap(true);
+        status->hide();
+        root->addWidget(status);
+
+        auto *grid = new QGridLayout;
+        grid->setHorizontalSpacing(14);
+        grid->setVerticalSpacing(14);
+        addCard(grid, 0, 0, "Browse software", "Recommended apps and the full catalogue",
+                "proper-apps", [this] { launch("/usr/bin/proper-apps"); });
+        addCard(grid, 0, 1, "Change appearance", "Desktop styles, text size, and wallpapers",
+                "proper-appearance", [this] { launch("/usr/bin/proper-appearance"); });
+        addCard(grid, 1, 0, "Check for updates", "System and application updates in Discover",
+                "system-software-update", [this] { launch("/usr/bin/proper-tool", {"updates"}); });
+        addCard(grid, 1, 1, "Learn shortcuts", "Fast paths with an ordinary pointer route too",
+                "proper-shortcuts", [this] { launch("/usr/bin/proper-tool", {"shortcuts"}); });
+        addCard(grid, 2, 0, "System Settings", "Hardware, accounts, networking, and the rest",
+                "systemsettings", [this] { launch("/usr/bin/systemsettings"); });
+        addCard(grid, 2, 1, "Project and support", "Read the project or report something that feels off",
+                "help-about", [this] {
+                    if (!QDesktopServices::openUrl(QUrl("https://github.com/marcodenic/PROPER_LINUX")))
+                        showFailure("The project page could not be opened in your browser.");
+                });
+        grid->setColumnStretch(0, 1);
+        grid->setColumnStretch(1, 1);
+        root->addLayout(grid, 1);
+
+        auto *footer = new QLabel("Proper Linux 0.1 · Normal system controls stay available");
+        footer->setObjectName("guideFooter");
+        footer->setAlignment(Qt::AlignCenter);
+        footer->setWordWrap(true);
+        root->addWidget(footer);
+    }
+
+private:
+    void addCard(QGridLayout *grid, int row, int column, const QString &title,
+                 const QString &description, const QString &icon,
+                 std::function<void()> action) {
+        auto *button = new QPushButton(title + "\n" + description);
+        button->setObjectName("guideCard");
+        button->setIcon(properIcon(icon));
+        button->setIconSize(QSize(42, 42));
+        button->setCursor(Qt::PointingHandCursor);
+        button->setAccessibleName(title + ". " + description);
+        button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        connect(button, &QPushButton::clicked, this, [action = std::move(action)] { action(); });
+        grid->addWidget(button, row, column);
+    }
+
+    void launch(const QString &program, const QStringList &arguments = {}) {
+        if (!QProcess::startDetached(program, arguments))
+            showFailure("That tool could not be opened. Reinstall the corresponding Proper Linux package and try again.");
+    }
+
+    void showFailure(const QString &message) {
+        status->setText(message);
+        status->show();
+    }
+
+    QLabel *status = nullptr;
+};
+
 int main(int argc, char **argv) {
     QApplication application(argc, argv);
+    if (QIcon::themeName().isEmpty())
+        QIcon::setThemeName("breeze");
     QApplication::setApplicationName("Proper Welcome");
     QApplication::setDesktopFileName("org.properlinux.Welcome");
+
+    const int screenshotOption = application.arguments().indexOf("--screenshot");
+    if (application.arguments().contains("--guide")) {
+        QApplication::setApplicationName("Start Here");
+        QApplication::setDesktopFileName("proper-start");
+        applyProperWidgetStyle(application);
+        Guide guide;
+        guide.show();
+        if (screenshotOption >= 0 && screenshotOption + 1 < application.arguments().size()) {
+            const QString output = application.arguments().at(screenshotOption + 1);
+            QTimer::singleShot(250, &guide, [&application, &guide, output] {
+                application.exit(guide.grab().save(output) ? 0 : 2);
+            });
+        }
+        return application.exec();
+    }
 
     if (application.arguments().contains("--install"))
         return QProcess::startDetached("/usr/bin/liveinst", {}) ? 0 : 1;
 
+    const QString styleRoot = qEnvironmentVariable("PROPER_UI_STYLE_DIR", "/usr/share/proper-linux/ui");
+    applyStyle(application, styleRoot + "/proper-welcome.qss");
+    IdleInhibitor idleInhibitor;
     Welcome window;
-    const int screenshotOption = application.arguments().indexOf("--screenshot");
     if (application.arguments().contains("--windowed") || screenshotOption >= 0) {
         window.resize(1120, 680);
         window.show();

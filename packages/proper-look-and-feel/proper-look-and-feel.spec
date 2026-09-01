@@ -1,17 +1,24 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        17%{?dist}
+Release:        21%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
 BuildRequires:  libxml2
+BuildRequires:  python3
 Provides:       system-backgrounds-kde
 Requires:       plasma-workspace >= 6.7
+Requires:       proper-branding
+Requires:       google-noto-sans-fonts
+Requires:       rsms-inter-fonts = 4.1-3%{?dist}
 
 %description
 System-wide visual assets for the Proper Linux visual identity. Proper Blue
 Hour is the default wallpaper. Proper Horizon and the three PM-selected KDE
 wallpapers are installed as a compact, fully attributed Plasma gallery.
+
+%build
+python3 %{_sourcedir}/generate-ui-assets.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-ui
 
 %install
 install -Dpm 0644 %{_sourcedir}/proper-blue-hour.png %{buildroot}%{_datadir}/wallpapers/ProperBlueHour/contents/images/1920x1080.png
@@ -30,13 +37,19 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.light.desktop/metadata.json %{bu
 install -Dpm 0644 %{_sourcedir}/com.properlinux.light.desktop/contents/defaults %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.light.desktop/contents/defaults
 install -Dpm 0644 %{_sourcedir}/com.properlinux.midnight.desktop/metadata.json %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.midnight.desktop/metadata.json
 install -Dpm 0644 %{_sourcedir}/com.properlinux.midnight.desktop/contents/defaults %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.midnight.desktop/contents/defaults
+for theme in com.properlinux.dark.desktop com.properlinux.light.desktop com.properlinux.midnight.desktop; do
+  install -Dpm 0644 %{_sourcedir}/Splash.qml \
+    "%{buildroot}%{_datadir}/plasma/look-and-feel/$theme/contents/splash/Splash.qml"
+done
 install -Dpm 0644 %{_sourcedir}/proper-wallpaper.conf %{buildroot}%{_sysconfdir}/xdg/plasma-workspace/env/proper-wallpaper.conf
 # Fedora 44 PLM reads the distro default from this exact file. Its README
 # documents /etc/plasmalogin.conf as the administrator override and
 # /usr/lib/plasmalogin/defaults.conf as the shipped default.
 install -Dpm 0644 %{_sourcedir}/plasmalogin.conf %{buildroot}%{_datadir}/proper-linux/plasmalogin.conf
 install -Dpm 0644 %{_sourcedir}/tokens.yaml %{buildroot}%{_datadir}/proper-linux/tokens.yaml
-install -Dpm 0644 %{_sourcedir}/Proper.colors %{buildroot}%{_datadir}/color-schemes/Proper.colors
+install -d %{buildroot}%{_datadir}/proper-linux/ui
+install -pm 0644 %{_builddir}/proper-ui/* %{buildroot}%{_datadir}/proper-linux/ui/
+install -Dpm 0644 %{_sourcedir}/proper/colors %{buildroot}%{_datadir}/color-schemes/Proper.colors
 install -Dpm 0644 %{_sourcedir}/ProperLight.colors %{buildroot}%{_datadir}/color-schemes/ProperLight.colors
 install -Dpm 0644 %{_sourcedir}/ProperMidnight.colors %{buildroot}%{_datadir}/color-schemes/ProperMidnight.colors
 style_root=%{buildroot}%{_datadir}/plasma/desktoptheme/proper
@@ -45,6 +58,7 @@ install -Dpm 0644 %{_sourcedir}/proper/colors "$style_root/colors"
 install -Dpm 0644 %{_sourcedir}/proper/dialogs/background.svg "$style_root/dialogs/background.svg"
 install -Dpm 0644 %{_sourcedir}/proper/widgets/panel-background.svg "$style_root/widgets/panel-background.svg"
 install -Dpm 0644 %{_sourcedir}/proper/widgets/plasmoidheading.svg "$style_root/widgets/plasmoidheading.svg"
+install -Dpm 0644 %{_sourcedir}/proper/widgets/tasks.svg "$style_root/widgets/tasks.svg"
 # Notifications, tooltips, and workspace OSDs use the same approved surface
 # recipe. Everything else remains an explicit Breeze fallback.
 install -Dpm 0644 %{_sourcedir}/proper/dialogs/background.svg "$style_root/widgets/tooltip.svg"
@@ -98,6 +112,17 @@ test -n "$panel_radius"
 test "$panel_radius" = "$asset_radius"
 test "$panel_radius" = "$mask_radius"
 
+# Proper task states must not fall through to Breeze's filled blue frames.
+task_asset=%{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/tasks.svg
+xmllint --noout "$task_asset"
+for state in normal focus hover minimized attention progress; do
+  for slice in center top bottom left right topleft topright bottomleft bottomright; do
+    test "$(xmllint --xpath "count(//*[@id = '$state-$slice'])" "$task_asset")" = 1
+  done
+done
+test "$(xmllint --xpath "count(//*[@id = 'focus-bottom']//*[contains(@class, 'ColorScheme-ButtonFocus')])" "$task_asset")" = 1
+test "$(xmllint --xpath "count(//*[@id = 'normal-bottom']//*[contains(@class, 'ColorScheme-Text')])" "$task_asset")" = 1
+
 %files
 %{_datadir}/wallpapers/ProperBlueHour/
 %{_datadir}/wallpapers/ProperHorizon/
@@ -112,6 +137,7 @@ test "$panel_radius" = "$mask_radius"
 %config(noreplace) %{_sysconfdir}/xdg/plasma-workspace/env/proper-wallpaper.conf
 %{_datadir}/proper-linux/plasmalogin.conf
 %{_datadir}/proper-linux/tokens.yaml
+%{_datadir}/proper-linux/ui/
 %{_datadir}/color-schemes/Proper.colors
 %{_datadir}/color-schemes/ProperLight.colors
 %{_datadir}/color-schemes/ProperMidnight.colors
@@ -126,6 +152,22 @@ test "$panel_radius" = "$mask_radius"
 install -m 0644 %{_datadir}/proper-linux/plasmalogin.conf %{_prefix}/lib/plasmalogin/defaults.conf || :
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-21
+- Make Inter 4 the canonical first-party and lock-screen UI family
+- Retain Noto Sans as the explicit fallback in generated Qt and web styles
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-20
+- Generate shared Qt and web styles directly from the canonical design tokens
+
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-19
+- Implement the approved active-line and running-dot task states without blue fills
+- Restore symmetric shelf end spacing and a Proper-branded session splash
+- Reveal the lock-screen authentication controls on a background click
+
+* Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-18
+- Package the actual Proper Dark palette as the default application colour scheme
+- Remove the obsolete light palette that was incorrectly installed as Proper Dark
+
 * Mon Aug 31 2026 Proper Linux <proper@example.invalid> - 0.1-17
 - Add three curated, previewable Proper desktop styles without changing the shell layout
 - Align the default, light, and midnight colour schemes to Proper Horizon tokens

@@ -8,6 +8,7 @@
 #include <QIcon>
 #include <QLabel>
 #include <QPainter>
+#include <QPalette>
 #include <QProcess>
 #include <QPushButton>
 #include <QRegularExpression>
@@ -50,6 +51,22 @@ struct TextPreset {
 static QString configRoot() {
     const QString root = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
     return root.isEmpty() ? QDir::homePath() + "/.config" : root;
+}
+
+static void applyProperWidgetStyle(QApplication &application) {
+    const QString requested = qEnvironmentVariable("PROPER_UI_VARIANT").toLower();
+    const bool light = requested == "light"
+        || (requested != "dark" && application.palette().color(QPalette::Window).lightness() > 128);
+    const QString root = qEnvironmentVariable("PROPER_UI_STYLE_DIR", "/usr/share/proper-linux/ui");
+    QFile style(root + QStringLiteral("/proper-widgets-")
+                + (light ? QStringLiteral("light.qss") : QStringLiteral("dark.qss")));
+    if (style.open(QIODevice::ReadOnly | QIODevice::Text))
+        application.setStyleSheet(QString::fromUtf8(style.readAll()));
+}
+
+static QIcon properIcon(const QString &name) {
+    const QString root = qEnvironmentVariable("PROPER_ICON_DIR", "/usr/share/icons/hicolor/scalable/apps");
+    return QIcon::fromTheme(name, QIcon(root + "/" + name + ".svg"));
 }
 
 static QPixmap variantPreview(const AppearanceVariant &variant) {
@@ -98,39 +115,11 @@ static QPixmap variantPreview(const AppearanceVariant &variant) {
 class ProperAppearance final : public QWidget {
 public:
     ProperAppearance() {
+        setObjectName("properRoot");
         setWindowTitle("Appearance");
-        setWindowIcon(QIcon::fromTheme("preferences-desktop-theme"));
+        setWindowIcon(properIcon("proper-appearance"));
         resize(1160, 820);
-        setMinimumSize(760, 600);
-        setStyleSheet(R"(
-            QWidget { background: #11151d; color: #f1f4f8; }
-            QScrollArea, QScrollArea > QWidget > QWidget { background: transparent; border: 0; }
-            QLabel#subtitle, QLabel#sectionCopy, QLabel#status { color: #a8b2c2; }
-            QLabel#sectionTitle { font-size: 19px; font-weight: 650; }
-            QToolButton {
-                background: rgba(27, 34, 45, 0.98);
-                border: 1px solid rgba(168, 178, 194, 0.18);
-                border-radius: 15px;
-                color: rgba(241, 244, 248, 0.90);
-                font-size: 14px;
-                padding: 10px;
-            }
-            QToolButton:hover { background: #222c39; border-color: rgba(145, 180, 255, 0.44); }
-            QToolButton:checked { background: #202c3d; border: 2px solid #91b4ff; color: white; }
-            QToolButton#textPreset { min-height: 54px; text-align: left; padding: 8px 14px; }
-            QPushButton {
-                background: #253243;
-                border: 1px solid rgba(168, 178, 194, 0.20);
-                border-radius: 10px;
-                color: white;
-                min-height: 38px;
-                padding: 0 18px;
-                font-weight: 600;
-            }
-            QPushButton:hover { background: #304156; }
-            QPushButton#primary { background: #91b4ff; border-color: #a9c5ff; color: #11151d; }
-            QPushButton#primary:hover { background: #a9c5ff; }
-        )");
+        setMinimumSize(760, 520);
 
         variants = {
             {"com.properlinux.dark.desktop", "Blue Hour", "Balanced dark · Proper default", "ProperBlueHour",
@@ -389,7 +378,7 @@ private:
         QDir().mkpath(QFileInfo(path).absolutePath());
         QSettings settings(path, QSettings::IniFormat);
         settings.beginGroup("Settings");
-        settings.setValue("gtk-font-name", QString("Noto Sans %1").arg(size));
+        settings.setValue("gtk-font-name", QString("Inter %1").arg(size));
         settings.endGroup();
         settings.sync();
     }
@@ -398,12 +387,16 @@ private:
         const int index = textGroup->checkedId();
         if (index < 0 || index >= textPresets.size()) return;
         const auto &preset = textPresets[index];
-        const QString normal = QString("Noto Sans,%1,-1,5,50,0,0,0,0,0").arg(preset.uiSize);
-        const QString small = QString("Noto Sans,%1,-1,5,50,0,0,0,0,0").arg(preset.smallSize);
+        const QString normal = QString("Inter,%1,-1,5,50,0,0,0,0,0").arg(preset.uiSize);
+        const QString toolbar = QString("Inter,%1,-1,5,50,0,0,0,0,0").arg(qMax(8, preset.uiSize - 1));
+        const QString small = QString("Inter,%1,-1,5,50,0,0,0,0,0").arg(preset.smallSize);
+        const QString title = QString("Inter,%1,-1,5,50,0,0,0,0,0").arg(qMax(8, preset.uiSize - 1));
         bool ok = true;
-        for (const QString &key : {QString("font"), QString("menuFont"), QString("toolBarFont")})
+        for (const QString &key : {QString("desktopFont"), QString("font"), QString("menuFont")})
             ok = runConfigWrite("General", key, normal) && ok;
+        ok = runConfigWrite("General", "toolBarFont", toolbar) && ok;
         ok = runConfigWrite("General", "smallestReadableFont", small) && ok;
+        ok = runConfigWrite("WM", "activeFont", title) && ok;
         ok = writeGhosttyFont(preset.terminalSize) && ok;
         writeGtkFont(configRoot() + "/gtk-3.0/settings.ini", preset.uiSize);
         writeGtkFont(configRoot() + "/gtk-4.0/settings.ini", preset.uiSize);
@@ -464,8 +457,12 @@ private:
 
 int main(int argc, char **argv) {
     QApplication application(argc, argv);
+    if (QIcon::themeName().isEmpty())
+        QIcon::setThemeName("breeze");
     QApplication::setOrganizationName("Proper Linux");
     QApplication::setApplicationName("Appearance");
+    QApplication::setDesktopFileName("proper-appearance");
+    applyProperWidgetStyle(application);
     ProperAppearance window;
     window.show();
     return application.exec();

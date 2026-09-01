@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -u
+
+# The PM review VM advertises 1920x1080 through virtio-gpu, but Plasma can
+# initially retain the 640x480 firmware mode. Apply the advertised review mode
+# before opening the full-screen choice so the welcome cannot intercept the
+# host-side KRunner fallback. Real hardware keeps its normal display policy.
+if [[ "${USER:-}" == liveuser ]] &&
+   grep -Eqi 'QEMU|KVM' /sys/class/dmi/id/sys_vendor /sys/class/dmi/id/product_name 2>/dev/null; then
+    for _ in {1..20}; do
+        if kscreen-doctor output.1.mode.1920x1080 output.1.scale.1 >/dev/null 2>&1; then
+            break
+        fi
+        sleep 0.5
+    done
+fi
+
+exec /usr/bin/proper-welcome "$@"

@@ -6,5 +6,5 @@ Actions=open-proper-terminal;
 
 [Desktop Action open-proper-terminal]
 Name=Open terminal here
-Icon=utilities-terminal
+Icon=com.mitchellh.ghostty
 Exec=ghostty --working-directory %f

@@ -79,7 +79,9 @@ apply_display_mode() {
   local index
   local character
 
-  command_text="kscreen-doctor output.1.mode.${display_width}x${display_height}@${display_refresh} output.1.scale.${display_scale}"
+  # Exact refresh spellings vary by virtual mode (for example 59.93 versus
+  # 60). Selecting by dimensions lets KScreen choose the advertised refresh.
+  command_text="kscreen-doctor output.1.mode.${display_width}x${display_height} output.1.scale.${display_scale}"
 
   {
     printf '%s\n' '{"execute":"qmp_capabilities"}'

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Start Here
+GenericName=Proper Linux guide
+Comment=Open apps, appearance, updates, shortcuts, settings, and support
+Exec=/usr/bin/proper-welcome --guide
+Icon=proper-logo-icon
+Categories=System;
+Keywords=proper;help;guide;apps;appearance;updates;shortcuts;support;
+StartupNotify=true

@@ -23,6 +23,7 @@ install -Dpm 0644 /etc/skel/.config/plasma-org.kde.plasma.desktop-appletsrc "$co
 install -Dpm 0644 /etc/skel/.config/plasma-com.properlinux.desktop-appletsrc "$config_dir/plasma-com.properlinux.desktop-appletsrc"
 install -Dpm 0644 /etc/skel/.config/plasmarc "$config_dir/plasmarc"
 install -Dpm 0644 /etc/skel/.config/plasmashellrc "$config_dir/plasmashellrc"
+install -Dpm 0644 /etc/skel/.config/ksplashrc "$config_dir/ksplashrc"
 install -Dpm 0644 /etc/skel/.config/kglobalshortcutsrc "$config_dir/kglobalshortcutsrc"
 install -Dpm 0644 /etc/skel/.config/vicinae/settings.json "$config_dir/vicinae/settings.json"
 

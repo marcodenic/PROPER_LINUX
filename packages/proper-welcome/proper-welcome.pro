@@ -1,4 +1,4 @@
-QT += widgets
+QT += widgets dbus
 CONFIG += c++17
 TARGET = proper-welcome
 TEMPLATE = app

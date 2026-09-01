@@ -683,3 +683,146 @@ Status values:
   legible and user-controlled. The explicit bounded choice avoids surprising
   launches, works with existing manual installs, and adds no privileged daemon,
   credential broker, or background process.
+
+## D061 — Make the Phase 12 review image source-fresh and visibly dark
+
+- **Status:** Accepted at Phase 12 integration review
+- **Date:** 2026-08-31
+- **Decision:** Package the canonical full Proper palette as the `Proper`
+  application colour scheme instead of the obsolete light placeholder. Refine
+  D059's terminal opacity from 92 to 88 percent while retaining opaque cell
+  backgrounds and compositor blur. Inhibit idle locking and display sleep only
+  while the live welcome choice is open. Remove the remaining visible Fedora
+  attribution from the welcome footer, keep the choice usable at the 640x480
+  firmware fallback, and select the advertised 1920x1080 mode before showing
+  it in the QEMU review session. Rebuild the complete Proper RPM
+  repository for every product ISO composition; repository existence is never
+  proof that its payloads match the current source tree.
+- **Reason:** The first Phase 12 candidate exposed light application chrome,
+  visually negligible terminal translucency, a welcome screen that could lock
+  behind a stale framebuffer, and a final Ghostty source edit newer than its
+  RPM. These were source-to-image integration failures, not acceptable visual
+  variants. The PM rejected that candidate and requested a genuinely current
+  image for review.
+
+## D062 — Complete the approved shelf states and restore pointer-first locking
+
+- **Status:** Accepted at Phase 12 shell review
+- **Date:** 2026-08-31
+- **Decision:** Implement D055's approved task language in Proper's Plasma
+  Style instead of inheriting Breeze's filled blue task frames: a focused
+  application uses a short cool underline, a running inactive application uses
+  a quiet dot, and hover adds no circle or filled tile. Restore equal shelf end
+  margins, superseding D055's extra four pixels after the clock. Preserve the
+  quiet clock-only lock state, but make a blank-screen pointer click reveal and
+  focus authentication controls, with a bounded return to the quiet state.
+  Replace the inherited distro session-start splash with the canonical Proper
+  icon. Restore the welcome block's approved width and a safe headline line
+  box so its text cannot wrap into clipped lines at the review scale.
+- **Reason:** The approved shelf preview already specified line and dot states,
+  but no Proper `tasks.svg` was promoted, so Plasma exposed Breeze's blue
+  backgrounds with geometry that did not match the Proper shelf. The custom
+  lock screen also omitted upstream's pointer reveal path, leaving an empty
+  password field permanently hidden after the clock view appeared. The PM
+  rejected both regressions and reversed the earlier asymmetric clock padding.
+
+## D063 — Complete the task-state language and materialize the dark application palette
+
+- **Status:** Accepted at Phase 12 shell review
+- **Date:** 2026-08-31
+- **Decision:** Replace the task manager's circular `IsStartup` busy indicator
+  with a short dim underline carrying one small highlight dot that travels
+  smoothly from side to side. Preserve D062's solid line for the active app
+  and static dot for a running inactive app; do not place circles, halos, or
+  filled tiles behind task icons. Carry this as a narrow patch against Fedora's
+  pinned `plasma-desktop-6.7.4-1.fc44` source package because Plasma exposes no
+  task-launch-indicator theme hook; do not change the system-wide busy
+  indicator. Seed the full Proper color groups in the new-user and system
+  `kdeglobals`, not only `ColorScheme=Proper`, so `KColorScheme` consumers such
+  as Dolphin begin with the intended dark view palette on their first launch.
+- **Source:** Fedora `plasma-desktop-6.7.4-1.fc44.src.rpm`, SHA-256
+  `bc3e4d042be57b1d3d6edac10203f85ddb8690ae36f1ce98368ed53f4f73166a`.
+  The retained source version and Fedora patches are unchanged; Proper adds
+  one GPL-2.0-or-later QML patch and a `.proper1` release suffix.
+- **Update method:** When Fedora updates `plasma-desktop`, pin and checksum the
+  new source RPM, rebase the one QML hunk, run its package tests, and verify the
+  launching, active, and running-inactive states in the review VM. Drop the
+  patch if upstream adds a supported task-specific launch-indicator hook.
+- **Reason:** Plasma's task startup feedback is a separate QML busy indicator,
+  so styling `tasks.svg` alone cannot remove the blue circle. The first-boot
+  palette also selected the Proper scheme by name without materializing its
+  color groups; Dolphin's `KColorScheme::View` consequently used a light
+  fallback until another scheme was applied and Proper was selected again.
+
+## D064 — Make Proper's tokens, app icons, and product home one system
+
+- **Status:** Accepted for implementation
+- **Date:** 2026-09-01
+- **Decision:** Generate the shared Qt widget styles and shortcut-reference CSS
+  from `tokens.yaml` during the `proper-look-and-feel` build. Proper Apps,
+  Appearance, the live welcome, Start Here, and the local shortcut reference
+  consume those generated assets instead of maintaining parallel colour and
+  radius literals. Ship a related dark-tile icon family for Proper Apps,
+  Appearance, Shortcuts, and Coding Agent; keep the approved white launcher
+  dot unchanged and use Ghostty's own identity for the terminal wrapper. Add a
+  passive Start Here application that links to apps, appearance, updates,
+  shortcuts, System Settings, and support. Promote it in Vicinae, but never
+  autostart it or insert it into first boot.
+- **Reason:** A coherent product needs one visual source of truth and a stable
+  home without turning onboarding into another modal journey. Build-generated
+  assets let native Qt and local web surfaces share the same decisions while
+  leaving upstream KDE controls and application identities intact.
+
+## D065 — Separate the Recommended shelf from the broad application directory
+
+- **Status:** Accepted for implementation
+- **Date:** 2026-09-01
+- **Decision:** Keep the 55-entry Omarchy-compatible directory searchable by
+  category and in All, but limit Recommended to Google Chrome, Helium, Signal,
+  VLC, Spotify, GitHub Desktop, Visual Studio Code Insiders, Codex desktop,
+  Codex CLI, and Claude Code CLI. Podman, printer compatibility, Calculator,
+  stable VS Code, and all other alternatives remain available without being
+  presented as Proper's front-page choices. Install Helium through its official
+  Fedora COPR. Bootstrap OpenAI's official Fedora 43/44 ChatGPT desktop preview
+  with the pinned reviewed RPM, which includes Codex and configures its update
+  repository. Do not list Claude Desktop until Anthropic publishes a supported,
+  reversible Linux provider; Claude Code CLI and the general web-app path remain
+  available.
+- **Sources:** [Helium Linux packaging](https://github.com/imputnet/helium-linux),
+  [OpenAI ChatGPT Linux release notes](https://help.openai.com/en/articles/6825453),
+  and [Anthropic Claude Desktop requirements](https://support.anthropic.com/en/articles/10065433-installing-claude-for-desktop),
+  checked 2026-09-01.
+- **Update method:** Review the Helium COPR and OpenAI RPM repository metadata,
+  update the pinned bootstrap RPM and icon ledger when their providers change,
+  and revalidate every install, removal, detection, and launch command. Recheck
+  Anthropic's official platform list before adding a Claude Desktop entry.
+- **Reason:** Recommended is a product opinion, not a popularity list. The full
+  directory preserves breadth and user choice without making the landing page
+  look indecisive or giving unofficial desktop wrappers Proper's endorsement.
+
+## D066 — Use Inter 4 for desktop UI with Noto Sans fallback
+
+- **Status:** Accepted from the approved taskbar typography direction
+- **Date:** 2026-09-01
+- **Decision:** Use Inter as the primary Proper Linux desktop, taskbar, clock,
+  first-party application, GTK, login, lock-screen, and restrained boot-text
+  family. Keep Noto Sans as the explicit international fallback. Keep
+  JetBrains Mono only for terminal, code, fixed-width, and keyboard-reference
+  surfaces. Fedora's maintained `rsms-inter-fonts-4.1-3.fc44.noarch` package is
+  the pinned Inter source for version 0.1; its installed files report family
+  `Inter` and OpenType font version 4.001 through fontconfig.
+- **Source:** Fedora `rsms-inter-fonts-4.1-3.fc44.noarch`, from the Fedora 44
+  release repository and upstream <https://rsms.me/inter/>. Noto fallback is
+  Fedora `google-noto-sans-fonts-20251201-2.fc44.noarch`; the fixed-width face
+  is Fedora `jetbrains-mono-fonts-2.304-10.fc44.noarch`.
+- **Licence:** OFL-1.1 for Inter, Noto Sans, and JetBrains Mono as declared by
+  their Fedora packages.
+- **Update method:** Review the Fedora package source, installed family name,
+  font metadata, licence, and fontconfig rules; update the exact RPM dependency
+  and image-manifest validation deliberately; regenerate the shared UI assets;
+  then require `fc-match Inter` and the desktop font settings to resolve to
+  Inter in the next exact ISO guest before promotion.
+- **Reason:** Inter was approved in the taskbar preview and gives Proper's
+  interface a more deliberate UI-specific voice. Explicit packaging and
+  regression checks prevent a missing font from silently turning that design
+  choice back into Noto Sans while retaining broad glyph fallback.

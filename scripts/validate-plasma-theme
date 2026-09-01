@@ -10,6 +10,11 @@ metadata="$style_root/metadata.json"
 spec="$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
 tokens="$project_root/packages/proper-look-and-feel/tokens.yaml"
 plasma_defaults="$project_root/packages/proper-defaults/plasmarc"
+dark_scheme="$style_root/colors"
+default_kdeglobals="$project_root/packages/proper-defaults/kdeglobals"
+task_asset="$style_root/widgets/tasks.svg"
+panel_asset="$style_root/widgets/panel-background.svg"
+task_loading_patch="$project_root/packages/plasma-desktop/proper-task-loading-indicator.patch"
 
 command -v xmllint >/dev/null 2>&1 || {
   printf 'Required command missing: xmllint\n' >&2
@@ -73,12 +78,46 @@ done
 
 panel_radius="$(sed -n "s/^radius: {panel: \([0-9][0-9]*\),.*/\1/p" "$tokens")"
 asset_radius="$(xmllint --xpath "string(//*[@id='top']/*[1]/@height)" \
-  "$style_root/widgets/panel-background.svg")"
+  "$panel_asset")"
 mask_radius="$(xmllint --xpath "string(//*[@id='mask-top']/@height)" \
-  "$style_root/widgets/panel-background.svg")"
+  "$panel_asset")"
 [[ -n "$panel_radius" && "$panel_radius" == "$asset_radius" && "$panel_radius" == "$mask_radius" ]] || {
   printf 'Panel radius token (%s), visible corner slice (%s), and mask slice (%s) must match.\n' \
     "$panel_radius" "$asset_radius" "$mask_radius" >&2
+  exit 1
+}
+
+left_margin="$(xmllint --xpath "string(//*[@id='hint-left-margin']/@width)" "$panel_asset")"
+right_margin="$(xmllint --xpath "string(//*[@id='hint-right-margin']/@width)" "$panel_asset")"
+[[ "$left_margin" == "$right_margin" ]] || {
+  printf 'Proper shelf end margins must be symmetric; found left %s and right %s.\n' \
+    "$left_margin" "$right_margin" >&2
+  exit 1
+}
+
+for state in normal focus hover minimized attention progress; do
+  for slice in center top bottom left right topleft topright bottomleft bottomright; do
+    count="$(xmllint --xpath "count(//*[@id='$state-$slice'])" "$task_asset")"
+    [[ "$count" == 1 ]] || {
+      printf 'Proper task asset must define %s-%s exactly once; found %s.\n' \
+        "$state" "$slice" "$count" >&2
+      exit 1
+    }
+  done
+done
+[[ "$(xmllint --xpath "count(//*[@id='focus-bottom']//*[contains(@class, 'ColorScheme-ButtonFocus')])" "$task_asset")" == 1 ]]
+[[ "$(xmllint --xpath "count(//*[@id='normal-bottom']//*[contains(@class, 'ColorScheme-Text')])" "$task_asset")" == 1 ]]
+[[ "$(xmllint --xpath "count(//*[starts-with(@id, 'hover-')]//*[@class='ColorScheme-ButtonFocus' or @class='ColorScheme-ButtonHover'])" "$task_asset")" == 0 ]] || {
+  printf 'Proper hover task state must not contain a filled blue focus or hover shape.\n' >&2
+  exit 1
+}
+
+grep -q 'id: launchIndicator' "$task_loading_patch"
+grep -q 'id: launchTrack' "$task_loading_patch"
+grep -q 'id: launchMotion' "$task_loading_patch"
+grep -q 'duration: 700' "$task_loading_patch"
+! grep -q '^+.*PlasmaComponents3[.]BusyIndicator' "$task_loading_patch" || {
+  printf 'Proper task startup patch must replace Plasma\x27s circular busy indicator.\n' >&2
   exit 1
 }
 
@@ -93,4 +132,29 @@ tooltip_delay="$(awk '
   exit 1
 }
 
-printf 'Plasma theme valid: matched panel radius/mask, neutral shadows, and hover tooltips disabled.\n'
+dark_window_rgb="$(awk '
+  /^\[Colors:Window\]$/ { in_window = 1; next }
+  /^\[/ { in_window = 0 }
+  in_window && /^BackgroundNormal=/ { sub(/^BackgroundNormal=/, ""); print; exit }
+' "$dark_scheme")"
+IFS=, read -r dark_red dark_green dark_blue <<<"$dark_window_rgb"
+[[ "$dark_red" =~ ^[0-9]+$ && "$dark_green" =~ ^[0-9]+$ && "$dark_blue" =~ ^[0-9]+$ ]] &&
+  (( dark_red < 80 && dark_green < 80 && dark_blue < 80 )) || {
+    printf 'Proper Dark window background must be dark; found %s.\n' "${dark_window_rgb:-missing}" >&2
+    exit 1
+  }
+
+default_view_rgb="$(awk '
+  /^\[Colors:View\]$/ { in_view = 1; next }
+  /^\[/ { in_view = 0 }
+  in_view && /^BackgroundNormal=/ { sub(/^BackgroundNormal=/, ""); print; exit }
+' "$default_kdeglobals")"
+[[ "$default_view_rgb" == "21,26,34" ]] || {
+  printf 'Proper KDE defaults must materialize the dark view palette; found %s.\n' \
+    "${default_view_rgb:-missing}" >&2
+  exit 1
+}
+
+grep -qx 'ColorScheme=Proper' "$default_kdeglobals"
+
+printf 'Plasma theme valid: materialized dark palette, symmetric shelf, launch/active/running task states, matched masks, neutral shadows, and hover tooltips disabled.\n'
