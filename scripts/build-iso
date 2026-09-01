@@ -14,7 +14,7 @@ else
 fi
 build_source_dir="$iso_dir/source"
 
-for binary in fc-scan git lsinitrd patch sha256sum xmllint xorriso; do
+for binary in fc-scan git lsinitrd patch sha256sum strings xmllint xorriso; do
   command -v "$binary" >/dev/null 2>&1 || { printf 'Required command missing: %s\n' "$binary" >&2; exit 1; }
 done
 [[ -n "$UPSTREAM_COMMIT" ]] || { printf 'Fedora input is not pinned. Run scripts/pin-fedora-base, review the lock, then rerun.\n' >&2; exit 1; }
@@ -247,8 +247,13 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image has no Noto Sans regular fallback file.\n' >&2
     exit 1
   }
-  find "$image_root/usr/share/fonts" -type f -name 'JetBrainsMono-Regular.ttf' -print -quit | grep -q . || {
-    printf 'Built image has no JetBrains Mono regular file.\n' >&2
+  image_jetbrains_font="$image_root/usr/share/fonts/jetbrains-mono-fonts/JetBrainsMono-Regular.otf"
+  [[ -f "$image_jetbrains_font" ]] || {
+    printf 'Built image has no Fedora JetBrains Mono regular OTF.\n' >&2
+    exit 1
+  }
+  [[ "$(fc-scan --format '%{family[0]}|%{style[0]}|%{fontversion}\n' "$image_jetbrains_font")" == 'JetBrains Mono|Regular|150995' ]] || {
+    printf 'Built JetBrains Mono family, style, or OpenType version differs from the reviewed Fedora payload.\n' >&2
     exit 1
   }
   image_widgets="$image_root/usr/share/proper-linux/ui/proper-widgets-dark.qss"
@@ -266,13 +271,15 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built lock screen does not select Inter explicitly.\n' >&2
     exit 1
   }
-  grep -aFq 'uiFontFamily' "$image_root/usr/libexec/plasma-login-greeter" &&
-    grep -aFq 'Inter' "$image_root/usr/libexec/plasma-login-greeter" || {
+  image_login_strings="$(strings -el "$image_root/usr/libexec/plasma-login-greeter")"
+  grep -Fxq 'uiFontFamily' <<<"$image_login_strings" &&
+    grep -Fxq 'Inter' <<<"$image_login_strings" || {
       printf 'Built login greeter does not embed the explicit Inter family.\n' >&2
       exit 1
     }
-  grep -aFq 'launchIndicator' \
-    "$iso_dir/image-build/build/image-root/usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.taskmanager.so" || {
+  image_task_strings="$(strings -el \
+    "$iso_dir/image-build/build/image-root/usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.taskmanager.so")"
+  grep -Fxq 'launchIndicator' <<<"$image_task_strings" || {
       printf 'Built task manager plugin lacks the Proper moving-dot launch state.\n' >&2
       exit 1
     }
