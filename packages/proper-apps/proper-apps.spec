@@ -1,6 +1,6 @@
 Name: proper-apps
 Version: 0.1
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: Proper Linux curated application catalogue
 License: GPL-3.0-or-later
 BuildRequires: qt6-qtbase-devel
@@ -35,6 +35,11 @@ install -pm 0644 %{_sourcedir}/icons/* %{buildroot}%{_datadir}/proper-apps/icons
 %{_datadir}/proper-apps/icons/
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-11
+- Preflight offline and critically low-space installs with actionable messages
+- Identify network, disk, missing-package, and stale-provider failures in plain language
+- Explain the live session's temporary, capacity-limited application storage
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-10
 - Show authentication, download, install, and configuration phases explicitly
 - Reconcile catalogue state after every provider result, including partial success

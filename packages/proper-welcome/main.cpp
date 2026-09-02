@@ -5,19 +5,24 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QFontDatabase>
+#include <QFrame>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QKeyEvent>
 #include <QLinearGradient>
 #include <QList>
 #include <QPainter>
 #include <QPalette>
 #include <QProcess>
 #include <QPushButton>
+#include <QResizeEvent>
 #include <QScreen>
+#include <QScrollArea>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <functional>
+#include <initializer_list>
 
 static void applyStyle(QApplication &application, const QString &path) {
     QFile style(path);
@@ -37,6 +42,35 @@ static void applyProperWidgetStyle(QApplication &application) {
 static QIcon properIcon(const QString &name) {
     const QString root = qEnvironmentVariable("PROPER_ICON_DIR", "/usr/share/icons/hicolor/scalable/apps");
     return QIcon::fromTheme(name, QIcon(root + "/" + name + ".svg"));
+}
+
+static QLabel *keycap(const QString &text) {
+    auto *label = new QLabel(text);
+    label->setObjectName("keycap");
+    label->setAlignment(Qt::AlignCenter);
+    label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    return label;
+}
+
+static QWidget *shortcutHint(const QStringList &keys, const QString &action, bool compact = false) {
+    auto *hint = new QFrame;
+    hint->setObjectName(compact ? "shortcutLine" : "shortcutHint");
+    auto *row = new QHBoxLayout(hint);
+    row->setContentsMargins(compact ? 10 : 12, compact ? 8 : 9, compact ? 10 : 12, compact ? 8 : 9);
+    row->setSpacing(6);
+    for (int index = 0; index < keys.size(); ++index) {
+        if (index > 0) {
+            auto *plus = new QLabel("+");
+            plus->setObjectName("keyJoin");
+            row->addWidget(plus);
+        }
+        row->addWidget(keycap(keys[index]));
+    }
+    auto *copy = new QLabel(action);
+    copy->setObjectName("shortcutAction");
+    copy->setWordWrap(true);
+    row->addWidget(copy, 1);
+    return hint;
 }
 
 class IdleInhibitor final {
@@ -202,21 +236,31 @@ public:
         content->addWidget(linuxLabel);
         content->addSpacing(15);
 
-        auto *headline = new QLabel("A considered desktop, ready to explore.");
+        auto *headline = new QLabel("Linux, properly put together.");
         headline->setObjectName("headline");
         headline->setAlignment(Qt::AlignCenter);
         headline->setWordWrap(true);
         headline->setMinimumHeight(56);
         content->addWidget(headline);
 
-        auto *body = new QLabel("Try the complete desktop without changing this computer, or install Proper Linux when you’re ready.");
+        auto *body = new QLabel(
+            "Proper pairs Fedora’s proven hardware, security, and update foundations with a deliberately curated KDE desktop. "
+            "It keeps familiar pointer controls, adds fast keyboard paths, and chooses coherent tools so you can get on with your work instead of assembling the basics."
+        );
         body->setObjectName("body");
         body->setAlignment(Qt::AlignCenter);
         body->setWordWrap(true);
-        body->setMinimumHeight(58);
-        body->setMaximumWidth(650);
+        body->setMinimumHeight(72);
+        body->setMaximumWidth(740);
         content->addWidget(body, 0, Qt::AlignHCenter);
-        content->addSpacing(17);
+
+        auto *shortcuts = new QHBoxLayout;
+        shortcuts->setSpacing(8);
+        shortcuts->addWidget(shortcutHint({"Meta"}, "Search", true));
+        shortcuts->addWidget(shortcutHint({"Meta", "M"}, "Arrange", true));
+        shortcuts->addWidget(shortcutHint({"Meta", "Enter"}, "Terminal", true));
+        content->addLayout(shortcuts);
+        content->addSpacing(12);
 
         auto *actions = new QHBoxLayout;
         actions->setSpacing(12);
@@ -254,84 +298,183 @@ public:
         setObjectName("properRoot");
         setWindowTitle("Start Here · Proper Linux");
         setWindowIcon(properIcon("proper-logo-icon"));
-        resize(900, 720);
-        setMinimumSize(680, 500);
+        resize(980, 760);
+        setMinimumSize(620, 460);
 
         auto *root = new QVBoxLayout(this);
-        root->setContentsMargins(34, 30, 34, 26);
-        root->setSpacing(20);
+        root->setContentsMargins(0, 0, 0, 0);
 
-        auto *header = new QHBoxLayout;
+        auto *scroll = new QScrollArea;
+        scroll->setWidgetResizable(true);
+        scroll->setFrameShape(QFrame::NoFrame);
+        scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        auto *content = new QWidget;
+        auto *page = new QVBoxLayout(content);
+        page->setContentsMargins(34, 30, 34, 26);
+        page->setSpacing(18);
+
+        auto *hero = new QFrame;
+        hero->setObjectName("guideHero");
+        auto *header = new QHBoxLayout(hero);
+        header->setContentsMargins(22, 20, 22, 20);
+        header->setSpacing(16);
         auto *mark = new QLabel;
         mark->setPixmap(properIcon("proper-logo-icon").pixmap(58, 58));
         mark->setFixedSize(64, 64);
         header->addWidget(mark, 0, Qt::AlignTop);
         auto *copy = new QVBoxLayout;
-        auto *title = new QLabel("Start here");
+        copy->setSpacing(6);
+        auto *eyebrow = new QLabel("WELCOME TO PROPER");
+        eyebrow->setObjectName("guideEyebrow");
+        copy->addWidget(eyebrow);
+        auto *title = new QLabel("A coherent desktop, without the assembly job.");
         QFont titleFont = title->font();
-        titleFont.setPixelSize(30);
+        titleFont.setPixelSize(27);
         titleFont.setBold(true);
         title->setFont(titleFont);
+        title->setWordWrap(true);
         copy->addWidget(title);
-        auto *intro = new QLabel("The useful parts of Proper Linux, gathered in one quiet place.");
+        auto *intro = new QLabel(
+            "Proper Linux keeps Fedora’s dependable base and KDE’s full capability, then makes opinionated choices about defaults, tools, shortcuts, and visual rhythm. "
+            "The result is curated—not restricted: floating windows and pointer controls stay familiar, while faster paths are ready when you want them. "
+            "That discipline keeps the complete live image under 3 GB: one clear tool for each job, no office suite, duplicate apps or redundant packages. The wider catalogue stays one click away."
+        );
         intro->setObjectName("guideCopy");
         intro->setWordWrap(true);
         copy->addWidget(intro);
         header->addLayout(copy, 1);
-        root->addLayout(header);
+        page->addWidget(hero);
+
+        auto *principles = new QHBoxLayout;
+        principles->setSpacing(8);
+        for (const QString &principle : {QString("PROVEN FOUNDATIONS"), QString("UNDER 3 GB · NO FILLER"), QString("POINTER + KEYBOARD")}) {
+            auto *pill = new QLabel(principle);
+            pill->setObjectName("principlePill");
+            pill->setAlignment(Qt::AlignCenter);
+            pill->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+            principles->addWidget(pill);
+        }
+        page->addLayout(principles);
 
         status = new QLabel;
         status->setObjectName("errorBanner");
         status->setWordWrap(true);
         status->hide();
-        root->addWidget(status);
+        page->addWidget(status);
 
-        auto *grid = new QGridLayout;
-        grid->setHorizontalSpacing(14);
-        grid->setVerticalSpacing(14);
-        addCard(grid, 0, 0, "Browse software", "Recommended apps and the full catalogue",
-                "proper-apps", [this] { launch("/usr/bin/proper-apps"); });
-        addCard(grid, 0, 1, "Change appearance", "Desktop styles, text size, and wallpapers",
-                "proper-appearance", [this] { launch("/usr/bin/proper-appearance"); });
-        addCard(grid, 1, 0, "Check for updates", "System and application updates in Discover",
-                "system-software-update", [this] { launch("/usr/bin/proper-tool", {"updates"}); });
-        addCard(grid, 1, 1, "Learn shortcuts", "Fast paths with an ordinary pointer route too",
-                "proper-shortcuts", [this] { launch("/usr/bin/proper-tool", {"shortcuts"}); });
-        addCard(grid, 2, 0, "Arrange windows", "Choose halves, columns, a grid, or restore floating positions",
-                "view-grid", [this] { launch("/usr/bin/proper-arrange-workspace"); });
-        addCard(grid, 2, 1, "System Settings", "Hardware, accounts, networking, and the rest",
-                "systemsettings", [this] { launch("/usr/bin/systemsettings"); });
-        addCard(grid, 3, 0, "Project and support", "Read the project or report something that feels off",
-                "help-about", [this] {
+        auto *section = new QLabel("MAKE IT YOURS");
+        section->setObjectName("guideSectionLabel");
+        page->addWidget(section);
+
+        actionGrid = new QGridLayout;
+        actionGrid->setHorizontalSpacing(12);
+        actionGrid->setVerticalSpacing(12);
+        actionCards = {
+            makeCard("Search anything", "Apps, files, commands, and actions—one calm summon key.",
+                     "proper-vicinae", {"Meta"}, [this] { launch("/usr/bin/proper-launcher"); }),
+            makeCard("Arrange your workspace", "Choose a layout, then press the same shortcut to restore floating positions.",
+                     "view-grid", {"Meta", "M"}, [this] { launch("/usr/bin/proper-arrange-workspace"); }),
+            makeCard("Open Ghostty", "A fast terminal with Proper’s restrained translucent treatment.",
+                     "utilities-terminal", {"Meta", "Enter"}, [this] { launch("/usr/bin/ghostty"); }),
+            makeCard("Browse curated apps", "A considered shortlist plus the wider catalogue, with honest install diagnostics.",
+                     "proper-apps", {}, [this] { launch("/usr/bin/proper-apps"); }),
+            makeCard("Change appearance", "Coordinated desktop styles, text sizes, and wallpapers.",
+                     "proper-appearance", {}, [this] { launch("/usr/bin/proper-appearance"); }),
+            makeCard("See every shortcut", "A quick keycap overview here, plus a searchable full reference.",
+                     "proper-shortcuts", {"Meta", "/"}, [this] { launch("/usr/bin/proper-welcome", {"--shortcuts"}); }),
+            makeCard("Check for updates", "Fedora system and application updates through Discover.",
+                     "system-software-update", {}, [this] { launch("/usr/bin/proper-tool", {"updates"}); }),
+            makeCard("System Settings", "Networking, displays, accounts, input, accessibility, and the rest.",
+                     "systemsettings", {}, [this] { launch("/usr/bin/systemsettings"); }),
+            makeCard("Project and support", "Read the project, understand decisions, or report something that feels off.",
+                     "help-about", {}, [this] {
                     if (!QDesktopServices::openUrl(QUrl("https://github.com/marcodenic/PROPER_LINUX")))
                         showFailure("The project page could not be opened in your browser.");
-                });
-        addCard(grid, 3, 1, "Search everything", "Apps, files, commands, and actions in Vicinae",
-                "proper-vicinae", [this] { launch("/usr/bin/proper-launcher"); });
-        grid->setColumnStretch(0, 1);
-        grid->setColumnStretch(1, 1);
-        root->addLayout(grid, 1);
+                })
+        };
+        page->addLayout(actionGrid);
+        page->addStretch();
 
         auto *footer = new QLabel("Proper Linux 0.1 · Normal system controls stay available");
         footer->setObjectName("guideFooter");
         footer->setAlignment(Qt::AlignCenter);
         footer->setWordWrap(true);
-        root->addWidget(footer);
+        page->addWidget(footer);
+        scroll->setWidget(content);
+        root->addWidget(scroll);
+        rebuildGrid(width());
+    }
+
+protected:
+    void resizeEvent(QResizeEvent *event) override {
+        QWidget::resizeEvent(event);
+        rebuildGrid(event->size().width());
     }
 
 private:
-    void addCard(QGridLayout *grid, int row, int column, const QString &title,
-                 const QString &description, const QString &icon,
-                 std::function<void()> action) {
-        auto *button = new QPushButton(title + "\n" + description);
-        button->setObjectName("guideCard");
-        button->setIcon(properIcon(icon));
-        button->setIconSize(QSize(42, 42));
+    QWidget *makeCard(const QString &title, const QString &description, const QString &icon,
+                      const QStringList &keys, std::function<void()> action) {
+        auto *card = new QFrame;
+        card->setObjectName("guideCard");
+        card->setMinimumHeight(104);
+        card->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        auto *row = new QHBoxLayout(card);
+        row->setContentsMargins(16, 14, 14, 14);
+        row->setSpacing(13);
+        auto *art = new QLabel;
+        art->setObjectName("guideIcon");
+        art->setPixmap(properIcon(icon).pixmap(34, 34));
+        art->setAlignment(Qt::AlignCenter);
+        art->setFixedSize(52, 52);
+        row->addWidget(art, 0, Qt::AlignTop);
+        auto *copy = new QVBoxLayout;
+        copy->setSpacing(4);
+        auto *heading = new QLabel(title);
+        heading->setObjectName("guideCardTitle");
+        heading->setWordWrap(true);
+        copy->addWidget(heading);
+        auto *body = new QLabel(description);
+        body->setObjectName("guideCopy");
+        body->setWordWrap(true);
+        copy->addWidget(body);
+        copy->addStretch();
+        row->addLayout(copy, 1);
+        auto *end = new QVBoxLayout;
+        end->setSpacing(8);
+        if (!keys.isEmpty()) {
+            auto *caps = new QHBoxLayout;
+            caps->setSpacing(4);
+            for (int index = 0; index < keys.size(); ++index) {
+                if (index > 0) {
+                    auto *plus = new QLabel("+");
+                    plus->setObjectName("keyJoin");
+                    caps->addWidget(plus);
+                }
+                caps->addWidget(keycap(keys[index]));
+            }
+            end->addLayout(caps);
+        }
+        end->addStretch();
+        auto *button = new QPushButton("Open");
+        button->setObjectName("cardAction");
         button->setCursor(Qt::PointingHandCursor);
         button->setAccessibleName(title + ". " + description);
-        button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(button, &QPushButton::clicked, this, [action = std::move(action)] { action(); });
-        grid->addWidget(button, row, column);
+        end->addWidget(button);
+        row->addLayout(end);
+        return card;
+    }
+
+    void rebuildGrid(int width) {
+        const int wanted = width >= 820 ? 2 : 1;
+        if (wanted == actionColumns && actionGrid->count() == actionCards.size())
+            return;
+        actionColumns = wanted;
+        while (auto *item = actionGrid->takeAt(0)) delete item;
+        for (int index = 0; index < actionCards.size(); ++index)
+            actionGrid->addWidget(actionCards[index], index / actionColumns, index % actionColumns);
+        for (int column = 0; column < actionColumns; ++column)
+            actionGrid->setColumnStretch(column, 1);
     }
 
     void launch(const QString &program, const QStringList &arguments = {}) {
@@ -345,6 +488,114 @@ private:
     }
 
     QLabel *status = nullptr;
+    QGridLayout *actionGrid = nullptr;
+    QVector<QWidget *> actionCards;
+    int actionColumns = 0;
+};
+
+class ShortcutOverview final : public QWidget {
+public:
+    ShortcutOverview() {
+        setObjectName("properRoot");
+        setWindowTitle("Keyboard shortcuts · Proper Linux");
+        setWindowIcon(properIcon("proper-shortcuts"));
+        resize(900, 640);
+        setMinimumSize(620, 460);
+
+        auto *root = new QVBoxLayout(this);
+        root->setContentsMargins(26, 24, 26, 22);
+        root->setSpacing(14);
+        auto *eyebrow = new QLabel("QUICK REFERENCE");
+        eyebrow->setObjectName("guideEyebrow");
+        root->addWidget(eyebrow);
+        auto *title = new QLabel("Keyboard shortcuts");
+        QFont titleFont = title->font();
+        titleFont.setPixelSize(28);
+        titleFont.setBold(true);
+        title->setFont(titleFont);
+        root->addWidget(title);
+        auto *intro = new QLabel("Every action here also has an ordinary pointer route. Press Esc to close this pane.");
+        intro->setObjectName("guideCopy");
+        intro->setWordWrap(true);
+        root->addWidget(intro);
+
+        auto *scroll = new QScrollArea;
+        scroll->setWidgetResizable(true);
+        scroll->setFrameShape(QFrame::NoFrame);
+        auto *content = new QWidget;
+        auto *grid = new QGridLayout(content);
+        grid->setContentsMargins(0, 6, 8, 6);
+        grid->setHorizontalSpacing(14);
+        grid->setVerticalSpacing(14);
+        grid->addWidget(section("Launch", {
+            {{"Meta"}, "Search apps, files, and actions"},
+            {{"Meta", "Enter"}, "Open Ghostty"},
+            {{"Meta", "/"}, "Show this shortcut pane"}
+        }), 0, 0);
+        grid->addWidget(section("Windows", {
+            {{"Meta", "← / →"}, "Tile to a half"},
+            {{"Meta", "1 / 3 / 7 / 9"}, "Tile to a quadrant"},
+            {{"Meta", "M"}, "Arrange or restore the workspace"},
+            {{"Meta", "↑ / ↓"}, "Maximise or restore"},
+            {{"Meta", "H"}, "Minimise"}
+        }), 0, 1);
+        grid->addWidget(section("Workspace", {
+            {{"Meta", "W"}, "Overview"},
+            {{"Meta", "G"}, "Desktop grid"},
+            {{"Meta", "D"}, "Peek at the desktop"},
+            {{"Meta", "T"}, "Edit tiling layout"}
+        }), 1, 0);
+        grid->addWidget(section("Capture", {
+            {{"Print"}, "Open Spectacle"},
+            {{"Meta", "Shift", "S"}, "Capture a region"},
+            {{"Meta", "Shift", "O"}, "Copy text from a region"},
+            {{"Meta", "V"}, "Clipboard history"}
+        }), 1, 1);
+        grid->setColumnStretch(0, 1);
+        grid->setColumnStretch(1, 1);
+        scroll->setWidget(content);
+        root->addWidget(scroll, 1);
+
+        auto *actions = new QHBoxLayout;
+        auto *full = new QPushButton("Open searchable reference");
+        auto *close = new QPushButton("Close");
+        close->setObjectName("primaryButton");
+        actions->addWidget(full);
+        actions->addStretch();
+        actions->addWidget(close);
+        root->addLayout(actions);
+        connect(full, &QPushButton::clicked, this, [] {
+            QDesktopServices::openUrl(QUrl("file:///usr/share/doc/proper-launchers/proper-shortcuts.html"));
+        });
+        connect(close, &QPushButton::clicked, this, &QWidget::close);
+    }
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override {
+        if (event->key() == Qt::Key_Escape) {
+            close();
+            return;
+        }
+        QWidget::keyPressEvent(event);
+    }
+
+private:
+    using Shortcut = QPair<QStringList, QString>;
+
+    static QWidget *section(const QString &name, std::initializer_list<Shortcut> shortcuts) {
+        auto *panel = new QFrame;
+        panel->setObjectName("shortcutPanel");
+        auto *layout = new QVBoxLayout(panel);
+        layout->setContentsMargins(14, 13, 14, 14);
+        layout->setSpacing(7);
+        auto *title = new QLabel(name.toUpper());
+        title->setObjectName("guideSectionLabel");
+        layout->addWidget(title);
+        for (const auto &item : shortcuts)
+            layout->addWidget(shortcutHint(item.first, item.second, true));
+        layout->addStretch();
+        return panel;
+    }
 };
 
 int main(int argc, char **argv) {
@@ -355,6 +606,20 @@ int main(int argc, char **argv) {
     QApplication::setDesktopFileName("org.properlinux.Welcome");
 
     const int screenshotOption = application.arguments().indexOf("--screenshot");
+    if (application.arguments().contains("--shortcuts")) {
+        QApplication::setApplicationName("Proper Shortcuts");
+        QApplication::setDesktopFileName("proper-shortcut-overview");
+        applyProperWidgetStyle(application);
+        ShortcutOverview overview;
+        overview.show();
+        if (screenshotOption >= 0 && screenshotOption + 1 < application.arguments().size()) {
+            const QString output = application.arguments().at(screenshotOption + 1);
+            QTimer::singleShot(250, &overview, [&application, &overview, output] {
+                application.exit(overview.grab().save(output) ? 0 : 2);
+            });
+        }
+        return application.exec();
+    }
     if (application.arguments().contains("--guide")) {
         QApplication::setApplicationName("Start Here");
         QApplication::setDesktopFileName("proper-start");

@@ -192,21 +192,24 @@ def slider() -> str:
 
 def switch() -> str:
     parts = [
-        '  <rect id="inactive-left" x="0" y="0" width="9" height="18" rx="9" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.220"/>',
-        '  <rect id="inactive-center" x="9" y="0" width="14" height="18" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.220"/>',
-        '  <rect id="inactive-right" x="23" y="0" width="9" height="18" rx="9" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.220"/>',
-        '  <rect id="active-left" x="38" y="0" width="9" height="18" rx="9" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.950"/>',
-        '  <rect id="active-center" x="47" y="0" width="14" height="18" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.950"/>',
-        '  <rect id="active-right" x="61" y="0" width="9" height="18" rx="9" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.950"/>',
-        '  <circle id="handle-shadow" cx="9" cy="36" r="8" fill="#000000" fill-opacity="0.260"/>',
-        '  <circle id="handle" cx="29" cy="36" r="7" class="ColorScheme-ButtonText" fill="currentColor" fill-opacity="0.960"/>',
-        '  <circle id="handle-hover" cx="49" cy="36" r="8" class="ColorScheme-ButtonText" fill="currentColor"/>',
-        '  <circle id="handle-focus" cx="70" cy="36" r="9" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.260"/>',
-        '  <circle id="handle-pressed" cx="91" cy="36" r="7" class="ColorScheme-ButtonText" fill="currentColor" fill-opacity="0.880"/>',
-        '  <rect id="hint-bar-size" x="105" y="27" width="32" height="18" fill="#ff00ff" fill-opacity="0.001"/>',
-        '  <rect id="hint-stretch-borders" x="139" y="27" width="1" height="1" fill="#ff6600"/>',
+        # Plasma's Switch expects Breeze-compatible 38x16 bar and 22x22
+        # handle geometry. Keeping those contracts avoids compressed handles
+        # and misaligned labels in Networks and Airplane Mode.
+        '  <rect id="inactive-left" x="0" y="0" width="8" height="16" rx="8" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.240"/>',
+        '  <rect id="inactive-center" x="8" y="0" width="22" height="16" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.240"/>',
+        '  <rect id="inactive-right" x="30" y="0" width="8" height="16" rx="8" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.240"/>',
+        '  <rect id="active-left" x="44" y="0" width="8" height="16" rx="8" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.900"/>',
+        '  <rect id="active-center" x="52" y="0" width="22" height="16" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.900"/>',
+        '  <rect id="active-right" x="74" y="0" width="8" height="16" rx="8" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.900"/>',
+        '  <circle id="handle-shadow" cx="13" cy="39" r="13" fill="#000000" fill-opacity="0.220"/>',
+        '  <circle id="handle" cx="43" cy="39" r="11" class="ColorScheme-ButtonText" fill="currentColor" fill-opacity="0.980"/>',
+        '  <circle id="handle-hover" cx="69" cy="39" r="11" class="ColorScheme-ButtonFocus" fill="currentColor"/>',
+        '  <circle id="handle-focus" cx="97" cy="39" r="13" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.260"/>',
+        '  <circle id="handle-pressed" cx="125" cy="39" r="11" class="ColorScheme-ButtonText" fill="currentColor" fill-opacity="0.880"/>',
+        '  <rect id="hint-bar-size" x="142" y="31" width="38" height="16" fill="#ff00ff" fill-opacity="0.001"/>',
+        '  <rect id="hint-stretch-borders" x="184" y="31" width="4" height="4" fill="#ff6600"/>',
     ]
-    return document(144, 52, "\n".join(parts))
+    return document(192, 56, "\n".join(parts))
 
 
 def tab_frame(prefix: str, x: int, y: int, edge: str) -> str:

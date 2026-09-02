@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -eu
+
+state_dir="${XDG_CONFIG_HOME:-$HOME/.config}/proper-linux"
+marker="$state_dir/natural-scroll-default-applied"
+[[ ! -e "$marker" ]] || exit 0
+
+# KWin writes a NaturalScroll key only after the user has made a per-device
+# choice. An upgrade must not reverse that existing choice merely because this
+# product default was introduced later.
+kwin_config="${XDG_CONFIG_HOME:-$HOME/.config}/kwinrc"
+if [[ -f "$kwin_config" ]] && grep -q '^NaturalScroll=' "$kwin_config"; then
+    mkdir -p "$state_dir"
+    : >"$marker"
+    exit 0
+fi
+
+# Device identifiers only exist after KWin/libinput starts. Apply the product
+# default once, then leave later choices entirely to the user and Plasma's
+# ordinary Mouse and Touchpad settings.
+for _ in {1..40}; do
+    pointers="$(qdbus-qt6 org.kde.KWin /org/kde/KWin/InputDevice \
+        org.kde.KWin.InputDeviceManager.ListPointers 2>/dev/null || true)"
+    applied=false
+    while IFS= read -r device; do
+        [[ "$device" =~ ^event[0-9]+$ ]] || continue
+        if busctl --user set-property org.kde.KWin \
+            "/org/kde/KWin/InputDevice/$device" \
+            org.kde.KWin.InputDevice naturalScroll b true >/dev/null 2>&1; then
+            applied=true
+        fi
+    done <<<"$pointers"
+    if [[ "$applied" == true ]]; then
+        mkdir -p "$state_dir"
+        : >"$marker"
+        exit 0
+    fi
+    sleep 0.25
+done
+
+# Do not create the marker when no supported pointer was present. A later
+# login can retry, which also covers machines first booted without a mouse.
+exit 0

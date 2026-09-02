@@ -3,6 +3,8 @@
 #include <QComboBox>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QDBusConnection>
+#include <QDBusInterface>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDir>
@@ -34,6 +36,7 @@
 #include <QSet>
 #include <QStackedWidget>
 #include <QStandardPaths>
+#include <QStorageInfo>
 #include <QTextBrowser>
 #include <QToolButton>
 #include <QUuid>
@@ -103,6 +106,23 @@ private:
 
 static QString homePath() {
     return QDir::homePath();
+}
+
+static bool isLiveSession() {
+    return qEnvironmentVariable("USER") == "liveuser"
+        || QFileInfo::exists("/run/initramfs/live")
+        || QFileInfo::exists("/run/overlayfs");
+}
+
+static bool hasInternetConnection() {
+    QDBusInterface manager("org.freedesktop.NetworkManager",
+                           "/org/freedesktop/NetworkManager",
+                           "org.freedesktop.NetworkManager",
+                           QDBusConnection::systemBus());
+    if (!manager.isValid())
+        return false;
+    // NetworkManager: 60 is connected-to-site and 70 is globally connected.
+    return manager.property("State").toUInt() >= 60;
 }
 
 static void applyProperWidgetStyle(QApplication &application) {
@@ -323,6 +343,10 @@ public:
         populateCategories();
         configureAgentMode();
         refresh();
+        if (isLiveSession() && !banner->isVisible()) {
+            banner->setText("Live session · app installs are temporary and share limited writable space. Install Proper Linux for persistent apps and full disk capacity.");
+            banner->setVisible(true);
+        }
     }
 
 private:
@@ -901,6 +925,30 @@ private:
     void installEntry(const QString &id) {
         const auto entry = entryFor(id);
         if (entry.isEmpty() || isInstalled(entry)) return;
+        if (!hasInternetConnection()) {
+            showFailure(
+                "You’re offline, so this app cannot be downloaded.",
+                "NetworkManager does not report an internet-capable connection.",
+                "Turn on Wi-Fi or connect a network cable from the taskbar, then retry."
+            );
+            return;
+        }
+        if (isLiveSession()) {
+            QStorageInfo storage(entry.value("provider").toString() == "flatpak" ? homePath() : QDir::rootPath());
+            storage.refresh();
+            constexpr qint64 liveMinimum = 1536LL * 1024 * 1024;
+            if (storage.isValid() && storage.isReady() && storage.bytesAvailable() >= 0
+                && storage.bytesAvailable() < liveMinimum) {
+                const qint64 availableMiB = storage.bytesAvailable() / (1024 * 1024);
+                showFailure(
+                    QString("This live session has only %1 MB of writable space left.").arg(availableMiB),
+                    QString("Available bytes: %1\nRequired live-session safety margin: %2")
+                        .arg(storage.bytesAvailable()).arg(liveMinimum),
+                    "App installs are temporary in the live session and this one is unlikely to fit. Install Proper Linux to disk, or free at least 1.5 GB and retry."
+                );
+                return;
+            }
+        }
         QJsonArray steps = entry.value("install_steps").toArray();
         const QString provider = entry.value("provider").toString();
         const QString providerId = entry.value("provider_id").toString();
@@ -1055,7 +1103,11 @@ private:
                                     programName + QString(" exited with status %1.\n\n").arg(exitCode) + activeOutput.right(1800));
                     return;
                 }
-                operationFailed("The provider could not complete that request.", programName + QString(" exited with status %1.\n\n").arg(exitCode) + activeOutput.right(1800));
+                const auto diagnosis = diagnoseProviderFailure(activeOutput);
+                operationFailed(diagnosis.first,
+                                programName + QString(" exited with status %1.\n\n").arg(exitCode) + activeOutput.right(1800),
+                                false,
+                                diagnosis.second);
                 return;
             }
             ++activeStep;
@@ -1076,7 +1128,49 @@ private:
         }
     }
 
-    void operationFailed(const QString &message, const QString &details, bool cancelled = false) {
+    static QPair<QString, QString> diagnoseProviderFailure(const QString &output) {
+        const QString text = output.toLower();
+        if (text.contains("no space left on device")
+            || text.contains("not enough free disk space")
+            || text.contains("disk requirements")
+            || (text.contains("needs ") && text.contains(" more space"))) {
+            return {
+                "There isn’t enough writable space to install this app.",
+                isLiveSession()
+                    ? "The live session has a small temporary writable layer. Install Proper Linux to disk for normal capacity, or free space and retry."
+                    : "Free some disk space, then retry. Nothing was marked installed unless Proper Apps could confirm it."
+            };
+        }
+        if (text.contains("could not resolve host")
+            || text.contains("network is unreachable")
+            || text.contains("failed to download metadata")
+            || text.contains("name or service not known")
+            || text.contains("curl error (6)")) {
+            return {
+                "The download failed because the network is unavailable.",
+                "Connect to Wi-Fi or a wired network from the taskbar, then retry."
+            };
+        }
+        if (text.contains("404 not found") || text.contains("status code: 404")) {
+            return {
+                "The app provider no longer offers the expected download.",
+                "Your connection is working. This catalogue entry needs an updated provider path; open the technical details when reporting it."
+            };
+        }
+        if (text.contains("no match for argument") || text.contains("unable to find a match")) {
+            return {
+                "The configured package is not available from the enabled software sources.",
+                "Refresh updates and retry. If it still fails, report the app name with the technical details."
+            };
+        }
+        return {
+            "The app provider could not complete the installation.",
+            "Your connection and disk space look usable. Open the technical details for the provider’s exact error, then retry once."
+        };
+    }
+
+    void operationFailed(const QString &message, const QString &details, bool cancelled = false,
+                         const QString &diagnosticAdvice = {}) {
         const QString failedId = activeEntryId;
         const QString failedVerb = activeVerb;
         const int completedSteps = activeStep;
@@ -1127,9 +1221,11 @@ private:
         }
 
         pendingDefaultAgent.clear();
-        QString informative = "Check your connection and retry. The catalogue has been refreshed from the actual system state.";
+        QString informative = diagnosticAdvice.isEmpty()
+            ? "Check your connection and disk space, then retry. The catalogue has been refreshed from the actual system state."
+            : diagnosticAdvice;
         if (completedSteps > 0) {
-            informative = QString("Installation stopped after %1 of %2 steps. Supporting components from completed steps may remain installed; retrying is safe and resumes from the detected state.")
+            informative += QString(" Installation stopped after %1 of %2 steps. Supporting components from completed steps may remain installed; retrying is safe and resumes from the detected state.")
                 .arg(completedSteps)
                 .arg(totalSteps);
         }

@@ -40,6 +40,3 @@ packages/proper-terminal/zig-*.tar.xz
 packages/proper-terminal/zig-*.minisig
 socket,json,sys,time
 .build/
-
-# Raw visual-review captures; keep only selected compressed checkpoint evidence
-/docs/evidence/raw/

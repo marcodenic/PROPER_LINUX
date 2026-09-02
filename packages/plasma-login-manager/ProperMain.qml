@@ -221,7 +221,10 @@ Item {
                 top: parent.top
                 topMargin: parent.height * 0.53
             }
-            width: Math.min(330, parent.width * 0.5)
+            // The authentication capsule has one deliberate visual measure.
+            // It responds only when the whole screen is too narrow; password
+            // length never changes its geometry.
+            width: Math.min(324, parent.width - 48)
             spacing: 8
             // Keep the focused field live while the greeter is in its idle
             // state. The global event filter deliberately lets ordinary key
@@ -270,24 +273,41 @@ Item {
             PlasmaComponents.TextField {
                 id: passwordBox
                 width: parent.width
-                height: 46
+                height: 50
                 activeFocusOnTab: true
                 color: "#f3f8ff"
                 echoMode: TextInput.Password
                 font.family: root.uiFontFamily
-                font.pixelSize: 17
+                font.letterSpacing: 2.4
+                font.pixelSize: 21
                 horizontalAlignment: TextInput.AlignHCenter
+                leftPadding: 18
                 passwordCharacter: "•"
                 placeholderText: ""
+                rightPadding: 18
                 selectByMouse: false
 
                 background: Rectangle {
                     border.color: root.notificationMessage.length > 0
-                        ? Qt.rgba(1, 0.45, 0.42, 0.58)
-                        : Qt.rgba(0.85, 0.92, 0.98, 0.22)
+                        ? Qt.rgba(1, 0.45, 0.42, 0.62)
+                        : passwordBox.activeFocus
+                            ? Qt.rgba(0.68, 0.82, 0.98, 0.28)
+                            : Qt.rgba(0.85, 0.92, 0.98, 0.12)
                     border.width: 1
-                    color: Qt.rgba(0.02, 0.07, 0.13, 0.38)
-                    radius: 13
+                    color: Qt.rgba(0.02, 0.065, 0.12, 0.38)
+                    radius: 16
+
+                    Rectangle {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            top: parent.top
+                            margins: 1
+                        }
+                        color: Qt.rgba(1, 1, 1, 0.035)
+                        height: 1
+                        radius: 1
+                    }
                 }
 
                 onAccepted: root.startLogin()

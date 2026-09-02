@@ -1,17 +1,17 @@
 Name:           proper-appearance
 Version:        0.1
-Release:        5%{?dist}
+Release:        9%{?dist}
 Summary:        Proper Linux appearance, text sizing, and arrival sync
 License:        GPL-3.0-or-later
 BuildRequires:  qt6-qtbase-devel
 Requires:       plasma-workspace
 Requires:       polkit
-Requires:       proper-look-and-feel >= 0.1-21
+Requires:       proper-look-and-feel >= 0.1-29
 Requires:       /usr/bin/kwriteconfig6
 
 %description
 A restrained visual control for three curated desktop styles, coordinated
-text-size presets, and the five Proper Linux wallpapers. Wallpaper selections
+text-size presets, and the thirteen Proper Linux wallpapers. Wallpaper selections
 can explicitly synchronise Plasma Login Manager after authentication.
 
 %prep
@@ -32,6 +32,23 @@ install -Dpm 0755 %{_sourcedir}/proper-set-login-wallpaper %{buildroot}%{_libexe
 %{_datadir}/applications/proper-appearance.desktop
 
 %changelog
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-9
+- Add Salt-Flat Station to the wallpaper gallery and authenticated login sync
+- Require the artwork package that contains the thirteenth wallpaper
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-8
+- Add the PM-approved Highland Blue Hour and Highland Sunrise photographs
+- Keep both available for desktop, lock-screen, and authenticated login sync
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-7
+- Add all five reviewed landscape and rally concepts to the Appearance gallery
+- Keep every wallpaper available for desktop, lock-screen, and authenticated login sync
+- Replace the Light preset's abstract background with the approved Alpine Morning photograph
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-6
+- Materialise the selected Plasma colour scheme so Light and Midnight cannot inherit stale palette groups
+- Notify the live desktop of font changes and update Appearance immediately
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-5
 - Make every text-size preset preserve Inter across Plasma, KWin, and GTK
 - Continue changing only Ghostty size so its JetBrains Mono family is retained

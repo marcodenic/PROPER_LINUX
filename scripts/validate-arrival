@@ -72,7 +72,7 @@ test "$(xmllint --xpath 'count(//*[local-name() = "rect"])' "$project_root/packa
 grep -qx 'StartupNotify=false' "$project_root/packages/proper-launchers/vicinae.desktop"
 grep -qx 'X-KDE-Shortcuts=Meta,Meta+Space' "$project_root/packages/proper-launchers/proper-vicinae-shortcut.desktop"
 grep -Fq $'_launch=Meta\tMeta+Space' "$project_root/packages/proper-launchers/kglobalshortcutsrc"
-grep -Fq '"Meta+Z"' "$project_root/packages/proper-defaults/proper-workspace-arranger/contents/code/main.js"
+grep -Fq '"Meta+M"' "$project_root/packages/proper-defaults/proper-workspace-arranger/contents/code/main.js"
 grep -q 'org.freedesktop.ScreenSaver' "$project_root/packages/proper-welcome/main.cpp"
 grep -q 'org.freedesktop.PowerManagement.Inhibit' "$project_root/packages/proper-welcome/main.cpp"
 grep -Fq 'new QLabel("Proper Linux 0.1")' "$project_root/packages/proper-welcome/main.cpp"

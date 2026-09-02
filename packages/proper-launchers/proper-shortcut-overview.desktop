@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Show Proper Shortcuts
+Exec=/usr/bin/proper-welcome --shortcuts
+NoDisplay=true
+StartupNotify=true
+Type=Application
+X-KDE-GlobalAccel-CommandShortcut=true
+X-KDE-Shortcuts=Meta+/

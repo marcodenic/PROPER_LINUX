@@ -5,7 +5,7 @@
     "Description": "Proper Linux light desktop defaults with the dark Proper shell",
     "Id": "com.properlinux.light.desktop",
     "License": "GPL-3.0-or-later",
-    "Name": "Proper Horizon Light",
+    "Name": "Proper Alpine Light",
     "Version": "0.1",
     "Website": "https://github.com/marcodenic/PROPER_LINUX"
   }

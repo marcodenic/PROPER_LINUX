@@ -23,6 +23,7 @@
 
 struct AppearanceVariant {
     QString id;
+    QString colorScheme;
     QString name;
     QString description;
     QString wallpaperId;
@@ -53,8 +54,10 @@ static QString configRoot() {
     return root.isEmpty() ? QDir::homePath() + "/.config" : root;
 }
 
-static void applyProperWidgetStyle(QApplication &application) {
-    const QString requested = qEnvironmentVariable("PROPER_UI_VARIANT").toLower();
+static void applyProperWidgetStyle(QApplication &application, const QString &explicitVariant = {}) {
+    const QString requested = explicitVariant.isEmpty()
+        ? qEnvironmentVariable("PROPER_UI_VARIANT").toLower()
+        : explicitVariant.toLower();
     const bool light = requested == "light"
         || (requested != "dark" && application.palette().color(QPalette::Window).lightness() > 128);
     const QString root = qEnvironmentVariable("PROPER_UI_STYLE_DIR", "/usr/share/proper-linux/ui");
@@ -122,19 +125,27 @@ public:
         setMinimumSize(760, 520);
 
         variants = {
-            {"com.properlinux.dark.desktop", "Blue Hour", "Balanced dark · Proper default", "ProperBlueHour",
+            {"com.properlinux.dark.desktop", "Proper", "Blue Hour", "Balanced dark · Proper default", "ProperBlueHour",
              "/usr/share/wallpapers/ProperBlueHour/contents/images/1920x1080.png", "#11151d", "#1b222d", "#f1f4f8", "#91b4ff"},
-            {"com.properlinux.light.desktop", "Horizon Light", "Quiet light surfaces · dark shell", "ProperHorizon",
+            {"com.properlinux.light.desktop", "ProperLight", "Alpine Light", "Airy light surfaces · dark shell", "ProperHorizon",
              "/usr/share/wallpapers/ProperHorizon/contents/images/1920x1080.png", "#f6f7fb", "#ffffff", "#18202b", "#3b68d9"},
-            {"com.properlinux.midnight.desktop", "Midnight", "Deeper contrast · cool blue focus", "summer_1am",
+            {"com.properlinux.midnight.desktop", "ProperMidnight", "Midnight", "Deeper contrast · cool blue focus", "summer_1am",
              "/usr/share/wallpapers/summer_1am/contents/images/2560x1600.jpg", "#090d14", "#141b25", "#f5f7fa", "#79a8ff"},
         };
         wallpapers = {
             {"ProperBlueHour", "Proper Blue Hour", "/usr/share/wallpapers/ProperBlueHour/contents/images/1920x1080.png"},
-            {"ProperHorizon", "Proper Horizon", "/usr/share/wallpapers/ProperHorizon/contents/images/1920x1080.png"},
+            {"ProperHorizon", "Alpine Morning", "/usr/share/wallpapers/ProperHorizon/contents/images/1920x1080.png"},
             {"Path", "Path", "/usr/share/wallpapers/Path/contents/images/2560x1600.jpg"},
             {"Volna", "Volna", "/usr/share/wallpapers/Volna/contents/images/5120x2880.jpg"},
             {"summer_1am", "Summer 1 AM", "/usr/share/wallpapers/summer_1am/contents/images/2560x1600.jpg"},
+            {"ProperRallyBlueHour", "Rally: Blue Hour", "/usr/share/wallpapers/ProperRallyBlueHour/contents/images/1920x1080.png"},
+            {"ProperRallyNightFlight", "Rally: Night Flight", "/usr/share/wallpapers/ProperRallyNightFlight/contents/images/1920x1080.png"},
+            {"ProperFloatingFalls", "Floating Falls", "/usr/share/wallpapers/ProperFloatingFalls/contents/images/1920x1080.png"},
+            {"ProperTerracedDawn", "Terraced Dawn", "/usr/share/wallpapers/ProperTerracedDawn/contents/images/1920x1080.png"},
+            {"ProperGlacialArch", "Glacial Arch", "/usr/share/wallpapers/ProperGlacialArch/contents/images/1920x1080.png"},
+            {"ProperHighlandBlueHour", "Highland Blue Hour", "/usr/share/wallpapers/ProperHighlandBlueHour/contents/images/1920x1080.png"},
+            {"ProperHighlandSunrise", "Highland Sunrise", "/usr/share/wallpapers/ProperHighlandSunrise/contents/images/1920x1080.png"},
+            {"ProperSaltFlatStation", "Salt-Flat Station", "/usr/share/wallpapers/ProperSaltFlatStation/contents/images/1920x1080.png"},
         };
         textPresets = {
             {"compact", "Compact", "More room", 9, 8, 11},
@@ -333,8 +344,14 @@ private:
             variantStatus->setText("That desktop style could not be applied. Your previous style is unchanged.");
             return;
         }
+        const QString colorTool = QStandardPaths::findExecutable("plasma-apply-colorscheme");
+        if (colorTool.isEmpty() || QProcess::execute(colorTool, {variant.colorScheme}) != 0) {
+            variantStatus->setText("The desktop layout changed, but its complete colour palette could not be applied. Reinstall Proper Appearance and retry.");
+            return;
+        }
         if (QFileInfo::exists(variant.wallpaperPath))
             QProcess::execute("/usr/bin/plasma-apply-wallpaperimage", {variant.wallpaperPath});
+        applyProperWidgetStyle(*qApp, variant.id == "com.properlinux.light.desktop" ? "light" : "dark");
         QSettings preferences(configRoot() + "/proper-linux/appearance.ini", QSettings::IniFormat);
         preferences.setValue("Appearance/variant", variant.id);
         variantStatus->setText(variant.name + " is now active. Open apps keep their current palette until restarted.");
@@ -342,7 +359,7 @@ private:
 
     static bool runConfigWrite(const QString &group, const QString &key, const QString &value) {
         const QString tool = QStandardPaths::findExecutable("kwriteconfig6");
-        return !tool.isEmpty() && QProcess::execute(tool, {"--file", "kdeglobals", "--group", group, "--key", key, value}) == 0;
+        return !tool.isEmpty() && QProcess::execute(tool, {"--notify", "--file", "kdeglobals", "--group", group, "--key", key, value}) == 0;
     }
 
     static bool writeGhosttyFont(int size) {
@@ -408,8 +425,11 @@ private:
         preferences.setValue("Appearance/textSize", preset.id);
         const QString qdbus = QStandardPaths::findExecutable("qdbus-qt6");
         if (!qdbus.isEmpty())
-            QProcess::startDetached(qdbus, {"org.kde.KGlobalSettings", "/KGlobalSettings", "org.kde.KGlobalSettings.notifyChange", "0", "0"});
-        variantStatus->setText(preset.name + " text is set. Running apps may need to be reopened; new Ghostty windows use it immediately.");
+            QProcess::execute(qdbus, {"org.kde.KGlobalSettings", "/KGlobalSettings", "org.kde.KGlobalSettings.notifyChange", "0", "0"});
+        QFont applicationFont("Inter");
+        applicationFont.setPointSize(preset.uiSize);
+        qApp->setFont(applicationFont);
+        variantStatus->setText(preset.name + " text is active. The desktop and this window update now; some already-open apps may need to be reopened.");
     }
 
     void applyWallpaper(bool syncLogin) {

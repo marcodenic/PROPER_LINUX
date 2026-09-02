@@ -1,15 +1,16 @@
 Name:           proper-defaults
 Version:        0.1
-Release:        23%{?dist}
+Release:        24%{?dist}
 Summary:        Proper Linux new-user KDE defaults
 License:        GPL-3.0-or-later
 BuildArch:      noarch
 Requires:       chromium
-Requires:       proper-look-and-feel >= 0.1-23
-Requires:       proper-launchers
-Requires:       proper-terminal
-Requires:       proper-apps
-Requires:       proper-appearance >= 0.1-5
+Requires:       proper-look-and-feel >= 0.1-27
+Requires:       proper-launchers >= 0.1-15
+Requires:       proper-terminal >= 1.3.1-5
+Requires:       proper-apps >= 0.1-11
+Requires:       proper-appearance >= 0.1-7
+Requires:       /usr/bin/qdbus-qt6
 
 %description
 KDE configuration defaults. KDE reads the XDG copies as system defaults and
@@ -17,6 +18,11 @@ the small skel copies initialise a live/installer-created account. They do not
 overwrite an existing user's configuration.
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-24
+- Enable natural scrolling once for each new Plasma account without overriding later choices
+- Disable password-wallet prompts only in the passwordless, ephemeral live account
+- Move workspace arrangement to Meta+M so Meta+Z remains free for undo conventions
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-23
 - Make the fit-content shelf visibly about 560 pixels wide with an 86-pixel task-to-tray spacer
 
@@ -108,6 +114,9 @@ install -Dpm 0644 %{_sourcedir}/proper-workspace-arranger/contents/code/main.js 
 install -Dpm 0644 %{_sourcedir}/dolphinrc %{buildroot}%{_sysconfdir}/skel/.config/dolphinrc
 install -Dpm 0755 %{_sourcedir}/proper-live-defaults %{buildroot}%{_bindir}/proper-live-defaults
 install -Dpm 0644 %{_sourcedir}/proper-live-defaults.desktop %{buildroot}%{_sysconfdir}/xdg/autostart/proper-live-defaults.desktop
+install -Dpm 0755 %{_sourcedir}/proper-natural-scroll-default %{buildroot}%{_bindir}/proper-natural-scroll-default
+install -Dpm 0644 %{_sourcedir}/proper-natural-scroll-default.desktop %{buildroot}%{_sysconfdir}/xdg/autostart/proper-natural-scroll-default.desktop
+install -Dpm 0644 %{_sourcedir}/kwalletrc-live %{buildroot}%{_datadir}/proper-linux/live/kwalletrc
 
 %files
 %config(noreplace) %{_sysconfdir}/xdg/kdeglobals
@@ -134,3 +143,6 @@ install -Dpm 0644 %{_sourcedir}/proper-live-defaults.desktop %{buildroot}%{_sysc
 %config(noreplace) %{_sysconfdir}/skel/.config/dolphinrc
 %{_bindir}/proper-live-defaults
 %{_sysconfdir}/xdg/autostart/proper-live-defaults.desktop
+%{_bindir}/proper-natural-scroll-default
+%{_sysconfdir}/xdg/autostart/proper-natural-scroll-default.desktop
+%{_datadir}/proper-linux/live/kwalletrc

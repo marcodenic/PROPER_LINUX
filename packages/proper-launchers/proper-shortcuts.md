@@ -9,8 +9,9 @@ shortcuts shipped by Proper Linux.
 | Alt+F2 | Open KRunner fallback |
 | Meta+Left / Right | Quick-tile window to half |
 | Meta+Up / Down | Maximise or restore a window |
-| Meta+Ctrl+1 / 3 / 7 / 9 | Quick-tile window to a quadrant |
-| Meta+Z | Arrange or restore the current workspace |
+| Meta+1 / 3 / 7 / 9 | Quick-tile window to a quadrant |
+| Meta+M | Arrange or restore the current workspace |
+| Meta+/ | Show the quick shortcut overview |
 | Meta+T | Open Plasma's visual tile-layout editor |
 | Meta+H | Minimise the active window |
 | Meta+E | Open Files (Dolphin) |

@@ -1,0 +1,8 @@
+{
+  "KPlugin": {
+    "Authors": [{"Name": "Proper Linux"}],
+    "Id": "ProperSaltFlatStation",
+    "License": "CC-BY-SA-4.0",
+    "Name": "Proper Salt-Flat Station"
+  }
+}

@@ -65,7 +65,7 @@
 		<ignore name="kolourpaint*"/>
 		<ignore name="skanpage*"/>
 		<ignore name="qrca*"/>
-		<!-- Phase 7 curation: Proper owns the five approved wallpapers and
+		<!-- Phase 7 curation: Proper owns the thirteen approved wallpapers and
 		     keeps optional cloud, container, and vendor-printer stacks in the
 		     catalogue instead of every default installation. -->
 		<ignore name="plasma-workspace-wallpapers"/>

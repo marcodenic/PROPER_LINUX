@@ -4,7 +4,7 @@
 # The HMP socket is retained for observation (including screendump), while the
 # QMP socket is the supported input/control path for graphical acceptance.
 # Relative mouse input is the PM-review default because QEMU's absolute pointer
-# is mis-scaled by XWayland on the BOX host's HiDPI display. Set
+# can be mis-scaled by XWayland on a HiDPI host display. Set
 # PROPER_VM_POINTER=tablet only for controlled absolute-input automation.
 # The default PM-review presentation uses a normal resizable local GTK window
 # with a 1920x1080 framebuffer at 100% scaling. The guest is zoomed to fit the

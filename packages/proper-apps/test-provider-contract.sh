@@ -13,7 +13,11 @@ for required in \
   'reachedRequestedState' \
   'could not confirm the requested result' \
   'provider reported a configuration error' \
-  'Keep Proper Apps open'; do
+  'Keep Proper Apps open' \
+  'You’re offline' \
+  'enough writable space' \
+  'Live session · app installs are temporary' \
+  'diagnoseProviderFailure'; do
   rg -q --fixed-strings "$required" "$source_file" || { printf 'transaction-state contract missing: %s\n' "$required" >&2; exit 1; }
 done
 for required in 'https" && url.scheme() != "http' 'proper-web-' 'QSaveFile' 'QRegularExpression("^[0-9a-f-]{36}$")' 'startsWith(ownedIcons + "/")'; do

@@ -12,6 +12,14 @@ case "$1" in
     Path) image=/usr/share/wallpapers/Path/contents/images/2560x1600.jpg ;;
     Volna) image=/usr/share/wallpapers/Volna/contents/images/5120x2880.jpg ;;
     summer_1am) image=/usr/share/wallpapers/summer_1am/contents/images/2560x1600.jpg ;;
+    ProperRallyBlueHour) image=/usr/share/wallpapers/ProperRallyBlueHour/contents/images/1920x1080.png ;;
+    ProperRallyNightFlight) image=/usr/share/wallpapers/ProperRallyNightFlight/contents/images/1920x1080.png ;;
+    ProperFloatingFalls) image=/usr/share/wallpapers/ProperFloatingFalls/contents/images/1920x1080.png ;;
+    ProperTerracedDawn) image=/usr/share/wallpapers/ProperTerracedDawn/contents/images/1920x1080.png ;;
+    ProperGlacialArch) image=/usr/share/wallpapers/ProperGlacialArch/contents/images/1920x1080.png ;;
+    ProperHighlandBlueHour) image=/usr/share/wallpapers/ProperHighlandBlueHour/contents/images/1920x1080.png ;;
+    ProperHighlandSunrise) image=/usr/share/wallpapers/ProperHighlandSunrise/contents/images/1920x1080.png ;;
+    ProperSaltFlatStation) image=/usr/share/wallpapers/ProperSaltFlatStation/contents/images/1920x1080.png ;;
     *) printf 'Unknown Proper Linux wallpaper: %s\n' "$1" >&2; exit 2 ;;
 esac
 

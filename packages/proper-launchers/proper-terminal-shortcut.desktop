@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Open Ghostty
+Exec=/usr/bin/ghostty
+NoDisplay=true
+StartupNotify=true
+Type=Application
+X-KDE-GlobalAccel-CommandShortcut=true
+X-KDE-Shortcuts=Meta+Return

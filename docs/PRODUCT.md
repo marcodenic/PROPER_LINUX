@@ -1,165 +1,180 @@
-# Proper Linux product definition
+# Proper Linux product and experience
 
-## One sentence
+## The idea
 
-Proper Linux is a tasteful, opinionated Fedora KDE developer desktop that keeps normal Linux power while making the default graphical experience coherent, attractive, discoverable, and equally comfortable with a mouse or keyboard.
+Proper Linux is a tasteful Fedora KDE desktop for people who want full Linux
+power without accepting the usual rough edges, visual clutter, or hours of
+post-install configuration.
 
-## The problem
+It is aimed first at its product manager and at technically capable people with
+similar preferences: mouse users who also value good shortcuts, developers who
+live in browsers and terminals, and anyone who wants strong defaults without
+losing the freedom to change them.
 
-Desktop Linux plumbing is generally good enough. The recurring failure is the product experience placed on top of it:
+The product promise is simple: install the system, log in, and find a computer
+that already feels considered.
 
-- Defaults look assembled rather than designed.
-- Distributions advertise implementation details and acronyms instead of showing why the desktop is desirable.
-- Users are asked to understand package formats and repositories to install ordinary software.
-- “Modern” enthusiast systems often make keyboard shortcuts mandatory rather than optional accelerators.
-- Login, wallpaper, screen orientation, application discovery, terminal styling, and window management contain small but needless paper cuts.
-- Customisability is treated as a substitute for choosing excellent defaults.
+## Ethos
 
-Proper Linux is an attempt to apply taste and sustained attention to those failures without rebuilding the parts Fedora already handles well.
+- **Defaults are the product.** Customisation remains available, but it is not
+  an excuse to ship an indecisive or unfinished starting point.
+- **Curate aggressively, restrict sparingly.** Proper chooses what to promote
+  and what to omit while keeping Plasma settings, DNF, Flatpak, the terminal,
+  and the underlying system available.
+- **Mouse and keyboard are peers.** Every ordinary operation has a visible
+  pointer path. Shortcuts make frequent actions quicker; they are never an
+  entrance exam.
+- **Remove noise before adding features.** Fewer duplicate apps, redundant
+  controls, popups, tooltips, panels, and setup screens make the useful parts
+  easier to see.
+- **Use the mature foundation.** Fedora and KDE continue to own the kernel,
+  hardware support, networking, security, installer, updates, compositor, and
+  ordinary system controls.
+- **Respect ownership.** Defaults seed a new profile once. Updates do not keep
+  resetting choices the user has made.
+- **Be honest and open.** The system is publicly downloadable without an
+  account, delayed download, paid edition, or deliberately limited build.
 
-## Primary customer
+## What changed and why
 
-The product manager is also the primary customer.
+### A calmer starting point
 
-The broader audience is technically capable people who:
+Proper opens on a clean desktop with no icons, forced tour, welcome carousel,
+or wall of configuration choices. The default is dark, uses Inter for interface
+text and JetBrains Mono where fixed-width text belongs, enables natural
+scrolling for new pointer profiles, and keeps normal application content
+opaque. Translucency is reserved for the shelf, shell popups, authentication,
+and terminal, where it adds a sense of place without making work harder to
+read.
 
-- want full access to Linux rather than an appliance that hides it;
-- dislike Linux's traditional visual and interaction conventions;
-- use a mouse normally and keyboard shortcuts opportunistically;
-- value developer tools, terminals, and AI coding agents;
-- want strong defaults without losing the ability to change them;
-- want to install the system, log in, and work without a setup ceremony.
+This is the clearest expression of the product: dozens of small defaults work
+together, and none is allowed to become a permanent override of the user's
+later preferences.
 
-This is not designed around a hypothetical beginner or a committee average. It begins with the primary customer's actual workflow and may serve people with similar preferences.
+### Arrival and appearance
 
-## Product promise
+Boot, login, lock, and desktop share Proper's identity and selected wallpaper.
+Login and lock screens are quiet, clock-first surfaces whose authentication
+controls appear when needed; account and power functions remain reachable
+without permanently covering the artwork.
 
-Install Proper Linux and receive a current, capable Linux workstation whose visible experience feels deliberately finished. Normal operations work as expected with the mouse. Excellent shortcuts are available when useful. Common applications are one click away. The terminal and AI tooling feel native to the product rather than bolted on.
+Proper Appearance offers a small preview-first set of coherent styles, three
+coordinated text-size presets, and the curated wallpaper gallery. It changes
+the normal KDE, GTK, terminal, desktop, and lock settings rather than creating a
+second theme system. The result is personalisation with clear choices instead
+of another settings maze.
 
-## Product principles
+### The shelf and system surfaces
 
-### Preserve what works
+The desktop uses one centred, floating bottom shelf. It contains the Proper
+launcher, pinned and running applications, a terminal shortcut, system status,
+and the clock. Focused, running, and launching applications use restrained
+line, dot, and motion states instead of coloured tiles and halos. The shelf
+grows when needed but keeps visual separation between application tasks and
+status controls.
 
-Keep Fedora's kernel, hardware enablement, networking, security, package system, installer, and updater unless a concrete user-facing problem requires intervention.
+Network, Bluetooth, audio, power, notifications, authentication, overview, and
+workspace controls remain KDE's maintained components. Proper gives their
+containers and common controls one calmer visual language without rearranging
+or forking their behaviour. This keeps the desktop coherent without taking on
+fragile replacements for security- and hardware-sensitive code.
 
-### Fix the experience, not Linux
+### One launcher, many useful paths
 
-Proper Linux does not protect technically capable users from the operating system. It removes needless friction and poor presentation.
+Vicinae is the promoted application launcher and command surface. Clicking the
+Proper button or tapping `Meta` opens a useful home with favourites, recent
+items, installed applications, and common actions before the user types.
+Search extends to applications, files, clipboard history, commands, settings,
+and supported extensions. KRunner remains available as a quiet fallback.
 
-### Defaults are the product
+Start Here is a passive hub for applications, appearance, updates, shortcuts,
+System Settings, and support. It never autostarts and does not turn first boot
+into onboarding.
 
-The initial layout, theme, shortcuts, applications, and behaviour must be good without requiring a rice, dotfile repository, or configuration guide.
+### Windows that work both ways
 
-### Mouse and keyboard are peers
+Windows float, overlap, drag, resize, minimise, maximise, and close normally.
+Edge snapping and quick tiling make halves and quadrants easy with either mouse
+or keyboard. Arrange Workspace can temporarily place eligible windows into a
+chosen layout and restore their previous floating geometry; new windows stay
+floating.
 
-Every normal desktop operation remains visually discoverable and usable with the pointer. Shortcuts make the same actions faster. Neither input method invalidates the other.
+This avoids the false choice between a conventional desktop and a fast tiling
+workflow. The layout editor, window buttons, pointer actions, Vicinae commands,
+and shortcut guide keep the system discoverable.
 
-### Reject false choices
+### Cleaner everyday applications
 
-Floating windows and tiling can coexist. Pointer discovery and typed commands can coexist in one launcher. A lean installation and a rich software catalogue can coexist.
+Dolphin remains the file manager because it has excellent Plasma integration,
+remote locations, previews, tabs, split view, undo, trash, and removable-device
+support. Proper presents it as Files with a restrained toolbar and sidebar,
+hides optional panels and duplicated controls by default, and adds Open in
+Ghostty.
 
-### Curate aggressively, restrict sparingly
+Chromium is the promoted browser. Ghostty 1.3.1 is the default terminal, with a
+coherent palette, measured padding, uniform translucency, and `btop` included.
+These are ordinary applications in ordinary windows, not special modes the user
+must learn.
 
-Proper Linux makes strong default choices. Users can still reach normal Plasma settings, `dnf`, Flatpak, the terminal, and the underlying system.
+### Less baggage, more useful choice
 
-### No paywall theatre
+The base image contains one clear default for each common job and removes
+office suites, personal-information stacks, bundled games, duplicate media
+apps, redundant launchers, and promotional welcome software. Core printing,
+camera, remote-desktop, installer, updater, and system tools remain.
 
-The ISO and source will be publicly downloadable without an account, paid edition, delayed download, or deliberately crippled community build. Optional donations or sponsorship may exist later but never gate the product.
+The build enforces a complete image below 3 GiB. Start Here presents that as
+evidence of deliberate curation—not as a vanity number—and explains that the
+broader software catalogue remains one click away.
 
-## Experience pillars
+Optional software belongs in Proper Apps. Its cards show recognisable products,
+plain descriptions, and one Install or Open action. Provider, licence, and
+maintenance details remain inspectable without dominating the normal flow.
+Proper Apps delegates installation and updates to Fedora, Flatpak, or a vetted
+vendor source; it does not become a package manager. It explains progress,
+cancellation, partial results, offline state, and storage problems in human
+terms and reconciles what is actually installed before reporting success.
 
-### 1. A coherent arrival
+The broad catalogue can include browsers, communication, media, development,
+creative, gaming, container, printer, and AI tools. Its Recommended shelf stays
+narrow so recommendation remains a real product opinion.
 
-Boot, installer, login, lock screen, and desktop use the same visual language. The login screen uses the intended wallpaper and correct monitor layout. Installation ends with login and immediate use, not a long onboarding questionnaire.
+### Developer and agent workflow
 
-### 2. A proper desktop shell
+Git and a compact set of useful command-line tools are present without turning
+the image into a preinstalled SDK collection. Codex, Claude Code, OpenCode, and
+other reviewed tools are easy to install and launch. A generic Coding Agent
+action asks the user which client to use, remembers only a valid explicit
+choice, and opens it in Ghostty at the requested directory.
 
-A tasteful translucent floating bottom taskbar provides applications, running-window state, a terminal affordance, and system status. It stays visible by default and can be hidden by user preference.
+Provider authentication stays in each agent's normal flow, and Proper never
+silently falls back to a different client.
 
-### 3. Normal windows, excellent arrangement
+## Core shortcuts
 
-Windows float, overlap, drag, resize, minimise, maximise, and close normally. Dragging to edges offers halves and grids. `Meta` plus arrow keys provides fast Windows-style quick tiling. More advanced Omarchy-inspired bindings are available without becoming mandatory.
+| Shortcut | Action |
+| --- | --- |
+| `Meta` or `Meta+Space` | Open or close Vicinae |
+| `Meta+Return` | Open Ghostty |
+| `Meta+Left/Right` | Tile to a half |
+| `Meta+Up/Down` | Maximise or restore |
+| `Meta+1/3/7/9` | Tile to a quadrant |
+| `Meta+M` | Arrange or restore the workspace |
+| `Meta+T` | Open Plasma's visual tile editor |
+| `Meta+/` | Open the shortcut overview |
 
-### 4. One deliberate launcher
+Every listed action also has an ordinary pointer route.
 
-Vicinae answers both “open an application” and “find or do something” with a polished Raycast-style surface. Clicking the Proper button opens a useful mouse-accessible home state with pinned and recent applications; typing searches applications, files, commands, actions, and extensions.
+## Product boundaries
 
-### 5. A first-class terminal and agent workflow
+Proper Linux 0.1 is a mutable Fedora KDE x86-64 desktop and installer image. It
+is not a new kernel, package manager, init system, compositor, installer,
+updater, or office platform. It does not include mandatory tiling, broad
+hardware certification, specialised editions, or a large Proper-operated
+software mirror.
 
-Ghostty is the default terminal and looks finished on first launch. A taskbar action opens an ordinary Ghostty window. `btop` is available immediately. Codex, Claude Code, OpenCode, and other agents are easy to install, authenticate, and launch.
-
-### 6. One obvious path to software
-
-A curated application directory presents recognisable products and a single Install action. Provider details remain available under an advanced disclosure, but users do not need to decide between RPM, Flatpak, a vendor repository, or another source during the normal path.
-
-## Version 0.1 scope
-
-Version 0.1 must include:
-
-- a mutable Fedora KDE base;
-- Proper Linux name and simple ASCII-influenced identity;
-- coherent system-wide wallpaper and visual defaults;
-- Plasma Login Manager configured for the correct wallpaper and display layout;
-- a polished floating bottom taskbar;
-- Vicinae as the single promoted application launcher and command surface;
-- mouse snapping and quick-tiling shortcuts;
-- a useful subset of Omarchy-inspired bindings;
-- Ghostty and `btop`;
-- a lean default application set;
-- the curated application directory;
-- straightforward access to selected AI coding agents;
-- Fedora's installer and update experience with minimal necessary branding;
-- a bootable x86-64 live ISO that installs successfully in QEMU/KVM.
-
-## Explicit non-goals for version 0.1
-
-- A new kernel, package manager, init system, display server, installer, or updater
-- A complete replacement for KDE Plasma
-- A keyboard-only or mandatory tiling workflow
-- A privileged system-wide AI agent daemon
-- A new office suite or office applications in the default image
-- A separate server, gaming, lightweight, NVIDIA, or atomic edition
-- Support for 32-bit machines
-- Broad hardware certification or a recruitment campaign for external testers
-- A custom public package mirror or large repository operation
-- Paid editions or download gates
-- Perfect visual consistency inside every third-party application
-- Reorganising every page of Plasma System Settings
-
-## Hardware position
-
-Proper Linux version 0.1 inherits Fedora KDE's general x86-64 compatibility,
-but its product validation target is narrower: mainstream laptops and desktops
-sold in roughly the previous four years, plus current new hardware supported by
-the selected Fedora release. Older machines may work and should not be
-needlessly excluded, but rejuvenating old hardware is not a version 0.1 product
-goal and is not allowed to constrain the approved visual experience.
-
-Apple Silicon Macs are ARM64 systems that require the Fedora Asahi platform
-stack and a separate image path. They are not supported by the x86-64 version
-0.1 image. Intel Macs may boot standard Fedora media depending on model, but
-Proper Linux does not claim them as validated hardware; T1/T2-era models can
-require non-upstream kernels, firmware or model-specific integration.
-
-Proper Linux does not make stronger general hardware promises than Fedora and
-does not treat server hardware as a separate product.
-
-## Success definition
-
-Version 0.1 succeeds when the product manager can:
-
-1. boot the ISO in a VM;
-2. install it through the normal graphical installer;
-3. reboot into a correctly oriented, correctly branded login screen;
-4. log in to the approved Proper Linux desktop;
-5. use the taskbar, browse apps, search with Vicinae, and arrange windows entirely with the mouse;
-6. perform the same window operations efficiently with shortcuts;
-7. launch a polished Ghostty terminal and run `btop`;
-8. install a curated application without understanding its package source; and
-9. update the system using Fedora's normal mechanism.
-
-The product manager must approve the five visual checkpoints described in `ACCEPTANCE.md`.
-
-## Public description
-
-> Proper Linux is normal Linux with proper defaults: Fedora KDE underneath, a finished desktop on top, excellent mouse and keyboard workflows, a first-class terminal, and common software one click away.
+The release is good when it builds reproducibly, installs through the normal
+graphical path, boots into the intended experience, keeps Fedora updates
+working, preserves user customisation, and makes its daily tasks comfortable
+with either pointer or keyboard. Visual polish counts only when the resulting
+system remains legible, accessible, and reliable in real applications.

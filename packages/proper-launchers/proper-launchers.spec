@@ -1,6 +1,6 @@
 Name:           proper-launchers
 Version:        0.1
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Proper Linux launcher and window workflow defaults
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -49,6 +49,8 @@ install -Dpm 0644 %{_sourcedir}/vicinae.service %{buildroot}%{_userunitdir}/vici
 install -Dpm 0644 %{_sourcedir}/vicinae.desktop %{buildroot}%{_datadir}/applications/vicinae.desktop
 install -Dpm 0644 %{_sourcedir}/proper-vicinae.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/proper-vicinae.svg
 install -Dpm 0644 %{_sourcedir}/proper-vicinae-shortcut.desktop %{buildroot}%{_datadir}/applications/proper-vicinae-shortcut.desktop
+install -Dpm 0644 %{_sourcedir}/proper-terminal-shortcut.desktop %{buildroot}%{_datadir}/applications/proper-terminal-shortcut.desktop
+install -Dpm 0644 %{_sourcedir}/proper-shortcut-overview.desktop %{buildroot}%{_datadir}/applications/proper-shortcut-overview.desktop
 install -Dpm 0644 %{_sourcedir}/proper-arrange-workspace.desktop %{buildroot}%{_datadir}/applications/proper-arrange-workspace.desktop
 install -Dpm 0644 %{_sourcedir}/proper-shortcuts.desktop %{buildroot}%{_datadir}/applications/proper-shortcuts.desktop
 install -Dpm 0644 %{_sourcedir}/settings.json %{buildroot}%{_sysconfdir}/skel/.config/vicinae/settings.json
@@ -70,6 +72,8 @@ done
 %{_datadir}/applications/vicinae.desktop
 %{_datadir}/applications/vicinae-url-handler.desktop
 %{_datadir}/applications/proper-vicinae-shortcut.desktop
+%{_datadir}/applications/proper-terminal-shortcut.desktop
+%{_datadir}/applications/proper-shortcut-overview.desktop
 %{_datadir}/applications/proper-arrange-workspace.desktop
 %{_datadir}/applications/proper-shortcuts.desktop
 %{_datadir}/vicinae/
@@ -85,10 +89,16 @@ done
 systemctl --global enable vicinae.service >/dev/null 2>&1 || :
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-15
+- Make the Meta summon shortcut dismiss Vicinae on a second press
+- Register Meta+Return for Ghostty, Meta+/ for the shortcut pane, and single-modifier quadrant tiling
+- Rebalance the four-cell launcher mark within its shelf target
+- Document Meta+M as the reversible arrangement shortcut
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-14
 - Replace the off-centre launcher dot with Proper's centred four-cell mark
 - Bind a Meta tap as well as Meta+Space to Vicinae without startup feedback
-- Document Meta+Z as the reversible workspace-arrangement shortcut
+- Document the reversible workspace-arrangement shortcut
 
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-13
 - Require the Inter-based shared stylesheet used by the shortcut reference

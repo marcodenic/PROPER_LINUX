@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -eu
 
+mode=open
+case "${1:-}" in
+    --toggle) mode=toggle ;;
+    "") ;;
+    *) printf 'Usage: proper-launcher [--toggle]\n' >&2; exit 2 ;;
+esac
+
 report_failure() {
     local message="Vicinae did not become ready. Try again, or check the Vicinae service in System Monitor."
 
@@ -28,14 +35,32 @@ open_vicinae() {
     [[ $status -eq 124 || $status -eq 137 || $output == *"Already opened"* ]]
 }
 
+toggle_vicinae() {
+    local output status
+
+    # Once the server is ready, the keyboard shortcut should behave like a
+    # proper summon key: show Vicinae when hidden and dismiss it when visible.
+    if output=$(timeout --kill-after=0.2s 1s vicinae toggle 2>&1); then
+        return 0
+    else
+        status=$?
+    fi
+    [[ $status -eq 124 || $status -eq 137 ]]
+}
+
 ping_vicinae() {
     timeout --kill-after=0.1s 0.5s vicinae ping >/dev/null 2>&1
 }
 
-# Opening is idempotent, unlike toggle: a second click while Vicinae is still
-# starting must never close the launcher the first click was trying to show.
-if ping_vicinae && open_vicinae; then
-    exit 0
+# Pointer launches remain idempotent. The global summon shortcut toggles only
+# after the IPC server is already ready, so a repeated key press can dismiss
+# Vicinae without turning a startup race into a flash-and-close.
+if ping_vicinae; then
+    if [[ "$mode" == toggle ]]; then
+        toggle_vicinae && exit 0
+    else
+        open_vicinae && exit 0
+    fi
 fi
 
 # The user service normally starts with Plasma. This also recovers cleanly if

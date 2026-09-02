@@ -2,7 +2,7 @@ diff --git a/Fedora.kiwi b/Fedora.kiwi
 index 9fb8c80..c11dd28 100644
 --- a/Fedora.kiwi
 +++ b/Fedora.kiwi
-@@ -1,12 +1,12 @@
+@@ -1,11 +1,11 @@
  <?xml version="1.0" encoding="utf-8"?>
  
 -<image schemaversion="7.4" name="Fedora">
@@ -19,8 +19,12 @@ index 9fb8c80..c11dd28 100644
 -		<version>44</version>
 +		<version>0.1</version>
  		<packagemanager>dnf5</packagemanager>
+@@ -12,4 +12,4 @@
  		<locale>en_US</locale>
  		<keytable>us</keytable>
+-		<timezone>UTC</timezone>
++		<timezone>Europe/London</timezone>
+ 		<release-version>44</release-version>
 diff --git a/components/liveinstall.xml b/components/liveinstall.xml
 index c44f3a3..6519428 100644
 --- a/components/liveinstall.xml

@@ -27,6 +27,12 @@ install -Dpm 0644 /etc/skel/.config/ksplashrc "$config_dir/ksplashrc"
 install -Dpm 0644 /etc/skel/.config/kglobalshortcutsrc "$config_dir/kglobalshortcutsrc"
 install -Dpm 0644 /etc/skel/.config/vicinae/settings.json "$config_dir/vicinae/settings.json"
 
+# The passwordless live account cannot create an encrypted wallet that PAM can
+# unlock. Deny Secret Service requests immediately instead of blocking every
+# app behind KWallet's recurring creation dialog. Installed accounts retain
+# KWallet and its PAM-backed encrypted storage.
+install -Dpm 0644 /usr/share/proper-linux/live/kwalletrc "$config_dir/kwalletrc"
+
 # The live user is created by livesys after image composition, so the
 # accelerator daemon can already be running when the session defaults land.
 # Reload it now so the shipped Meta tap and Meta+Space shortcuts are active immediately.

@@ -56,6 +56,33 @@ QWidget#properRoot QLabel#sectionCopy,
 QWidget#properRoot QLabel#status,
 QWidget#properRoot QLabel#guideCopy,
 QWidget#properRoot QLabel#guideFooter {{ color: {muted}; }}
+QWidget#properRoot QLabel#guideEyebrow,
+QWidget#properRoot QLabel#guideSectionLabel {{ color: {accent}; font-size: 10px; font-weight: 700; letter-spacing: 1px; }}
+QWidget#properRoot QLabel#guideCardTitle {{ color: {text}; font-size: 15px; font-weight: 650; }}
+QWidget#properRoot QLabel#shortcutAction {{ color: {muted}; font-size: 12px; }}
+QWidget#properRoot QLabel#keyJoin {{ color: {muted}; font-size: 10px; }}
+QWidget#properRoot QLabel#keycap {{
+    color: {text}; background: {rgba(muted, 0.100)}; border: 1px solid {rgba(muted, 0.300)};
+    border-bottom: 2px solid {rgba(muted, 0.380)}; border-radius: 6px;
+    min-width: 18px; min-height: 18px; padding: 1px 5px; font-family: "{typography['mono']}"; font-size: 10px; font-weight: 650;
+}}
+QWidget#properRoot QLabel#principlePill {{
+    color: {muted}; background: {rgba(accent, 0.065)}; border: 1px solid {rgba(accent, 0.170)};
+    border-radius: {control_radius}px; padding: 7px 8px; font-size: 9px; font-weight: 700;
+}}
+QWidget#properRoot QFrame#guideHero {{
+    background: {rgba(accent, 0.055)}; border: 1px solid {rgba(accent, 0.180)}; border-radius: {popup_radius}px;
+}}
+QWidget#properRoot QFrame#guideCard,
+QWidget#properRoot QFrame#shortcutPanel {{
+    background: {surface}; border: 1px solid {rgba(muted, 0.160)}; border-radius: {popup_radius}px;
+}}
+QWidget#properRoot QFrame#guideCard:hover {{ border-color: {rgba(accent, 0.360)}; background: {rgba(accent, 0.055)}; }}
+QWidget#properRoot QLabel#guideIcon {{
+    background: {rgba(accent, 0.095)}; border: 1px solid {rgba(accent, 0.170)}; border-radius: 12px;
+}}
+QWidget#properRoot QFrame#shortcutHint,
+QWidget#properRoot QFrame#shortcutLine {{ background: transparent; border: 0; }}
 QDialog, QMessageBox {{ background: {base}; color: {text}; font-family: {qss_font}; }}
 QDialog QLabel, QMessageBox QLabel {{ color: {text}; }}
 QWidget#properRoot QLabel#cardTitle {{ font-size: 16px; font-weight: 650; }}
@@ -68,11 +95,22 @@ QWidget#properRoot QLabel#categoryPill {{
 QWidget#properRoot QLineEdit,
 QWidget#properRoot QComboBox {{
     background: {surface}; color: {text}; border: 1px solid {rgba(muted, 0.240)};
-    border-radius: {control_radius}px; padding: {unit * 2}px {unit * 3}px;
+    border-radius: {control_radius}px;
     selection-background-color: {accent}; selection-color: {base};
 }}
+QWidget#properRoot QLineEdit {{ padding: {unit * 2}px {unit * 3}px; }}
+QWidget#properRoot QComboBox {{ padding: {unit * 2}px 40px {unit * 2}px {unit * 3}px; }}
 QWidget#properRoot QLineEdit:focus,
 QWidget#properRoot QComboBox:focus {{ border: 2px solid {accent}; }}
+QWidget#properRoot QComboBox::drop-down {{
+    subcontrol-origin: border; subcontrol-position: top right; width: 32px;
+    border: 0; border-left: 1px solid {rgba(muted, 0.180)};
+    border-top-right-radius: {control_radius - 1}px;
+    border-bottom-right-radius: {control_radius - 1}px;
+    background: {rgba(muted, 0.070)};
+}}
+QWidget#properRoot QComboBox::drop-down:hover {{ background: {rgba(accent, 0.120)}; }}
+QWidget#properRoot QComboBox::down-arrow {{ width: 10px; height: 7px; }}
 QWidget#properRoot QComboBox QAbstractItemView {{
     background: {surface}; color: {text}; selection-background-color: {rgba(accent, 0.260)};
 }}
@@ -110,11 +148,7 @@ QWidget#properRoot QPushButton#primaryButton {{ background: {accent}; color: {ba
 QWidget#properRoot QPushButton#primary:hover,
 QWidget#properRoot QPushButton#primaryButton:hover {{ background: {rgba(accent, 0.860)}; }}
 QWidget#properRoot QPushButton#secondaryButton {{ background: {rgba(muted, 0.120)}; color: {text}; }}
-QWidget#properRoot QPushButton#guideCard {{
-    min-height: 112px; padding: {unit * 4}px; text-align: left; font-size: 15px;
-    background: {surface}; border: 1px solid {rgba(muted, 0.170)}; border-radius: {popup_radius}px;
-}}
-QWidget#properRoot QPushButton#guideCard:hover {{ background: {rgba(accent, 0.100)}; border-color: {rgba(accent, 0.420)}; }}
+QWidget#properRoot QPushButton#cardAction {{ min-width: 58px; min-height: 30px; padding: 0 12px; }}
 QWidget#properRoot QPushButton:disabled {{ color: {rgba(muted, 0.650)}; background: {rgba(surface, 0.700)}; }}
 QWidget#properRoot QScrollArea,
 QWidget#properRoot QScrollArea > QWidget > QWidget {{ background: transparent; border: 0; }}
@@ -151,6 +185,10 @@ QWidget#properWelcome QLabel#headline {{ color: {text}; font-size: 31px; font-we
 QWidget#properWelcome QLabel#body {{ color: {muted}; font-size: 15px; }}
 QWidget#properWelcome QLabel#liveBadge {{ color: {text}; background: {rgba(accent, 0.120)}; border: 1px solid {rgba(accent, 0.260)}; border-radius: {control_radius + 4}px; font-size: 11px; font-weight: 650; padding: 5px 10px; }}
 QWidget#properWelcome QLabel#footer {{ color: {rgba(muted, 0.520)}; font-size: 11px; }}
+QWidget#properWelcome QFrame#shortcutLine {{ background: {rgba(surface, 0.640)}; border: 1px solid {rgba(muted, 0.170)}; border-radius: {control_radius + 2}px; }}
+QWidget#properWelcome QLabel#shortcutAction {{ color: {muted}; font-size: 11px; }}
+QWidget#properWelcome QLabel#keyJoin {{ color: {muted}; font-size: 10px; }}
+QWidget#properWelcome QLabel#keycap {{ color: {text}; background: {rgba(surface, 0.920)}; border: 1px solid {rgba(muted, 0.330)}; border-bottom: 2px solid {rgba(muted, 0.420)}; border-radius: 6px; min-width: 18px; min-height: 18px; padding: 1px 5px; font-family: "{typography['mono']}"; font-size: 10px; font-weight: 650; }}
 QWidget#properWelcome QPushButton {{ min-height: 48px; min-width: 176px; padding: 0 24px; border-radius: {control_radius + 3}px; border: 1px solid {rgba(muted, 0.200)}; background: {rgba(surface, 0.880)}; color: {text}; font-family: {qss_font}; font-size: 14px; font-weight: 600; }}
 QWidget#properWelcome QPushButton:hover {{ background: {rgba(accent, 0.150)}; border-color: {rgba(accent, 0.450)}; }}
 QWidget#properWelcome QPushButton:focus {{ border: 2px solid {accent}; }}

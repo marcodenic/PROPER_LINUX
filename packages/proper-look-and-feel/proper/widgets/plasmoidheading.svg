@@ -7,40 +7,40 @@
     .ColorScheme-Frame { color: #a6afbd; }
   </style>
 
-  <rect id="header-center" x="5" y="5" width="32" height="32" fill="#181d25" fill-opacity="0.94"/>
-  <rect id="header-top" x="5" width="32" height="5" fill="#181d25" fill-opacity="0.94"/>
+  <rect id="header-center" x="5" y="5" width="32" height="32" fill="#181d25" fill-opacity="0.90"/>
+  <rect id="header-top" x="5" width="32" height="5" fill="#181d25" fill-opacity="0.90"/>
   <g id="header-bottom" transform="translate(5 37)">
-    <rect width="32" height="5" fill="#181d25" fill-opacity="0.94"/>
+    <rect width="32" height="5" fill="#181d25" fill-opacity="0.90"/>
     <rect y="4" width="32" height="1" fill="#a6afbd" fill-opacity="0.14"/>
   </g>
-  <rect id="header-left" y="5" width="5" height="32" fill="#181d25" fill-opacity="0.94"/>
-  <rect id="header-right" x="37" y="5" width="5" height="32" fill="#181d25" fill-opacity="0.94"/>
-  <rect id="header-topleft" width="5" height="5" fill="#181d25" fill-opacity="0.94"/>
-  <rect id="header-topright" x="37" width="5" height="5" fill="#181d25" fill-opacity="0.94"/>
-  <rect id="header-bottomleft" y="37" width="5" height="5" fill="#181d25" fill-opacity="0.94"/>
+  <rect id="header-left" y="5" width="5" height="32" fill="#181d25" fill-opacity="0.90"/>
+  <rect id="header-right" x="37" y="5" width="5" height="32" fill="#181d25" fill-opacity="0.90"/>
+  <rect id="header-topleft" width="5" height="5" fill="#181d25" fill-opacity="0.90"/>
+  <rect id="header-topright" x="37" width="5" height="5" fill="#181d25" fill-opacity="0.90"/>
+  <rect id="header-bottomleft" y="37" width="5" height="5" fill="#181d25" fill-opacity="0.90"/>
   <g id="header-bottomright" transform="translate(37 37)">
-    <rect width="5" height="5" fill="#181d25" fill-opacity="0.94"/>
+    <rect width="5" height="5" fill="#181d25" fill-opacity="0.90"/>
     <rect y="4" width="5" height="1" fill="#a6afbd" fill-opacity="0.14"/>
   </g>
 
-  <rect id="footer-center" x="53" y="5" width="32" height="32" fill="#181d25" fill-opacity="0.94"/>
+  <rect id="footer-center" x="53" y="5" width="32" height="32" fill="#181d25" fill-opacity="0.90"/>
   <g id="footer-top" transform="translate(53 0)">
-    <rect width="32" height="5" fill="#181d25" fill-opacity="0.94"/>
+    <rect width="32" height="5" fill="#181d25" fill-opacity="0.90"/>
     <rect width="32" height="1" fill="#a6afbd" fill-opacity="0.14"/>
   </g>
-  <rect id="footer-bottom" x="53" y="37" width="32" height="5" fill="#181d25" fill-opacity="0.94"/>
-  <rect id="footer-left" x="48" y="5" width="5" height="32" fill="#181d25" fill-opacity="0.94"/>
-  <rect id="footer-right" x="85" y="5" width="5" height="32" fill="#181d25" fill-opacity="0.94"/>
+  <rect id="footer-bottom" x="53" y="37" width="32" height="5" fill="#181d25" fill-opacity="0.90"/>
+  <rect id="footer-left" x="48" y="5" width="5" height="32" fill="#181d25" fill-opacity="0.90"/>
+  <rect id="footer-right" x="85" y="5" width="5" height="32" fill="#181d25" fill-opacity="0.90"/>
   <g id="footer-topleft" transform="translate(48 0)">
-    <rect width="5" height="5" fill="#181d25" fill-opacity="0.94"/>
+    <rect width="5" height="5" fill="#181d25" fill-opacity="0.90"/>
     <rect width="5" height="1" fill="#a6afbd" fill-opacity="0.14"/>
   </g>
   <g id="footer-topright" transform="translate(85 0)">
-    <rect width="5" height="5" fill="#181d25" fill-opacity="0.94"/>
+    <rect width="5" height="5" fill="#181d25" fill-opacity="0.90"/>
     <rect width="5" height="1" fill="#a6afbd" fill-opacity="0.14"/>
   </g>
-  <rect id="footer-bottomleft" x="48" y="37" width="5" height="5" fill="#181d25" fill-opacity="0.94"/>
-  <rect id="footer-bottomright" x="85" y="37" width="5" height="5" fill="#181d25" fill-opacity="0.94"/>
+  <rect id="footer-bottomleft" x="48" y="37" width="5" height="5" fill="#181d25" fill-opacity="0.90"/>
+  <rect id="footer-bottomright" x="85" y="37" width="5" height="5" fill="#181d25" fill-opacity="0.90"/>
 
   <rect id="hint-top-margin" x="43" width="2" height="4" fill="#f0f"/>
   <rect id="hint-bottom-margin" x="43" y="38" width="2" height="4" fill="#f0f"/>

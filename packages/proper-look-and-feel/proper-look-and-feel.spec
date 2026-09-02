@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        24%{?dist}
+Release:        29%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -14,8 +14,9 @@ Requires:       rsms-inter-fonts = 4.1-3%{?dist}
 
 %description
 System-wide visual assets for the Proper Linux visual identity. Proper Blue
-Hour is the default wallpaper. Proper Horizon and the three PM-selected KDE
-wallpapers are installed as a compact, fully attributed Plasma gallery.
+Hour remains the default wallpaper. Eight Proper landscape photographs and two
+rally treatments join three PM-selected KDE wallpapers in a compact, fully
+attributed Plasma gallery.
 
 %build
 python3 %{_sourcedir}/generate-ui-assets.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-ui
@@ -32,6 +33,22 @@ install -Dpm 0644 %{_sourcedir}/volna.jpg %{buildroot}%{_datadir}/wallpapers/Vol
 install -Dpm 0644 %{_sourcedir}/Volna/metadata.json %{buildroot}%{_datadir}/wallpapers/Volna/metadata.json
 install -Dpm 0644 %{_sourcedir}/summer-1am.jpg %{buildroot}%{_datadir}/wallpapers/summer_1am/contents/images/2560x1600.jpg
 install -Dpm 0644 %{_sourcedir}/summer_1am/metadata.json %{buildroot}%{_datadir}/wallpapers/summer_1am/metadata.json
+install -Dpm 0644 %{_sourcedir}/proper-rally-blue-hour.png %{buildroot}%{_datadir}/wallpapers/ProperRallyBlueHour/contents/images/1920x1080.png
+install -Dpm 0644 %{_sourcedir}/ProperRallyBlueHour/metadata.json %{buildroot}%{_datadir}/wallpapers/ProperRallyBlueHour/metadata.json
+install -Dpm 0644 %{_sourcedir}/proper-rally-night-flight.png %{buildroot}%{_datadir}/wallpapers/ProperRallyNightFlight/contents/images/1920x1080.png
+install -Dpm 0644 %{_sourcedir}/ProperRallyNightFlight/metadata.json %{buildroot}%{_datadir}/wallpapers/ProperRallyNightFlight/metadata.json
+install -Dpm 0644 %{_sourcedir}/proper-floating-falls.png %{buildroot}%{_datadir}/wallpapers/ProperFloatingFalls/contents/images/1920x1080.png
+install -Dpm 0644 %{_sourcedir}/ProperFloatingFalls/metadata.json %{buildroot}%{_datadir}/wallpapers/ProperFloatingFalls/metadata.json
+install -Dpm 0644 %{_sourcedir}/proper-terraced-dawn.png %{buildroot}%{_datadir}/wallpapers/ProperTerracedDawn/contents/images/1920x1080.png
+install -Dpm 0644 %{_sourcedir}/ProperTerracedDawn/metadata.json %{buildroot}%{_datadir}/wallpapers/ProperTerracedDawn/metadata.json
+install -Dpm 0644 %{_sourcedir}/proper-glacial-arch.png %{buildroot}%{_datadir}/wallpapers/ProperGlacialArch/contents/images/1920x1080.png
+install -Dpm 0644 %{_sourcedir}/ProperGlacialArch/metadata.json %{buildroot}%{_datadir}/wallpapers/ProperGlacialArch/metadata.json
+install -Dpm 0644 %{_sourcedir}/proper-highland-blue-hour.png %{buildroot}%{_datadir}/wallpapers/ProperHighlandBlueHour/contents/images/1920x1080.png
+install -Dpm 0644 %{_sourcedir}/ProperHighlandBlueHour/metadata.json %{buildroot}%{_datadir}/wallpapers/ProperHighlandBlueHour/metadata.json
+install -Dpm 0644 %{_sourcedir}/proper-highland-sunrise.png %{buildroot}%{_datadir}/wallpapers/ProperHighlandSunrise/contents/images/1920x1080.png
+install -Dpm 0644 %{_sourcedir}/ProperHighlandSunrise/metadata.json %{buildroot}%{_datadir}/wallpapers/ProperHighlandSunrise/metadata.json
+install -Dpm 0644 %{_sourcedir}/proper-salt-flat-station.png %{buildroot}%{_datadir}/wallpapers/ProperSaltFlatStation/contents/images/1920x1080.png
+install -Dpm 0644 %{_sourcedir}/ProperSaltFlatStation/metadata.json %{buildroot}%{_datadir}/wallpapers/ProperSaltFlatStation/metadata.json
 install -Dpm 0644 %{_sourcedir}/com.properlinux.dark.desktop/metadata.json %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.dark.desktop/metadata.json
 install -Dpm 0644 %{_sourcedir}/com.properlinux.dark.desktop/contents/defaults %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.dark.desktop/contents/defaults
 install -Dpm 0644 %{_sourcedir}/com.properlinux.light.desktop/metadata.json %{buildroot}%{_datadir}/plasma/look-and-feel/com.properlinux.light.desktop/metadata.json
@@ -152,6 +169,14 @@ test "$(xmllint --xpath "count(//*[@id = 'groove-highlight-center'])" \
 %{_datadir}/wallpapers/Path/
 %{_datadir}/wallpapers/Volna/
 %{_datadir}/wallpapers/summer_1am/
+%{_datadir}/wallpapers/ProperRallyBlueHour/
+%{_datadir}/wallpapers/ProperRallyNightFlight/
+%{_datadir}/wallpapers/ProperFloatingFalls/
+%{_datadir}/wallpapers/ProperTerracedDawn/
+%{_datadir}/wallpapers/ProperGlacialArch/
+%{_datadir}/wallpapers/ProperHighlandBlueHour/
+%{_datadir}/wallpapers/ProperHighlandSunrise/
+%{_datadir}/wallpapers/ProperSaltFlatStation/
 %{_datadir}/plasma/look-and-feel/com.properlinux.dark.desktop/
 %{_datadir}/plasma/look-and-feel/com.properlinux.light.desktop/
 %{_datadir}/plasma/look-and-feel/com.properlinux.midnight.desktop/
@@ -175,6 +200,28 @@ test "$(xmllint --xpath "count(//*[@id = 'groove-highlight-center'])" \
 install -m 0644 %{_datadir}/proper-linux/plasmalogin.conf %{_prefix}/lib/plasmalogin/defaults.conf || :
 
 %changelog
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-29
+- Add the PM-approved photographic Salt-Flat Station wallpaper
+- Keep Proper Blue Hour as the default while expanding the gallery to thirteen choices
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-28
+- Add the PM-approved photographic Highland Blue Hour and Highland Sunrise wallpapers
+- Preserve Proper Blue Hour as the default while expanding the native Plasma gallery to twelve choices
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-27
+- Promote all five PM-reviewed wallpaper concepts into the native Plasma gallery
+- Keep Proper Blue Hour as the system default while exposing both rally treatments
+- Replace the abstract Light background with the approved photographic Alpine Morning
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-26
+- Centre the approved fixed-width soft-glass lock password capsule
+- Enlarge and centre password dots without adding reveal or submit icons
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-25
+- Restore Breeze-compatible switch geometry for Networks and Airplane Mode
+- Give task indicators one crisp rounded line or dot and fix combo-box endcaps
+- Increase panel and popup translucency while retaining readable owned surfaces
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-24
 - Restyle upstream Plasma system applets through supported control assets only
 - Keep network, Bluetooth, audio, display, brightness, and power QML untouched

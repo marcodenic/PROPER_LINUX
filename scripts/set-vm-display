@@ -65,9 +65,9 @@ emit_character() {
     ' ') emit_key_event spc ;;
     '-') emit_key_event minus ;;
     '.') emit_key_event dot ;;
-    # Proper's default British layout types @ with Shift+apostrophe. QMP sends
-    # physical qcodes, so using the US Shift+2 chord would enter a quote.
-    '@') emit_key_event apostrophe true ;;
+    # The live image's pinned keytable is US. QMP sends physical qcodes, so the
+    # refresh separator must use the US Shift+2 chord.
+    '@') emit_key_event 2 true ;;
     [a-z0-9]) emit_key_event "$character" ;;
     *)
       printf 'Unsupported character in VM display command: %q\n' "$character" >&2
@@ -89,8 +89,16 @@ apply_display_mode() {
   {
     printf '%s\n' '{"execute":"qmp_capabilities"}'
     sleep 0.2
-    printf '%s\n' '{"execute":"input-send-event","arguments":{"events":[{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"alt"}}},{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"f2"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"f2"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"alt"}}}]}}'
+    # Alt+F2 is unsafe before the graphical session owns the console: Linux
+    # interprets it as a switch to tty2, which can terminate PLM's in-flight
+    # Wayland session via its VT-release signal. Alt+Space opens KRunner in
+    # Plasma without overlapping a kernel VT-switch chord.
+    printf '%s\n' '{"execute":"input-send-event","arguments":{"events":[{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"alt"}}},{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"spc"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"spc"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"alt"}}}]}}'
     sleep 1
+    # KRunner retains the previous query after a failed execution. Clear it so
+    # the single bounded retry cannot append to a stale calculator result.
+    printf '%s\n' '{"execute":"input-send-event","arguments":{"events":[{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"ctrl"}}},{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"a"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"a"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"ctrl"}}}]}}'
+    emit_key_event backspace
     for ((index = 0; index < ${#command_text}; index++)); do
       character="${command_text:index:1}"
       emit_character "$character"

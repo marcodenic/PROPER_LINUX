@@ -3,12 +3,13 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Applications and Search">
   <title>Applications and Search</title>
-  <!-- Four cells from Proper's ASCII-influenced grid identity, centred on the
-       same canvas as Plasma's running-state underline. -->
+  <!-- Four cells from Proper's ASCII-influenced grid identity. The mark sits
+       two pixels left of mathematical centre so its right-side breathing room
+       balances the shelf's outer-left inset. -->
   <g fill="#f8fbff">
-    <rect x="7" y="7" width="7" height="7" rx="1"/>
-    <rect x="18" y="7" width="7" height="7" rx="1"/>
-    <rect x="7" y="18" width="7" height="7" rx="1"/>
-    <rect x="18" y="18" width="7" height="7" rx="1"/>
+    <rect x="5" y="7" width="7" height="7" rx="1"/>
+    <rect x="16" y="7" width="7" height="7" rx="1"/>
+    <rect x="5" y="18" width="7" height="7" rx="1"/>
+    <rect x="16" y="18" width="7" height="7" rx="1"/>
   </g>
 </svg>

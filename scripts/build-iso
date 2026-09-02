@@ -14,7 +14,7 @@ else
 fi
 build_source_dir="$iso_dir/source"
 
-for binary in fc-scan git lsinitrd patch sha256sum strings xmllint xorriso; do
+for binary in fc-scan git lsinitrd patch sha256sum stat strings xmllint xorriso; do
   command -v "$binary" >/dev/null 2>&1 || { printf 'Required command missing: %s\n' "$binary" >&2; exit 1; }
 done
 [[ -n "$UPSTREAM_COMMIT" ]] || { printf 'Fedora input is not pinned. Run scripts/pin-fedora-base, review the lock, then rerun.\n' >&2; exit 1; }
@@ -43,9 +43,19 @@ mkdir -p "$build_source_dir"
 if [[ "${PROPER_BASELINE:-0}" == 1 ]]; then
   kiwi_file=/source/Fedora.kiwi
 else
-  # Repository existence does not prove that its RPM payloads match the
-  # current source tree. Rebuild the curated set for every product image.
-  PROPER_OUTPUT_DIR="$output_root" "$project_root/scripts/build-rpms"
+  # An ordinary product build remains clean and conservative. During a
+  # reviewed image-only iteration, callers may explicitly reuse the RPM repo
+  # produced by the immediately preceding successful build; the final image
+  # validators below still enforce every expected package NEVRA.
+  if [[ "${PROPER_REUSE_RPMS:-0}" == 1 ]]; then
+    [[ -f "$output_root/repo/repodata/repomd.xml" ]] || {
+      printf 'PROPER_REUSE_RPMS=1 requested, but no complete RPM repository exists: %s\n' "$output_root/repo" >&2
+      exit 1
+    }
+    printf 'Reusing reviewed RPM repository for image-only iteration: %s\n' "$output_root/repo"
+  else
+    PROPER_OUTPUT_DIR="$output_root" "$project_root/scripts/build-rpms"
+  fi
   cp -a "$project_root/image/descriptions/proper.xml" "$build_source_dir/proper.xml"
   patch --batch --forward -d "$build_source_dir" -p1 < "$project_root/image/descriptions/proper-media.patch"
   # Fedora's upstream hook ends with `exit 0`.  Insert our live-session hook
@@ -100,6 +110,12 @@ fi
 mapfile -t images < <(find "$iso_dir" -maxdepth 3 -type f -name '*.iso' -print)
 (( ${#images[@]} == 1 )) || { printf 'Expected exactly one ISO in %s; found %d.\n' "$iso_dir" "${#images[@]}" >&2; exit 1; }
 if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
+  iso_size_bytes="$(stat -c '%s' "${images[0]}")"
+  if (( iso_size_bytes >= 3 * 1024 * 1024 * 1024 )); then
+    printf 'Proper image is %d bytes; Start Here promises a complete image below 3 GiB.\n' "$iso_size_bytes" >&2
+    exit 1
+  fi
+  printf 'Verified lean-image claim: %d bytes (below 3 GiB).\n' "$iso_size_bytes"
   mapfile -t package_manifests < <(find "$iso_dir" -maxdepth 3 -type f -name '*.packages' -print)
   (( ${#package_manifests[@]} == 1 )) || {
     printf 'Expected exactly one package manifest in %s; found %d.\n' "$iso_dir" "${#package_manifests[@]}" >&2
@@ -119,8 +135,8 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       exit 1
     }
   done
-  grep -Eq '^proper-look-and-feel\|\(none\)\|0[.]1\|24[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the style-only Proper system-surface release.\n' >&2
+  grep -Eq '^proper-look-and-feel\|\(none\)\|0[.]1\|29[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the thirteen-wallpaper Proper artwork release.\n' >&2
     exit 1
   }
   for upstream_applet in plasma-nm bluedevil plasma-pa powerdevil kscreen; do
@@ -131,15 +147,15 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       exit 1
     }
   done
-  grep -Eq '^proper-defaults\|\(none\)\|0[.]1\|23[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the shelf and Meta+Z desktop defaults release.\n' >&2
+  grep -Eq '^proper-defaults\|\(none\)\|0[.]1\|24[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the shelf and Meta+M desktop defaults release.\n' >&2
     exit 1
   }
   grep -Eq '^plasma-desktop\|\(none\)\|6[.]7[.]4\|1[.]fc44[.]proper1\|' "${package_manifests[0]}" || {
     printf 'Built image does not contain the pinned Proper task-launch indicator patch.\n' >&2
     exit 1
   }
-  grep -Eq '^plasma-login-manager\|\(none\)\|6[.]7[.]4\|1[.]proper3[.]fc44\|' "${package_manifests[0]}" || {
+  grep -Eq '^plasma-login-manager\|\(none\)\|6[.]7[.]4\|1[.]proper4[.]fc44\|' "${package_manifests[0]}" || {
     printf 'Built image does not contain the Inter-based Proper login composition.\n' >&2
     exit 1
   }
@@ -147,23 +163,23 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image does not contain the Inter-based Proper boot branding release.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-terminal\|\(none\)\|1[.]3[.]1\|4[.]fc44\|' "${package_manifests[0]}" || {
+  grep -Eq '^proper-terminal\|\(none\)\|1[.]3[.]1\|5[.]fc44\|' "${package_manifests[0]}" || {
     printf 'Built image does not contain the clear-translucency Ghostty release.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-welcome\|\(none\)\|0[.]1\|7[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the window-and-search Start Here release.\n' >&2
+  grep -Eq '^proper-welcome\|\(none\)\|0[.]1\|9[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the lean-image Start Here release.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-apps\|\(none\)\|0[.]1\|10[.]fc44\|' "${package_manifests[0]}" || {
+  grep -Eq '^proper-apps\|\(none\)\|0[.]1\|11[.]fc44\|' "${package_manifests[0]}" || {
     printf 'Built image does not contain the reconciled Proper Apps transaction release.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-appearance\|\(none\)\|0[.]1\|5[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the Inter-preserving Appearance release.\n' >&2
+  grep -Eq '^proper-appearance\|\(none\)\|0[.]1\|9[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the thirteen-wallpaper Appearance release.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-launchers\|\(none\)\|0[.]1\|14[.]fc44\|' "${package_manifests[0]}" || {
+  grep -Eq '^proper-launchers\|\(none\)\|0[.]1\|15[.]fc44\|' "${package_manifests[0]}" || {
     printf 'Built image does not contain the centred Vicinae and Meta shortcut release.\n' >&2
     exit 1
   }
@@ -204,6 +220,10 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
   image_dark_scheme="$iso_dir/image-build/build/image-root/usr/share/color-schemes/Proper.colors"
   image_kdeglobals="$iso_dir/image-build/build/image-root/etc/xdg/kdeglobals"
   image_root="$iso_dir/image-build/build/image-root"
+  [[ "$(readlink "$image_root/etc/localtime")" == "../usr/share/zoneinfo/Europe/London" ]] || {
+    printf 'Built image does not use the reviewed Europe/London v0.1 time-zone default.\n' >&2
+    exit 1
+  }
   dark_window_rgb="$(awk '
     /^\[Colors:Window\]$/ { in_window = 1; next }
     /^\[/ { in_window = 0 }

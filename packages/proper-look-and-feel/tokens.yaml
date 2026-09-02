@@ -3,7 +3,7 @@ name: Proper Horizon
 colour:
   light: {base: '#f6f7fb', surface: '#ffffff', text: '#18202b', muted: '#687386', accent: '#3b68d9', urgent: '#c33d52'}
   dark: {base: '#11151d', surface: '#1b222d', text: '#f1f4f8', muted: '#a8b2c2', accent: '#91b4ff', urgent: '#ff7184'}
-opacity: {panel: 0.78, panel_edge: 0.09, panel_highlight: 0.18, popup: 0.94, hover: 0.12, active: 0.18}
+opacity: {panel: 0.72, panel_edge: 0.09, panel_highlight: 0.18, popup: 0.90, hover: 0.12, active: 0.18}
 radius: {panel: 16, popup: 14, control: 9}
 blur: {panel: 24, popup: 32}
 spacing: {unit: 4, panel: 10, panel_end: 14, item: 8, section: 16}

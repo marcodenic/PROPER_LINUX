@@ -1,14 +1,14 @@
 Name:           proper-welcome
 Version:        0.1
-Release:        7%{?dist}
+Release:        9%{?dist}
 Summary:        Proper Linux live-session welcome
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
 BuildRequires:  qt6-qtbase-devel
 Requires:       anaconda-live
 Requires:       proper-branding
-Requires:       proper-look-and-feel >= 0.1-21
-Requires:       proper-launchers >= 0.1-14
+Requires:       proper-look-and-feel >= 0.1-25
+Requires:       proper-launchers >= 0.1-15
 
 %description
 A focused, pointer-accessible live-session choice between exploring the Proper
@@ -37,6 +37,15 @@ install -Dpm 0644 %{_sourcedir}/proper-start.desktop %{buildroot}%{_datadir}/app
 %{_datadir}/applications/proper-start.desktop
 
 %changelog
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-9
+- Surface the complete sub-3 GB live image as evidence of deliberate curation
+- Explain that the lean image omits an office suite, duplicate apps or redundant packages without restricting the catalogue
+
+* Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-8
+- Explain Proper's Fedora foundation, curation, ethos, and workflow on arrival and in Start Here
+- Replace rigid button tiles with a padded, scrollable, responsive editorial launchpad
+- Add visible keycap hints and a compact Meta+/ shortcut overview pane
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-7
 - Add obvious pointer cards for workspace arrangement and Vicinae search
 

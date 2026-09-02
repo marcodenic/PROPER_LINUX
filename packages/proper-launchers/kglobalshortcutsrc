@@ -9,10 +9,10 @@ Window Quick Tile Left=Meta+Left,Meta+Left,Quick Tile Window to the Left
 Window Quick Tile Right=Meta+Right,Meta+Right,Quick Tile Window to the Right
 Window Quick Tile Top=none,none,Quick Tile Window to the Top
 Window Quick Tile Bottom=none,none,Quick Tile Window to the Bottom
-Window Quick Tile Top Left=Meta+Ctrl+7,none,Quick Tile Window to the Top Left
-Window Quick Tile Top Right=Meta+Ctrl+9,none,Quick Tile Window to the Top Right
-Window Quick Tile Bottom Left=Meta+Ctrl+1,none,Quick Tile Window to the Bottom Left
-Window Quick Tile Bottom Right=Meta+Ctrl+3,none,Quick Tile Window to the Bottom Right
+Window Quick Tile Top Left=Meta+7,none,Quick Tile Window to the Top Left
+Window Quick Tile Top Right=Meta+9,none,Quick Tile Window to the Top Right
+Window Quick Tile Bottom Left=Meta+1,none,Quick Tile Window to the Bottom Left
+Window Quick Tile Bottom Right=Meta+3,none,Quick Tile Window to the Bottom Right
 Window Maximize=Meta+Up,Meta+PgUp,Maximise Window
 Window Restore=Meta+Down,Meta+Backspace,Restore Window
 Window Minimize=Meta+H,Meta+PgDown,Minimise Window
@@ -24,5 +24,17 @@ Show Desktop=Meta+D,Meta+D,Peek at Desktop
 [services][proper-vicinae-shortcut.desktop]
 _launch=Meta	Meta+Space
 
+[services][proper-terminal-shortcut.desktop]
+_launch=Meta+Return
+
+[services][proper-shortcut-overview.desktop]
+_launch=Meta+/
+
 [krunner]
 run command=Alt+F2,Alt+F2,Run command
+
+[plasmashell]
+activate task manager entry 1=none,Meta+1,Activate Task Manager Entry 1
+activate task manager entry 3=none,Meta+3,Activate Task Manager Entry 3
+activate task manager entry 7=none,Meta+7,Activate Task Manager Entry 7
+activate task manager entry 9=none,Meta+9,Activate Task Manager Entry 9
