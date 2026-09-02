@@ -155,11 +155,11 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image does not retain the reviewed Fedora powerdevil Qt 6 rebuild unchanged.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-agent-status\|\(none\)\|0[.]1\|2[.]fc44\|' "${package_manifests[0]}" || {
+  grep -Eq '^proper-agent-status\|\(none\)\|0[.]2\|1[.]fc44\|' "${package_manifests[0]}" || {
     printf 'Proper agent-status package differs from the reviewed integration.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-defaults\|\(none\)\|0[.]1\|31[.]fc44\|' "${package_manifests[0]}" || {
+  grep -Eq '^proper-defaults\|\(none\)\|0[.]1\|32[.]fc44\|' "${package_manifests[0]}" || {
     printf 'Built image does not contain the native balanced-halves arrangement default.\n' >&2
     exit 1
   }
@@ -250,10 +250,12 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
   [[ -x "$image_root/usr/bin/proper-agent-status" &&
      -f "$image_root/usr/share/plasma/plasmoids/com.properlinux.agentstatus/metadata.json" &&
      -f "$image_root/usr/share/plasma/plasmoids/com.properlinux.agentstatus/contents/ui/main.qml" &&
+     -f "$image_root/usr/share/plasma/plasmoids/com.properlinux.statusshade/metadata.json" &&
+     -f "$image_root/usr/share/plasma/plasmoids/com.properlinux.statusshade/contents/ui/FullRepresentation.qml" &&
      -f "$image_root/usr/lib/systemd/user/proper-agent-panel.timer" &&
      -x "$image_root/usr/bin/proper-qemu-review-display" &&
      -f "$image_root/usr/lib/systemd/system/plasmalogin.service.d/20-proper-review-display.conf" ]] || {
-    printf 'Built image is missing the agent usage helper or Plasma widget.\n' >&2
+    printf 'Built image is missing the status shade, agent helper, or Plasma widgets.\n' >&2
     exit 1
   }
   if grep -qx 'plugin=com.properlinux.agentstatus' "$image_root/etc/xdg/plasma-org.kde.plasma.desktop-appletsrc"; then

@@ -7,6 +7,7 @@ set -Eeuo pipefail
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 style_root="$project_root/packages/proper-look-and-feel/proper"
 metadata="$style_root/metadata.json"
+heading_asset="$style_root/widgets/plasmoidheading.svg"
 spec="$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
 tokens="$project_root/packages/proper-look-and-feel/tokens.yaml"
 plasma_defaults="$project_root/packages/proper-defaults/plasmarc"
@@ -27,6 +28,10 @@ solid_panel_asset="$style_root/solid/widgets/panel-background.svg"
 popup_asset="$style_root/dialogs/background.svg"
 solid_popup_asset="$style_root/solid/dialogs/background.svg"
 task_loading_patch="$project_root/packages/plasma-desktop/proper-task-loading-indicator.patch"
+applet_tooltip_patch="$project_root/packages/plasma-desktop/proper-quiet-applet-tooltips.patch"
+system_tray_tooltip_patch="$project_root/packages/plasma-workspace/proper-quiet-system-tray-tooltips.patch"
+tooltip_layout_patch="$project_root/packages/libplasma/proper-quiet-tooltip-layout.patch"
+rpm_build_script="$project_root/scripts/build-rpms"
 control_generator="$project_root/packages/proper-look-and-feel/generate-plasma-controls.py"
 panel_generator="$project_root/packages/proper-look-and-feel/generate-panel-material.py"
 generated_controls="$(mktemp -d /tmp/proper-plasma-controls.XXXXXX)"
@@ -265,7 +270,7 @@ for asset in "${surface_assets[@]}"; do
   matched_edge_rims="$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[2][@fill='$rim_color' and @fill-opacity='$rim_opacity'])" "$asset")"
   matched_corner_rim_groups="$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2][@opacity='$rim_opacity'])" "$asset")"
   matched_corner_rim_bleeds="$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2]/*[local-name()='rect' and @fill='$rim_color'])" "$asset")"
-  matched_corner_rim_paths="$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and @stroke='$rim_color'])" "$asset")"
+  matched_corner_rim_paths="$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and (@stroke='$rim_color' or @fill='$rim_color')])" "$asset")"
   [[ "$matched_edge_rims" == 4 && "$matched_corner_rim_groups" == 4 &&
      "$matched_corner_rim_bleeds" == 8 && "$matched_corner_rim_paths" == 4 ]] || {
     printf '%s must post-composite one identical seam-safe rim around every slice.\n' "$asset" >&2
@@ -281,9 +286,43 @@ for asset in "${surface_assets[@]}"; do
   }
 done
 
+[[ "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$popup_asset")" == 'M0 0H12V1H1V12H0Z' &&
+   "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$popup_asset")" == 'M0 0H12V12H11V1H0Z' &&
+   "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$popup_asset")" == 'M0 0H1V11H12V12H0Z' &&
+   "$(xmllint --xpath "string(//*[@id='rim-bottomright']/@d)" "$popup_asset")" == 'M11 0H12V12H0V11H11Z' ]] || {
+  printf '%s must use filled one-pixel corner rims that cannot be clipped at slice bounds.\n' "$popup_asset" >&2
+  exit 1
+}
+popup_rim_color="$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill)" "$popup_asset")"
+[[ "$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and @fill='$popup_rim_color' and not(@stroke)])" "$popup_asset")" == 4 ]] || {
+  printf '%s corner rims must be filled shapes rather than boundary-clipped strokes.\n' "$popup_asset" >&2
+  exit 1
+}
+
 [[ "$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$popup_asset")" == 0.90 &&
    "$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$solid_popup_asset")" == 1.00 ]] || {
   printf 'Proper popup materials must retain their reviewed translucent and dense optical states.\n' >&2
+  exit 1
+}
+
+xmllint --noout "$heading_asset"
+for prefix in header footer; do
+  for slice in center top bottom left right topleft topright bottomleft bottomright; do
+    [[ "$(xmllint --xpath "count(//*[@id='$prefix-$slice'])" "$heading_asset")" == 1 ]] || {
+      printf '%s is missing %s-%s.\n' "$heading_asset" "$prefix" "$slice" >&2
+      exit 1
+    }
+  done
+done
+[[ "$(xmllint --xpath "count(//*[@id='header-top' or @id='header-left' or @id='header-right']/*[2][@fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" == 3 &&
+   "$(xmllint --xpath "count(//*[@id='header-topleft' or @id='header-topright']/*[2][local-name()='path' and @fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" == 2 &&
+   "$(xmllint --xpath "count(//*[@id='header-bottomleft' or @id='header-bottomright']/*[@fill='#a6afbd'])" "$heading_asset")" == 4 ]] || {
+  printf '%s header must preserve the popup rim and join its bottom separator at both sides.\n' "$heading_asset" >&2
+  exit 1
+}
+[[ "$(xmllint --xpath "count(//*[@id='footer-bottom' or @id='footer-left' or @id='footer-right']/*[2][@fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" == 3 &&
+   "$(xmllint --xpath "count(//*[@id='footer-bottomleft' or @id='footer-bottomright']/*[2][local-name()='path' and @fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" == 2 ]] || {
+  printf '%s footer must preserve the popup rim across its lower corners.\n' "$heading_asset" >&2
   exit 1
 }
 
@@ -416,6 +455,17 @@ grep -q 'active: model.IsWindow' "$task_loading_patch"
   printf 'Proper task startup patch must replace Plasma\x27s circular busy indicator.\n' >&2
   exit 1
 }
+
+grep -q '^+    icon: plasmoidItem[.]Plasmoid[.]icon' "$applet_tooltip_patch"
+grep -q 'mainText: systemTrayState[.]expanded.*Hidden icons' "$system_tray_tooltip_patch"
+grep -q 'i18np("%1 background item", "%1 background items", root[.]hiddenModel[.]count)' "$system_tray_tooltip_patch"
+grep -q '^+    icon: applet?.Plasmoid[.]icon' "$system_tray_tooltip_patch"
+grep -q '^+    icon: iconItem[.]source' "$system_tray_tooltip_patch"
+grep -q '^+            Layout[.]preferredWidth: Kirigami[.]Units[.]iconSizes[.]smallMedium' "$tooltip_layout_patch"
+grep -q '^+                maximumLineCount: 1' "$tooltip_layout_patch"
+grep -q '^+                maximumLineCount: 2' "$tooltip_layout_patch"
+grep -q 'libplasma/6[.]7[.]4/1[.]fc44/src/libplasma-6[.]7[.]4-1[.]fc44[.]src[.]rpm' "$rpm_build_script"
+grep -q 'plasma-workspace/6[.]7[.]4/1[.]fc44/src/plasma-workspace-6[.]7[.]4-1[.]fc44[.]src[.]rpm' "$rpm_build_script"
 
 tooltip_delay="$(awk '
   /^\[PlasmaToolTips\]$/ { in_group = 1; next }

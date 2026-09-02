@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        39%{?dist}
+Release:        40%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -181,9 +181,23 @@ for asset in \
   test "$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[2][@fill='$rim_color' and @fill-opacity='$rim_opacity'])" "$asset")" = 4
   test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2][@opacity='$rim_opacity'])" "$asset")" = 4
   test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2]/*[local-name()='rect' and @fill='$rim_color'])" "$asset")" = 8
-  test "$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and @stroke='$rim_color'])" "$asset")" = 4
+  test "$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and (@stroke='$rim_color' or @fill='$rim_color')])" "$asset")" = 4
   test "$(xmllint --xpath "count(//*[local-name()='linearGradient'])" "$asset")" = 0
   test "$(xmllint --xpath "count(//*[@id='mask-topleft' or @id='mask-topright' or @id='mask-bottomleft' or @id='mask-bottomright']/*[local-name()='rect'])" "$asset")" = 8
+done
+for asset in \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/dialogs/background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/tooltip.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/translucentbackground.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/tooltip.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/translucentbackground.svg; do
+  rim_color="$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill)" "$asset")"
+  test "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$asset")" = 'M0 0H12V1H1V12H0Z'
+  test "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$asset")" = 'M0 0H12V12H11V1H0Z'
+  test "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$asset")" = 'M0 0H1V11H12V12H0Z'
+  test "$(xmllint --xpath "string(//*[@id='rim-bottomright']/@d)" "$asset")" = 'M11 0H12V12H0V11H11Z'
+  test "$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and @fill='$rim_color' and not(@stroke)])" "$asset")" = 4
 done
 for asset in \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg \
@@ -221,6 +235,18 @@ test "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg)" = 0.90
 test "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/dialogs/background.svg)" = 1.00
+heading_asset=%{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/plasmoidheading.svg
+xmllint --noout "$heading_asset"
+for prefix in header footer; do
+  for side in top bottom left right topleft topright bottomleft bottomright center; do
+    test "$(xmllint --xpath "count(//*[@id='$prefix-$side'])" "$heading_asset")" = 1
+  done
+done
+test "$(xmllint --xpath "count(//*[@id='header-top' or @id='header-left' or @id='header-right']/*[2][@fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" = 3
+test "$(xmllint --xpath "count(//*[@id='header-topleft' or @id='header-topright']/*[2][local-name()='path' and @fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" = 2
+test "$(xmllint --xpath "count(//*[@id='header-bottomleft' or @id='header-bottomright']/*[@fill='#a6afbd'])" "$heading_asset")" = 4
+test "$(xmllint --xpath "count(//*[@id='footer-bottom' or @id='footer-left' or @id='footer-right']/*[2][@fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" = 3
+test "$(xmllint --xpath "count(//*[@id='footer-bottomleft' or @id='footer-bottomright']/*[2][local-name()='path' and @fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" = 2
 for asset in button lineedit listitem tabbar viewitem; do
   control_asset=%{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/$asset.svg
   test "$(xmllint --xpath "count(//*[contains(@id, 'hint-compose-over-border')])" "$control_asset")" = 0

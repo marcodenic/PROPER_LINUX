@@ -1,0 +1,21 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Proper Linux"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "A top-edge overview of system health, network activity, and coding-agent limits",
+        "FormFactors": [
+            "horizontal"
+        ],
+        "Icon": "utilities-system-monitor",
+        "Id": "com.properlinux.statusshade",
+        "License": "GPL-3.0-or-later",
+        "Name": "Proper Status Shade",
+        "Website": "https://github.com/proper-linux/proper-linux"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

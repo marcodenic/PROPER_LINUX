@@ -119,23 +119,45 @@ class AgentStatusTest(unittest.TestCase):
             self.assertEqual(provider["status"], "waiting")
             self.assertEqual(provider["windows"], [])
 
-    def test_panel_is_seeded_once_only_after_an_agent_is_installed(self) -> None:
+    def test_agent_panel_is_seeded_once_only_after_an_agent_is_installed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             home = Path(temporary)
             environment = {"HOME": str(home), "XDG_CONFIG_HOME": str(home / "config")}
-            providers = [{"id": "codex", "installed": True}]
-            completed = mock.Mock(returncode=0, stdout="proper-agent-panel-ready\n")
-            with mock.patch.dict(os.environ, environment, clear=False), mock.patch.object(Path, "home", return_value=home), mock.patch.object(agent_status, "snapshot", return_value={"providers": providers}), mock.patch.object(agent_status.shutil, "which", return_value="/usr/bin/qdbus-qt6"), mock.patch.object(agent_status.subprocess, "run", return_value=completed) as run:
-                self.assertEqual(agent_status.ensure_panel(), 0)
-                self.assertEqual(agent_status.ensure_panel(), 0)
+            with mock.patch.dict(os.environ, environment, clear=False), mock.patch.object(Path, "home", return_value=home), mock.patch.object(agent_status, "_find_agent_binary", side_effect=lambda name: "/usr/bin/codex" if name == "codex" else None), mock.patch.object(agent_status, "_run_plasma_script", return_value=True) as run:
+                self.assertEqual(agent_status.ensure_agent_panel(), 0)
+                self.assertEqual(agent_status.ensure_agent_panel(), 0)
             self.assertEqual(run.call_count, 1)
-            script = run.call_args.args[0][-1]
+            script = run.call_args.args[0]
             self.assertIn('new Panel("org.kde.panel")', script)
             self.assertIn('panel.alignment = "right"', script)
             self.assertIn("panel.height = 56", script)
             self.assertIn("panel.minimumLength = 132", script)
             self.assertIn("panel.floating = true", script)
             self.assertIn('panel.opacity = "adaptive"', script)
+
+    def test_global_shade_is_seeded_once_without_an_agent(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            home = Path(temporary)
+            environment = {"HOME": str(home), "XDG_CONFIG_HOME": str(home / "config")}
+            with mock.patch.dict(os.environ, environment, clear=False), mock.patch.object(Path, "home", return_value=home), mock.patch.object(agent_status, "_run_plasma_script", return_value=True) as run:
+                self.assertEqual(agent_status.ensure_shade(), 0)
+                self.assertEqual(agent_status.ensure_shade(), 0)
+            self.assertEqual(run.call_count, 1)
+            script = run.call_args.args[0]
+            self.assertIn('panel.location = "top"', script)
+            self.assertIn('panel.hiding = "autohide"', script)
+            self.assertIn('panel.addWidget("com.properlinux.statusshade")', script)
+            self.assertIn('shade.globalShortcut = "Meta+S"', script)
+
+    def test_system_snapshot_reduces_live_counters(self) -> None:
+        with mock.patch.object(agent_status, "_read_cpu_times", side_effect=[(100, 30), (200, 50)]), mock.patch.object(agent_status, "_default_network_interface", return_value="eth0"), mock.patch.object(agent_status, "_network_counters", side_effect=[(1000, 2000), (3000, 2400)]), mock.patch.object(agent_status, "_network_name", return_value="Studio LAN"), mock.patch.object(agent_status, "_memory_usage", return_value=(4_000, 10_000)), mock.patch.object(agent_status, "_storage_usage", return_value=(20_000, 100_000)), mock.patch.object(agent_status, "_temperature_celsius", return_value=54.2), mock.patch.object(agent_status.time, "sleep"), mock.patch.object(agent_status.time, "monotonic", side_effect=[10.0, 10.2]):
+            result = agent_status.system_snapshot(sample_seconds=0.2)
+        self.assertEqual(result["system"]["cpu_percent"], 80.0)
+        self.assertEqual(result["system"]["temperature_c"], 54.2)
+        self.assertEqual(result["system"]["memory_used_bytes"], 4_000)
+        self.assertEqual(result["network"]["name"], "Studio LAN")
+        self.assertEqual(result["network"]["download_bytes_per_second"], 10_000)
+        self.assertEqual(result["network"]["upload_bytes_per_second"], 2_000)
 
 
 if __name__ == "__main__":

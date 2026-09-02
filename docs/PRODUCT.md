@@ -84,6 +84,14 @@ layers and coherent toggles, without rearranging or forking their behaviour.
 This keeps the desktop coherent without taking on fragile replacements for
 security- and hardware-sensitive code.
 
+A slim auto-hidden handle at the top edge opens the global Status Shade by
+click, pull-down, or `Meta+S`. Its single bounded surface gives a quiet current
+view of CPU temperature and load, memory, root storage, the active network and
+its last minute of in-memory throughput, and installed-agent usage. The shade
+is always available; the absence of Codex or Claude is shown as a neutral state
+instead of hiding the system view. It complements rather than replaces KDE's
+maintained network, audio, power, and notification controls in the shelf.
+
 ### One launcher, many useful paths
 
 Vicinae is the promoted application launcher and command surface. Clicking the
@@ -175,6 +183,7 @@ pointer path; installing no agent leaves no visible placeholder.
 | `Meta+1/3/7/9` | Tile to a quadrant |
 | `Meta+W` | Arrange or restore the workspace |
 | `Meta+O` | Open Overview |
+| `Meta+S` | Open or close the Status Shade |
 | `Meta+T` | Open Plasma's visual tile editor |
 | `Meta+/` | Open the shortcut overview |
 

@@ -1,6 +1,6 @@
 Name:           proper-defaults
 Version:        0.1
-Release:        31%{?dist}
+Release:        32%{?dist}
 Summary:        Proper Linux new-user KDE defaults
 License:        GPL-3.0-or-later
 BuildArch:      noarch
@@ -10,7 +10,7 @@ Requires:       proper-launchers >= 0.1-16
 Requires:       proper-terminal >= 1.3.1-5
 Requires:       proper-apps >= 0.1-11
 Requires:       proper-appearance >= 0.1-7
-Requires:       proper-agent-status >= 0.1-2
+Requires:       proper-agent-status >= 0.2-1
 Requires:       /usr/bin/kscreen-doctor
 Requires:       /usr/bin/qdbus-qt6
 Requires:       /usr/bin/kreadconfig6
@@ -22,6 +22,9 @@ the small skel copies initialise a live/installer-created account. They do not
 overwrite an existing user's configuration.
 
 %changelog
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-32
+- Require the global status-shade and agent-meter package revision
+
 * Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-31
 - Make balanced halves the default reversible workspace arrangement on Meta+W
 - Use native KWin tiles so dragging a shared edge resizes both neighbouring windows

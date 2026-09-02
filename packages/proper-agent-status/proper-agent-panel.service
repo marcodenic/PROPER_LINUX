@@ -1,8 +1,7 @@
 [Unit]
-Description=Seed the Proper agent-usage panel when an agent is installed
+Description=Seed the Proper status shade and optional agent-usage panel
 After=plasma-plasmashell.service
 
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/proper-agent-status --ensure-panel
-

@@ -38,13 +38,37 @@ if [[ "${PROPER_RPM_RESUME:-0}" != 1 ]]; then
 fi
 mkdir -p "$rpm_root" "$repo_root" "$source_cache"
 
-default_packages="plasma-login-manager plasma-desktop proper-release proper-branding proper-welcome proper-look-and-feel proper-agent-status proper-defaults proper-launchers proper-terminal proper-apps proper-appearance"
+default_packages="libplasma plasma-workspace plasma-login-manager plasma-desktop proper-release proper-branding proper-welcome proper-look-and-feel proper-agent-status proper-defaults proper-launchers proper-terminal proper-apps proper-appearance"
 read -r -a packages_to_build <<<"${PROPER_RPM_PACKAGES:-$default_packages}"
 for package in "${packages_to_build[@]}"; do
   package_root="$project_root/packages/$package"
   spec="$package_root/$package.spec"
   mkdir -p "$rpm_root/$package"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-  if [[ "$package" == plasma-login-manager ]]; then
+  if [[ "$package" == libplasma ]]; then
+    libplasma_srpm="$source_cache/libplasma-6.7.4-1.fc44.src.rpm"
+    libplasma_sources="$(mktemp -d "$source_cache/libplasma-6.7.4-1.fc44-proper.XXXXXX")"
+    download_verified https://kojipkgs.fedoraproject.org/packages/libplasma/6.7.4/1.fc44/src/libplasma-6.7.4-1.fc44.src.rpm "$libplasma_srpm" 06548e88a9791720838fd04455ed86ec1678bad81b0bbbddbebf1208cb00d66f
+    (cd "$libplasma_sources" && rpm2cpio "$libplasma_srpm" | cpio -idm --quiet)
+    install -m 0644 "$package_root/proper-quiet-tooltip-layout.patch" "$libplasma_sources/proper-quiet-tooltip-layout.patch"
+    (cd "$libplasma_sources" && patch --batch --forward -p1 < "$package_root/libplasma.spec.patch")
+    podman run --rm \
+      --volume "$libplasma_sources:/src:z" \
+      --volume "$rpm_root/$package:/out:z" \
+      quay.io/fedora/fedora:44@sha256:c095fee5833adde3e7fb9bdfc30023d34b884a327e8019d597c708cbe8d8dd13 \
+      bash -lc "dnf -y install rpm-build dnf5-plugins >/dev/null && dnf -y builddep /src/libplasma.spec >/dev/null && mkdir -p /out/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} && cd /src && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /src' --define '_smp_mflags -j8' libplasma.spec"
+  elif [[ "$package" == plasma-workspace ]]; then
+    plasma_workspace_srpm="$source_cache/plasma-workspace-6.7.4-1.fc44.src.rpm"
+    plasma_workspace_sources="$(mktemp -d "$source_cache/plasma-workspace-6.7.4-1.fc44-proper.XXXXXX")"
+    download_verified https://kojipkgs.fedoraproject.org/packages/plasma-workspace/6.7.4/1.fc44/src/plasma-workspace-6.7.4-1.fc44.src.rpm "$plasma_workspace_srpm" 33af539128354cb2cd513a1ec4bee2f8914623b979f82d7118ea681f2d8d2dab
+    (cd "$plasma_workspace_sources" && rpm2cpio "$plasma_workspace_srpm" | cpio -idm --quiet)
+    install -m 0644 "$package_root/proper-quiet-system-tray-tooltips.patch" "$plasma_workspace_sources/proper-quiet-system-tray-tooltips.patch"
+    (cd "$plasma_workspace_sources" && patch --batch --forward -p1 < "$package_root/plasma-workspace.spec.patch")
+    podman run --rm \
+      --volume "$plasma_workspace_sources:/src:z" \
+      --volume "$rpm_root/$package:/out:z" \
+      quay.io/fedora/fedora:44@sha256:c095fee5833adde3e7fb9bdfc30023d34b884a327e8019d597c708cbe8d8dd13 \
+      bash -lc "dnf -y install rpm-build dnf5-plugins >/dev/null && dnf -y builddep /src/plasma-workspace.spec >/dev/null && mkdir -p /out/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} && cd /src && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /src' --define '_smp_mflags -j8' plasma-workspace.spec"
+  elif [[ "$package" == plasma-login-manager ]]; then
     plm_srpm="$source_cache/plasma-login-manager-6.7.4-1.fc44.src.rpm"
     plm_sources="$(mktemp -d "$source_cache/plasma-login-manager-6.7.4-1.fc44-proper.XXXXXX")"
     download_verified https://download.fedoraproject.org/pub/fedora/linux/updates/44/Everything/source/tree/Packages/p/plasma-login-manager-6.7.4-1.fc44.src.rpm "$plm_srpm" d8139ab3fdac94c5361cb0823e229d421d9385efb3dd26e54fd11442eed7ffa6
@@ -65,6 +89,7 @@ for package in "${packages_to_build[@]}"; do
     download_verified https://download.fedoraproject.org/pub/fedora/linux/updates/44/Everything/source/tree/Packages/p/plasma-desktop-6.7.4-1.fc44.src.rpm "$plasma_desktop_srpm" bc3e4d042be57b1d3d6edac10203f85ddb8690ae36f1ce98368ed53f4f73166a
     (cd "$plasma_desktop_sources" && rpm2cpio "$plasma_desktop_srpm" | cpio -idm --quiet)
     install -m 0644 "$package_root/proper-task-loading-indicator.patch" "$plasma_desktop_sources/proper-task-loading-indicator.patch"
+    install -m 0644 "$package_root/proper-quiet-applet-tooltips.patch" "$plasma_desktop_sources/proper-quiet-applet-tooltips.patch"
     (cd "$plasma_desktop_sources" && patch --batch --forward -p1 < "$package_root/plasma-desktop.spec.patch")
     podman run --rm \
       --volume "$plasma_desktop_sources:/src:z" \

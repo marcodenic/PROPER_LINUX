@@ -38,7 +38,7 @@ KDE continue to deliver their mature infrastructure and security updates.
 | `packages/proper-branding/` | Boot, installer, system-logo, and platform artwork |
 | `packages/proper-look-and-feel/` | Design tokens, global themes, Plasma Style, wallpapers, lock screen, colours, and generated shared UI assets |
 | `packages/proper-appearance/` | Preview-first style, text-size, and wallpaper control plus the bounded login-wallpaper helper |
-| `packages/proper-agent-status/` | Agent usage normalizer, supported Codex and Claude adapters, and the native Plasma panel widget |
+| `packages/proper-agent-status/` | Global system/network status shade, agent usage normalizer, supported Codex and Claude adapters, and the native Plasma panel widgets |
 | `packages/proper-defaults/` | Panel, KWin, shortcuts, Files, natural scrolling, default applications, and narrowly scoped migrations |
 | `packages/proper-launchers/` | Pinned Vicinae build, reliable opener, desktop actions, arrangement, OCR, and shortcut reference |
 | `packages/proper-terminal/` | Pinned Ghostty build, terminal defaults, `btop`, and Files integration |
@@ -120,7 +120,21 @@ normal privilege prompt, never pipes remote scripts into a privileged shell,
 and checks real installed state after a provider exits. Optional software keeps
 the update mechanism of its chosen provider.
 
-### Agent usage integration
+### Status surfaces and agent usage
+
+The global Status Shade is a Proper-owned Plasma applet opened from a slim
+auto-hidden top-edge panel. Plasma owns the edge reveal, popup placement,
+keyboard activation, focus dismissal, and shell material. The applet samples
+ordinary Linux CPU, thermal, memory, filesystem, and network counters only
+while it is visible. Its 60-second throughput trace lives only in QML memory;
+no performance or network history is persisted. NetworkManager supplies the
+active connection's display name while continuing to own connectivity and all
+network controls.
+
+The top-edge panel and `Meta+S` shortcut are seeded once for every profile. A
+separate seed marker preserves later removal or movement as a user choice. The
+shade consumes the same reduced agent JSON as the compact meter but does not
+depend on an agent being installed.
 
 The bottom-right Agent Usage meter is a Proper-owned Plasma applet inside a
 native fit-content panel rather than a port of a macOS menu-bar application or

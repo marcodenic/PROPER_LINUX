@@ -1,0 +1,22 @@
+--- a/plasma-workspace.spec
++++ b/plasma-workspace.spec
+@@ -3,7 +3,7 @@
+ Name:    plasma-workspace
+ Summary: Plasma workspace, applications and applets
+ Version: 6.7.4
+-Release: 1%{?dist}
++Release: 1%{?dist}.proper1
+ 
+ # Automatically converted from old format: BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND LGPL-3.0-or-later AND (GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only) AND MIT - review is highly recommended.
+ License: BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND LGPL-3.0-or-later AND (GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only) AND MIT
+@@ -40,6 +40,10 @@
+ # default to enable the lock/logout actions
+ Patch107:       plasma-workspace-5.27.80-enable-lock-logout-action.patch
+ 
++# Proper keeps status-area help quiet: one icon, one title, and no more than
++# one useful supporting line.
++Patch108:       proper-quiet-system-tray-tooltips.patch
++
+ # udev
+ BuildRequires:  zlib-devel
+ BuildRequires:  libGL-devel

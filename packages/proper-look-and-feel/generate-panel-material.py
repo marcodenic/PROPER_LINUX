@@ -230,7 +230,7 @@ def popup_svg(
       <rect x="{edge - 1}" width="1" height="{edge}" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-topleft" d="M0 .5H{edge}M.5 0V{edge}" fill="none" stroke="{rim}"/>
+      <path id="rim-topleft" d="M0 0H{edge}V1H1V{edge}H0Z" fill="{rim}"/>
       <rect x="{edge - 1}" width="1" height="1" fill="{rim}"/>
       <rect y="{edge - 1}" width="1" height="1" fill="{rim}"/>
     </g>
@@ -241,7 +241,7 @@ def popup_svg(
       <rect width="1" height="{edge}" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-topright" d="M0 .5H{edge}M{edge - .5} 0V{edge}" fill="none" stroke="{rim}"/>
+      <path id="rim-topright" d="M0 0H{edge}V{edge}H{edge - 1}V1H0Z" fill="{rim}"/>
       <rect width="1" height="1" fill="{rim}"/>
       <rect x="{edge - 1}" y="{edge - 1}" width="1" height="1" fill="{rim}"/>
     </g>
@@ -252,7 +252,7 @@ def popup_svg(
       <rect x="{edge - 1}" width="1" height="{edge}" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-bottomleft" d="M0 {edge - .5}H{edge}M.5 0V{edge}" fill="none" stroke="{rim}"/>
+      <path id="rim-bottomleft" d="M0 0H1V{edge - 1}H{edge}V{edge}H0Z" fill="{rim}"/>
       <rect x="{edge - 1}" y="{edge - 1}" width="1" height="1" fill="{rim}"/>
       <rect width="1" height="1" fill="{rim}"/>
     </g>
@@ -263,7 +263,7 @@ def popup_svg(
       <rect width="1" height="{edge}" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-bottomright" d="M0 {edge - .5}H{edge}M{edge - .5} 0V{edge}" fill="none" stroke="{rim}"/>
+      <path id="rim-bottomright" d="M{edge - 1} 0H{edge}V{edge}H0V{edge - 1}H{edge - 1}Z" fill="{rim}"/>
       <rect y="{edge - 1}" width="1" height="1" fill="{rim}"/>
       <rect x="{edge - 1}" width="1" height="1" fill="{rim}"/>
     </g>

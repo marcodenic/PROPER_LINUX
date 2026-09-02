@@ -33,7 +33,7 @@
       <rect x="11" width="1" height="12" fill="#181d25"/>
     </g>
     <g opacity="0.180">
-      <path id="rim-topleft" d="M0 .5H12M.5 0V12" fill="none" stroke="#a6afbd"/>
+      <path id="rim-topleft" d="M0 0H12V1H1V12H0Z" fill="#a6afbd"/>
       <rect x="11" width="1" height="1" fill="#a6afbd"/>
       <rect y="11" width="1" height="1" fill="#a6afbd"/>
     </g>
@@ -44,7 +44,7 @@
       <rect width="1" height="12" fill="#181d25"/>
     </g>
     <g opacity="0.180">
-      <path id="rim-topright" d="M0 .5H12M11.5 0V12" fill="none" stroke="#a6afbd"/>
+      <path id="rim-topright" d="M0 0H12V12H11V1H0Z" fill="#a6afbd"/>
       <rect width="1" height="1" fill="#a6afbd"/>
       <rect x="11" y="11" width="1" height="1" fill="#a6afbd"/>
     </g>
@@ -55,7 +55,7 @@
       <rect x="11" width="1" height="12" fill="#181d25"/>
     </g>
     <g opacity="0.180">
-      <path id="rim-bottomleft" d="M0 11.5H12M.5 0V12" fill="none" stroke="#a6afbd"/>
+      <path id="rim-bottomleft" d="M0 0H1V11H12V12H0Z" fill="#a6afbd"/>
       <rect x="11" y="11" width="1" height="1" fill="#a6afbd"/>
       <rect width="1" height="1" fill="#a6afbd"/>
     </g>
@@ -66,7 +66,7 @@
       <rect width="1" height="12" fill="#181d25"/>
     </g>
     <g opacity="0.180">
-      <path id="rim-bottomright" d="M0 11.5H12M11.5 0V12" fill="none" stroke="#a6afbd"/>
+      <path id="rim-bottomright" d="M11 0H12V12H0V11H11Z" fill="#a6afbd"/>
       <rect y="11" width="1" height="1" fill="#a6afbd"/>
       <rect x="11" width="1" height="1" fill="#a6afbd"/>
     </g>

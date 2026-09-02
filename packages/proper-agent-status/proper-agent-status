@@ -10,6 +10,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import selectors
 import shutil
 import subprocess
@@ -20,10 +21,11 @@ from typing import Any
 
 
 SCHEMA_VERSION = 1
-HELPER_VERSION = "0.1.0"
+HELPER_VERSION = "0.2.0"
 CLAUDE_CAPTURE_COMMAND = "/usr/bin/proper-agent-status --capture-claude"
 MAX_INPUT_BYTES = 1024 * 1024
 CODEX_TIMEOUT_SECONDS = 8.0
+SYSTEM_SAMPLE_SECONDS = 0.20
 
 
 def _xdg_path(variable: str, fallback: Path) -> Path:
@@ -49,6 +51,10 @@ def claude_hook_state_path() -> Path:
 
 def panel_seed_state_path() -> Path:
     return config_root() / "panel-seeded.json"
+
+
+def shade_seed_state_path() -> Path:
+    return config_root() / "shade-seeded.json"
 
 
 def claude_settings_path() -> Path:
@@ -372,18 +378,77 @@ def snapshot() -> dict[str, Any]:
     }
 
 
-def ensure_panel() -> int:
-    """Seed the native Plasma panel once, after a supported agent appears."""
+def _run_plasma_script(script: str, ready_marker: str) -> bool:
+    qdbus = shutil.which("qdbus-qt6")
+    if qdbus is None:
+        return False
+    try:
+        completed = subprocess.run(
+            [
+                qdbus,
+                "org.kde.plasmashell",
+                "/PlasmaShell",
+                "org.kde.PlasmaShell.evaluateScript",
+                script.strip(),
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            timeout=8.0,
+            check=False,
+            text=True,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return completed.returncode == 0 and ready_marker in completed.stdout
+
+
+def ensure_shade() -> int:
+    """Seed the global top-edge status shade once for every Proper profile."""
+    state_path = shade_seed_state_path()
+    if state_path.exists():
+        return 0
+    script = """
+let found = false;
+panels().forEach(panel => {
+    const shades = panel.widgets("com.properlinux.statusshade");
+    if (shades.length > 0) {
+        found = true;
+        if (!shades[0].globalShortcut) {
+            shades[0].globalShortcut = "Meta+S";
+        }
+    }
+});
+if (!found) {
+    const panel = new Panel("org.kde.panel");
+    panel.location = "top";
+    panel.alignment = "center";
+    panel.screen = 0;
+    panel.height = 8;
+    panel.lengthMode = "fill";
+    panel.hiding = "autohide";
+    panel.floating = false;
+    panel.opacity = "adaptive";
+    const shade = panel.addWidget("com.properlinux.statusshade");
+    shade.globalShortcut = "Meta+S";
+}
+print("proper-status-shade-ready");
+"""
+    if not _run_plasma_script(script, "proper-status-shade-ready"):
+        return 1
+    _atomic_json_write(
+        state_path,
+        {"schema_version": SCHEMA_VERSION, "seeded_at": int(time.time())},
+    )
+    return 0
+
+
+def ensure_agent_panel() -> int:
+    """Seed the compact agent meter once, after a supported agent appears."""
     state_path = panel_seed_state_path()
     if state_path.exists():
         return 0
-    current = snapshot()
-    if not any(provider.get("installed") for provider in current["providers"]):
+    if not any(_find_agent_binary(name) for name in ("codex", "claude")):
         return 0
-
-    qdbus = shutil.which("qdbus-qt6")
-    if qdbus is None:
-        return 1
     script = """
 let found = false;
 panels().forEach(panel => {
@@ -406,31 +471,168 @@ if (!found) {
     panel.addWidget("com.properlinux.agentstatus");
 }
 print("proper-agent-panel-ready");
-""".strip()
-    try:
-        completed = subprocess.run(
-            [
-                qdbus,
-                "org.kde.plasmashell",
-                "/PlasmaShell",
-                "org.kde.PlasmaShell.evaluateScript",
-                script,
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            timeout=8.0,
-            check=False,
-            text=True,
-        )
-        if completed.returncode != 0 or "proper-agent-panel-ready" not in completed.stdout:
-            return 1
-        _atomic_json_write(
-            state_path,
-            {"schema_version": SCHEMA_VERSION, "seeded_at": int(time.time())},
-        )
-    except (OSError, subprocess.TimeoutExpired):
+"""
+    if not _run_plasma_script(script, "proper-agent-panel-ready"):
         return 1
+    _atomic_json_write(
+        state_path,
+        {"schema_version": SCHEMA_VERSION, "seeded_at": int(time.time())},
+    )
     return 0
+
+
+def ensure_panel() -> int:
+    """Seed the global shade and, when relevant, the compact agent meter."""
+    shade_result = ensure_shade()
+    agent_result = ensure_agent_panel()
+    return 0 if shade_result == 0 and agent_result == 0 else 1
+
+
+def _read_cpu_times(path: Path = Path("/proc/stat")) -> tuple[int, int]:
+    fields = path.read_text(encoding="utf-8").splitlines()[0].split()
+    if not fields or fields[0] != "cpu" or len(fields) < 5:
+        raise ValueError("CPU counters are unavailable")
+    values = [int(value) for value in fields[1:9]]
+    total = sum(values)
+    idle = values[3] + (values[4] if len(values) > 4 else 0)
+    return total, idle
+
+
+def _memory_usage(path: Path = Path("/proc/meminfo")) -> tuple[int, int]:
+    values: dict[str, int] = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        match = re.fullmatch(r"([A-Za-z_()]+):\s+(\d+)\s+kB", line)
+        if match:
+            values[match.group(1)] = int(match.group(2)) * 1024
+    total = values.get("MemTotal", 0)
+    available = values.get("MemAvailable", 0)
+    if total <= 0:
+        raise ValueError("Memory counters are unavailable")
+    return max(0, total - available), total
+
+
+def _storage_usage(path: str = "/") -> tuple[int, int]:
+    stats = os.statvfs(path)
+    total = stats.f_blocks * stats.f_frsize
+    available = stats.f_bavail * stats.f_frsize
+    return max(0, total - available), total
+
+
+def _temperature_celsius(class_root: Path = Path("/sys/class")) -> float | None:
+    candidates: list[tuple[int, float]] = []
+    for input_path in class_root.glob("hwmon/hwmon*/temp*_input"):
+        try:
+            value = float(input_path.read_text(encoding="utf-8").strip()) / 1000.0
+            name = (input_path.parent / "name").read_text(encoding="utf-8").strip().lower()
+            label_path = input_path.with_name(input_path.name.replace("_input", "_label"))
+            label = label_path.read_text(encoding="utf-8").strip().lower() if label_path.exists() else ""
+        except (OSError, ValueError):
+            continue
+        identity = f"{name} {label}"
+        score = 3 if any(token in identity for token in ("package", "tctl", "cpu")) else 2 if "core" in identity else 0
+        if score and -20.0 < value < 150.0:
+            candidates.append((score, value))
+    for zone in class_root.glob("thermal/thermal_zone*"):
+        try:
+            kind = (zone / "type").read_text(encoding="utf-8").strip().lower()
+            value = float((zone / "temp").read_text(encoding="utf-8").strip()) / 1000.0
+        except (OSError, ValueError):
+            continue
+        score = 3 if any(token in kind for token in ("package", "x86_pkg", "cpu")) else 1 if "soc" in kind else 0
+        if score and -20.0 < value < 150.0:
+            candidates.append((score, value))
+    if not candidates:
+        return None
+    best_score = max(score for score, _ in candidates)
+    return round(max(value for score, value in candidates if score == best_score), 1)
+
+
+def _default_network_interface(route_path: Path = Path("/proc/net/route")) -> str | None:
+    try:
+        for line in route_path.read_text(encoding="utf-8").splitlines()[1:]:
+            fields = line.split()
+            if len(fields) >= 4 and fields[1] == "00000000" and int(fields[3], 16) & 0x2:
+                return fields[0]
+    except (OSError, ValueError):
+        pass
+    for operstate in Path("/sys/class/net").glob("*/operstate"):
+        try:
+            if operstate.parent.name != "lo" and operstate.read_text(encoding="utf-8").strip() == "up":
+                return operstate.parent.name
+        except OSError:
+            continue
+    return None
+
+
+def _network_counters(interface: str) -> tuple[int, int]:
+    root = Path("/sys/class/net") / interface / "statistics"
+    return (
+        int((root / "rx_bytes").read_text(encoding="utf-8").strip()),
+        int((root / "tx_bytes").read_text(encoding="utf-8").strip()),
+    )
+
+
+def _network_name(interface: str | None) -> str:
+    if not interface:
+        return "Offline"
+    nmcli = shutil.which("nmcli")
+    if nmcli:
+        try:
+            completed = subprocess.run(
+                [nmcli, "-g", "GENERAL.CONNECTION", "device", "show", interface],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                timeout=1.0,
+                check=False,
+                text=True,
+            )
+            name = completed.stdout.strip().splitlines()[0] if completed.stdout.strip() else ""
+            if completed.returncode == 0 and name and name != "--":
+                return name
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    return interface
+
+
+def system_snapshot(sample_seconds: float = SYSTEM_SAMPLE_SECONDS) -> dict[str, Any]:
+    before_total, before_idle = _read_cpu_times()
+    interface = _default_network_interface()
+    try:
+        before_rx, before_tx = _network_counters(interface) if interface else (0, 0)
+    except (OSError, ValueError):
+        before_rx, before_tx = 0, 0
+    started = time.monotonic()
+    time.sleep(sample_seconds)
+    elapsed = max(0.001, time.monotonic() - started)
+    after_total, after_idle = _read_cpu_times()
+    try:
+        after_rx, after_tx = _network_counters(interface) if interface else (0, 0)
+    except (OSError, ValueError):
+        after_rx, after_tx = before_rx, before_tx
+    total_delta = max(0, after_total - before_total)
+    idle_delta = max(0, after_idle - before_idle)
+    cpu_percent = 0.0 if total_delta == 0 else 100.0 * max(0, total_delta - idle_delta) / total_delta
+    memory_used, memory_total = _memory_usage()
+    storage_used, storage_total = _storage_usage()
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "generated_at": int(time.time()),
+        "system": {
+            "cpu_percent": round(min(100.0, max(0.0, cpu_percent)), 1),
+            "temperature_c": _temperature_celsius(),
+            "memory_used_bytes": memory_used,
+            "memory_total_bytes": memory_total,
+            "storage_used_bytes": storage_used,
+            "storage_total_bytes": storage_total,
+        },
+        "network": {
+            "connected": interface is not None,
+            "interface": interface,
+            "name": _network_name(interface),
+            "download_bytes_per_second": round(max(0, after_rx - before_rx) / elapsed),
+            "upload_bytes_per_second": round(max(0, after_tx - before_tx) / elapsed),
+        },
+    }
 
 
 def _read_bounded_stdin() -> bytes:
@@ -556,6 +758,7 @@ def main(argv: list[str] | None = None) -> int:
     actions.add_argument("--install-claude-hook", action="store_true", help="connect Claude's supported status line")
     actions.add_argument("--remove-claude-hook", action="store_true", help="restore the previous Claude status line")
     actions.add_argument("--ensure-panel", action="store_true", help=argparse.SUPPRESS)
+    actions.add_argument("--system-snapshot", action="store_true", help=argparse.SUPPRESS)
     arguments = parser.parse_args(argv)
     if arguments.capture_claude:
         return capture_claude()
@@ -565,6 +768,10 @@ def main(argv: list[str] | None = None) -> int:
         return remove_claude_hook()
     if arguments.ensure_panel:
         return ensure_panel()
+    if arguments.system_snapshot:
+        json.dump(system_snapshot(), sys.stdout, ensure_ascii=False, separators=(",", ":"))
+        sys.stdout.write("\n")
+        return 0
     json.dump(snapshot(), sys.stdout, ensure_ascii=False, separators=(",", ":"))
     sys.stdout.write("\n")
     return 0
