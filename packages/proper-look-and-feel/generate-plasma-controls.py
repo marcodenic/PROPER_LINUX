@@ -52,11 +52,13 @@ def document(width: int, height: int, body: str) -> str:
 
 
 def rounded_frame(prefix: str, x: int, y: int, radius: int, center: int,
-                  css_class: str, opacity: float, hints: bool = False) -> str:
+                  css_class: str, opacity: float, hints: bool = False,
+                  hint_margin: float | None = None) -> str:
     total = radius * 2 + center
     right = x + radius + center
     bottom = y + radius + center
     fill = f'class="{css_class}" fill="currentColor" fill-opacity="{opacity:.3f}"'
+    grouped_fill = f'class="{css_class}" fill="currentColor"'
     corner = radius - 1
     elements = [
         f'  <rect id="{prefix}-center" x="{x + radius}" y="{y + radius}" width="{center}" height="{center}" {fill}/>',
@@ -64,18 +66,35 @@ def rounded_frame(prefix: str, x: int, y: int, radius: int, center: int,
         f'  <rect id="{prefix}-bottom" x="{x + radius}" y="{bottom}" width="{center}" height="{radius}" {fill}/>',
         f'  <rect id="{prefix}-left" x="{x}" y="{y + radius}" width="{radius}" height="{center}" {fill}/>',
         f'  <rect id="{prefix}-right" x="{right}" y="{y + radius}" width="{radius}" height="{center}" {fill}/>',
-        f'  <path id="{prefix}-topleft" d="M {x + radius} {y} V {y + radius} H {x} v-1 C {x} {y + radius * 0.45:.2f} {x + radius * 0.45:.2f} {y} {x + corner} {y} Z" {fill}/>',
-        f'  <path id="{prefix}-topright" d="M {right} {y} V {y + radius} H {x + total} v-1 C {x + total} {y + radius * 0.45:.2f} {x + total - radius * 0.45:.2f} {y} {x + total - corner} {y} Z" {fill}/>',
-        f'  <path id="{prefix}-bottomleft" d="M {x + radius} {y + total} V {bottom} H {x} v1 C {x} {y + total - radius * 0.45:.2f} {x + radius * 0.45:.2f} {y + total} {x + corner} {y + total} Z" {fill}/>',
-        f'  <path id="{prefix}-bottomright" d="M {right} {y + total} V {bottom} H {x + total} v1 C {x + total} {y + total - radius * 0.45:.2f} {x + total - radius * 0.45:.2f} {y + total} {x + total - corner} {y + total} Z" {fill}/>',
+        f'''  <g id="{prefix}-topleft" opacity="{opacity:.3f}">
+    <path d="M {x + radius} {y} V {y + radius} H {x} v-1 C {x} {y + radius * 0.45:.2f} {x + radius * 0.45:.2f} {y} {x + corner} {y} Z" {grouped_fill}/>
+    <rect x="{x + radius - 1}" y="{y}" width="1" height="{radius}" {grouped_fill}/>
+    <rect x="{x}" y="{y + radius - 1}" width="{radius}" height="1" {grouped_fill}/>
+  </g>''',
+        f'''  <g id="{prefix}-topright" opacity="{opacity:.3f}">
+    <path d="M {right} {y} V {y + radius} H {x + total} v-1 C {x + total} {y + radius * 0.45:.2f} {x + total - radius * 0.45:.2f} {y} {x + total - corner} {y} Z" {grouped_fill}/>
+    <rect x="{right}" y="{y}" width="1" height="{radius}" {grouped_fill}/>
+    <rect x="{right}" y="{y + radius - 1}" width="{radius}" height="1" {grouped_fill}/>
+  </g>''',
+        f'''  <g id="{prefix}-bottomleft" opacity="{opacity:.3f}">
+    <path d="M {x + radius} {y + total} V {bottom} H {x} v1 C {x} {y + total - radius * 0.45:.2f} {x + radius * 0.45:.2f} {y + total} {x + corner} {y + total} Z" {grouped_fill}/>
+    <rect x="{x + radius - 1}" y="{bottom}" width="1" height="{radius}" {grouped_fill}/>
+    <rect x="{x}" y="{bottom}" width="{radius}" height="1" {grouped_fill}/>
+  </g>''',
+        f'''  <g id="{prefix}-bottomright" opacity="{opacity:.3f}">
+    <path d="M {right} {y + total} V {bottom} H {x + total} v1 C {x + total} {y + total - radius * 0.45:.2f} {x + total - radius * 0.45:.2f} {y + total} {x + total - corner} {y + total} Z" {grouped_fill}/>
+    <rect x="{right}" y="{bottom}" width="1" height="{radius}" {grouped_fill}/>
+    <rect x="{right}" y="{bottom}" width="{radius}" height="1" {grouped_fill}/>
+  </g>''',
     ]
     if hints:
-        margin = max(3, radius - 2)
+        margin = max(3, radius - 2) if hint_margin is None else hint_margin
+        margin_text = f"{margin:g}"
         elements.extend([
-            f'  <rect id="{prefix}-hint-top-margin" x="{x + radius + center // 2}" y="{y}" width="1" height="{margin}" fill="#ff00ff"/>',
-            f'  <rect id="{prefix}-hint-bottom-margin" x="{x + radius + center // 2}" y="{y + total - margin}" width="1" height="{margin}" fill="#ff00ff"/>',
-            f'  <rect id="{prefix}-hint-left-margin" x="{x}" y="{y + radius + center // 2}" width="{margin}" height="1" fill="#ff00ff"/>',
-            f'  <rect id="{prefix}-hint-right-margin" x="{x + total - margin}" y="{y + radius + center // 2}" width="{margin}" height="1" fill="#ff00ff"/>',
+            f'  <rect id="{prefix}-hint-top-margin" x="{x + radius + center // 2}" y="{y}" width="1" height="{margin_text}" fill="#ff00ff"/>',
+            f'  <rect id="{prefix}-hint-bottom-margin" x="{x + radius + center // 2}" y="{y + total - margin}" width="1" height="{margin_text}" fill="#ff00ff"/>',
+            f'  <rect id="{prefix}-hint-left-margin" x="{x}" y="{y + radius + center // 2}" width="{margin_text}" height="1" fill="#ff00ff"/>',
+            f'  <rect id="{prefix}-hint-right-margin" x="{x + total - margin}" y="{y + radius + center // 2}" width="{margin_text}" height="1" fill="#ff00ff"/>',
         ])
     return "\n".join(elements)
 
@@ -134,18 +153,31 @@ def button() -> str:
                          "ColorScheme-Background", 1.0, False)
     shadow = rounded_frame("shadow", width + 54, 0, 9, 20,
                            "ColorScheme-Background", 0.001, True)
-    extras = '\n  <rect id="normal-hint-compose-over-border" x="2" y="2" width="1" height="1" fill="#ff6600"/>'
+    extras = '\n  <rect id="hint-tile-center" x="2" y="2" width="1" height="1" fill="#ff6600"/>'
     return document(width + 100, height + 4, frames + "\n" + mask + "\n" + shadow + extras)
 
 
 def lineedit() -> str:
+    # Plasma expands hover and focus layers outwards by their FrameSvg margins.
+    # Keep the base's seven-pixel content padding, but make overlay margins
+    # effectively zero so focused password fields cannot escape their owner.
     states = [
-        ("base", "ColorScheme-ButtonBackground", 0.680, True),
-        ("hover", "ColorScheme-ButtonHover", 0.090, True),
-        ("focus", "ColorScheme-ButtonFocus", 0.140, True),
-        ("focusframe", "ColorScheme-ButtonFocus", 0.200, True),
+        ("base", "ColorScheme-ButtonBackground", 0.680, 7.0),
+        ("hover", "ColorScheme-ButtonHover", 0.090, 0.001),
+        ("focus", "ColorScheme-ButtonFocus", 0.140, 0.001),
+        ("focusframe", "ColorScheme-ButtonFocus", 0.200, 0.001),
     ]
-    frames, width, height = frame_grid(states)
+    radius = 9
+    center = 20
+    size = radius * 2 + center
+    gap = 12
+    frames = "\n".join(
+        rounded_frame(prefix, index * (size + gap), 0, radius, center,
+                      css_class, opacity, True, hint_margin)
+        for index, (prefix, css_class, opacity, hint_margin) in enumerate(states)
+    )
+    width = len(states) * (size + gap)
+    height = size + gap
     extras = f'\n  <rect id="hint-focus-over-base" x="2" y="{height + 1}" width="1" height="1" fill="#ff6600"/>\n  <rect id="hint-tile-center" x="5" y="{height + 1}" width="1" height="1" fill="#ff6600"/>'
     return document(width, height + 5, frames + extras)
 
@@ -192,20 +224,22 @@ def slider() -> str:
 
 def switch() -> str:
     parts = [
-        # Plasma's Switch expects Breeze-compatible 38x16 bar and 22x22
-        # handle geometry. Keeping those contracts avoids compressed handles
-        # and misaligned labels in Networks and Airplane Mode.
-        '  <rect id="inactive-left" x="0" y="0" width="8" height="16" rx="8" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.240"/>',
-        '  <rect id="inactive-center" x="8" y="0" width="22" height="16" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.240"/>',
-        '  <rect id="inactive-right" x="30" y="0" width="8" height="16" rx="8" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.240"/>',
-        '  <rect id="active-left" x="44" y="0" width="8" height="16" rx="8" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.900"/>',
-        '  <rect id="active-center" x="52" y="0" width="22" height="16" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.900"/>',
-        '  <rect id="active-right" x="74" y="0" width="8" height="16" rx="8" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.900"/>',
-        '  <circle id="handle-shadow" cx="13" cy="39" r="13" fill="#000000" fill-opacity="0.220"/>',
-        '  <circle id="handle" cx="43" cy="39" r="11" class="ColorScheme-ButtonText" fill="currentColor" fill-opacity="0.980"/>',
-        '  <circle id="handle-hover" cx="69" cy="39" r="11" class="ColorScheme-ButtonFocus" fill="currentColor"/>',
-        '  <circle id="handle-focus" cx="97" cy="39" r="13" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.260"/>',
-        '  <circle id="handle-pressed" cx="125" cy="39" r="11" class="ColorScheme-ButtonText" fill="currentColor" fill-opacity="0.880"/>',
+        # Keep Plasma's 38x16 bar contract, but use true half-pill cap paths.
+        # Rounded rects round both sides of each slice and visibly break the
+        # track into blocks once FrameSvg composes left, center, and right.
+        '  <path id="inactive-left" d="M 8 0 A 8 8 0 0 0 8 16 Z" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.280"/>',
+        '  <rect id="inactive-center" x="8" y="0" width="22" height="16" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.280"/>',
+        '  <path id="inactive-right" d="M 30 0 A 8 8 0 0 1 30 16 Z" class="ColorScheme-Frame" fill="currentColor" fill-opacity="0.280"/>',
+        '  <path id="active-left" d="M 52 0 A 8 8 0 0 0 52 16 Z" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.820"/>',
+        '  <rect id="active-center" x="52" y="0" width="22" height="16" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.820"/>',
+        '  <path id="active-right" d="M 74 0 A 8 8 0 0 1 74 16 Z" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.820"/>',
+        # A 16px handle sits on the track's two 8px-radius end centres. The old
+        # 22-26px handle/halo overwhelmed the track in the Networks toolbar.
+        '  <circle id="handle-shadow" cx="9" cy="39" r="9" fill="#000000" fill-opacity="0.180"/>',
+        '  <circle id="handle" cx="35" cy="39" r="8" class="ColorScheme-ButtonText" fill="currentColor" fill-opacity="0.980"/>',
+        '  <circle id="handle-hover" cx="57" cy="39" r="8" class="ColorScheme-ButtonText" fill="currentColor"/>',
+        '  <circle id="handle-focus" cx="81" cy="39" r="11" class="ColorScheme-Highlight" fill="currentColor" fill-opacity="0.260"/>',
+        '  <circle id="handle-pressed" cx="103" cy="39" r="7" class="ColorScheme-ButtonText" fill="currentColor" fill-opacity="0.880"/>',
         '  <rect id="hint-bar-size" x="142" y="31" width="38" height="16" fill="#ff00ff" fill-opacity="0.001"/>',
         '  <rect id="hint-stretch-borders" x="184" y="31" width="4" height="4" fill="#ff6600"/>',
     ]

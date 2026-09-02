@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Proper task preview default repair
+Exec=/usr/bin/proper-tooltip-default-repair
+OnlyShowIn=KDE;
+X-KDE-autostart-phase=1
+NoDisplay=true

@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        29%{?dist}
+Release:        39%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -9,6 +9,7 @@ BuildRequires:  python3
 Provides:       system-backgrounds-kde
 Requires:       plasma-workspace >= 6.7
 Requires:       proper-branding
+Requires:       breeze-icon-theme
 Requires:       google-noto-sans-fonts
 Requires:       rsms-inter-fonts = 4.1-3%{?dist}
 
@@ -21,6 +22,7 @@ attributed Plasma gallery.
 %build
 python3 %{_sourcedir}/generate-ui-assets.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-ui
 python3 %{_sourcedir}/generate-plasma-controls.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-controls
+python3 %{_sourcedir}/generate-panel-material.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-panel
 
 %install
 install -Dpm 0644 %{_sourcedir}/proper-blue-hour.png %{buildroot}%{_datadir}/wallpapers/ProperBlueHour/contents/images/1920x1080.png
@@ -70,11 +72,27 @@ install -pm 0644 %{_builddir}/proper-ui/* %{buildroot}%{_datadir}/proper-linux/u
 install -Dpm 0644 %{_sourcedir}/proper/colors %{buildroot}%{_datadir}/color-schemes/Proper.colors
 install -Dpm 0644 %{_sourcedir}/ProperLight.colors %{buildroot}%{_datadir}/color-schemes/ProperLight.colors
 install -Dpm 0644 %{_sourcedir}/ProperMidnight.colors %{buildroot}%{_datadir}/color-schemes/ProperMidnight.colors
+# Keep Dolphin's desktop identity for task grouping while presenting Files with
+# the PM-selected plain folder. These links retain Breeze's independently
+# updated, size-specific upstream artwork rather than copying it into Proper.
+icon_root=%{buildroot}%{_datadir}/icons
+install -Dpm 0644 %{_sourcedir}/proper.index.theme "$icon_root/proper/index.theme"
+install -Dpm 0644 %{_sourcedir}/proper-dark.index.theme "$icon_root/proper-dark/index.theme"
+for size in 16 22 24 32 48 64 96; do
+  install -d "$icon_root/proper/apps/$size" "$icon_root/proper-dark/apps/$size"
+  ln -s "../../../breeze/places/$size/folder-blue.svg" \
+    "$icon_root/proper/apps/$size/org.kde.dolphin.svg"
+  ln -s "../../../breeze-dark/places/$size/folder-blue.svg" \
+    "$icon_root/proper-dark/apps/$size/org.kde.dolphin.svg"
+done
 style_root=%{buildroot}%{_datadir}/plasma/desktoptheme/proper
 install -Dpm 0644 %{_sourcedir}/proper/metadata.json "$style_root/metadata.json"
+install -Dpm 0644 %{_sourcedir}/proper/plasmarc "$style_root/plasmarc"
 install -Dpm 0644 %{_sourcedir}/proper/colors "$style_root/colors"
-install -Dpm 0644 %{_sourcedir}/proper/dialogs/background.svg "$style_root/dialogs/background.svg"
-install -Dpm 0644 %{_sourcedir}/proper/widgets/panel-background.svg "$style_root/widgets/panel-background.svg"
+install -Dpm 0644 %{_builddir}/proper-panel/popup-background.svg "$style_root/dialogs/background.svg"
+install -Dpm 0644 %{_builddir}/proper-panel/panel-background.svg "$style_root/widgets/panel-background.svg"
+install -Dpm 0644 %{_builddir}/proper-panel/solid-panel-background.svg "$style_root/solid/widgets/panel-background.svg"
+install -Dpm 0644 %{_builddir}/proper-panel/solid-popup-background.svg "$style_root/solid/dialogs/background.svg"
 install -Dpm 0644 %{_sourcedir}/proper/widgets/plasmoidheading.svg "$style_root/widgets/plasmoidheading.svg"
 install -Dpm 0644 %{_sourcedir}/proper/widgets/tasks.svg "$style_root/widgets/tasks.svg"
 # Keep all five system applets on their upstream QML and RPM update path.
@@ -84,8 +102,10 @@ for asset in button line lineedit listitem slider switch tabbar viewitem; do
 done
 # Notifications, tooltips, and workspace OSDs use the same approved surface
 # recipe. Everything else remains an explicit Breeze fallback.
-install -Dpm 0644 %{_sourcedir}/proper/dialogs/background.svg "$style_root/widgets/tooltip.svg"
-install -Dpm 0644 %{_sourcedir}/proper/dialogs/background.svg "$style_root/widgets/translucentbackground.svg"
+install -Dpm 0644 %{_builddir}/proper-panel/popup-background.svg "$style_root/widgets/tooltip.svg"
+install -Dpm 0644 %{_builddir}/proper-panel/popup-background.svg "$style_root/widgets/translucentbackground.svg"
+install -Dpm 0644 %{_builddir}/proper-panel/solid-popup-background.svg "$style_root/solid/widgets/tooltip.svg"
+install -Dpm 0644 %{_builddir}/proper-panel/solid-popup-background.svg "$style_root/solid/widgets/translucentbackground.svg"
 install -Dpm 0644 %{_sourcedir}/LICENSES/CC-BY-SA-4.0.txt %{buildroot}%{_licensedir}/%{name}/CC-BY-SA-4.0.txt
 install -Dpm 0644 %{_sourcedir}/LICENSES/LGPL-3.0-only.txt %{buildroot}%{_licensedir}/%{name}/LGPL-3.0-only.txt
 install -Dpm 0644 %{_sourcedir}/LICENSES/GPL-2.0-or-later.txt %{buildroot}%{_licensedir}/%{name}/GPL-2.0-or-later.txt
@@ -99,20 +119,39 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/metadata.json "$shell_ro
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/LockScreen.qml "$shell_root/contents/lockscreen/LockScreen.qml"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml "$shell_root/contents/lockscreen/LockScreenUi.qml"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/PasswordSync.qml "$shell_root/contents/lockscreen/PasswordSync.qml"
+install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/ProperGridClock.qml "$shell_root/contents/lockscreen/ProperGridClock.qml"
+install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/ProperPasswordCells.qml "$shell_root/contents/lockscreen/ProperPasswordCells.qml"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/qmldir "$shell_root/contents/lockscreen/qmldir"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-ensure-proper-panel.js "$shell_root/contents/updates/00-ensure-proper-panel.js"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/01-refine-proper-panel.js "$shell_root/contents/updates/01-refine-proper-panel.js"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/02-expand-proper-panel.js "$shell_root/contents/updates/02-expand-proper-panel.js"
 
 %check
-# Proper's rounded shell surfaces use a mask-composed centre and nine neutral
-# slices to stop Plasma from exposing rectangular contrast or fallback-shadow
-# layers. Keep the check here for builds outside the repository wrapper.
+# Proper overrides only Dolphin and otherwise inherits the complete upstream
+# Breeze themes. Preserve every size-specific source link.
+grep -qx 'Inherits=breeze' %{buildroot}%{_datadir}/icons/proper/index.theme
+grep -qx 'Inherits=breeze-dark' %{buildroot}%{_datadir}/icons/proper-dark/index.theme
+for size in 16 22 24 32 48 64 96; do
+  light_icon=%{buildroot}%{_datadir}/icons/proper/apps/$size/org.kde.dolphin.svg
+  dark_icon=%{buildroot}%{_datadir}/icons/proper-dark/apps/$size/org.kde.dolphin.svg
+  test -L "$light_icon"
+  test -L "$dark_icon"
+  test "$(readlink "$light_icon")" = "../../../breeze/places/$size/folder-blue.svg"
+  test "$(readlink "$dark_icon")" = "../../../breeze-dark/places/$size/folder-blue.svg"
+done
+
+# Proper's rounded shell surfaces provide complete masks. Keep the checks here
+# for builds outside the repository wrapper. Panels follow Breeze's
+# tiled-centre contract with the same material opacity in all nine slices.
 for asset in \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/panel-background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/dialogs/background.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/tooltip.svg \
-  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/translucentbackground.svg; do
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/translucentbackground.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/tooltip.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/translucentbackground.svg; do
   xmllint --noout "$asset"
   for element in \
     center top bottom left right \
@@ -121,11 +160,77 @@ for asset in \
     mask-topleft mask-topright mask-bottomleft mask-bottomright; do
     test "$(xmllint --xpath "count(//*[@id = '$element'])" "$asset")" = 1
   done
-  shadow_selector="//*[starts-with(@id, 'shadow-') and not(starts-with(@id, 'shadow-hint-'))]"
+done
+for asset in \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/panel-background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/dialogs/background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/tooltip.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/translucentbackground.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/tooltip.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/translucentbackground.svg; do
+  test "$(xmllint --xpath "count(//*[@id = 'hint-compose-over-border'])" "$asset")" = 0
+  test "$(xmllint --xpath "count(//*[@id = 'hint-tile-center'])" "$asset")" = 1
+  centre_opacity=$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$asset")
+  test "$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[1][@fill-opacity='$centre_opacity'])" "$asset")" = 4
+  test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1][@opacity='$centre_opacity'])" "$asset")" = 4
+  test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$asset")" = 8
+  rim_color=$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill)" "$asset")
+  rim_opacity=$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill-opacity)" "$asset")
+  test "$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[2][@fill='$rim_color' and @fill-opacity='$rim_opacity'])" "$asset")" = 4
+  test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2][@opacity='$rim_opacity'])" "$asset")" = 4
+  test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2]/*[local-name()='rect' and @fill='$rim_color'])" "$asset")" = 8
+  test "$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and @stroke='$rim_color'])" "$asset")" = 4
+  test "$(xmllint --xpath "count(//*[local-name()='linearGradient'])" "$asset")" = 0
+  test "$(xmllint --xpath "count(//*[@id='mask-topleft' or @id='mask-topright' or @id='mask-bottomleft' or @id='mask-bottomright']/*[local-name()='rect'])" "$asset")" = 8
+done
+for asset in \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/panel-background.svg; do
+  test "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$asset")" = 'M16 .5H15C6.99.5.5 6.99.5 15V16'
+  test "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$asset")" = 'M0 .5H1c8.01 0 14.5 6.49 14.5 14.5V16'
+  test "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$asset")" = 'M16 15.5H15C6.99 15.5.5 9.01.5 1V0'
+  test "$(xmllint --xpath "string(//*[@id='rim-bottomright']/@d)" "$asset")" = 'M0 15.5H1c8.01 0 14.5-6.49 14.5-14.5V0'
+done
+for asset in \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/dialogs/background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/tooltip.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/translucentbackground.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/tooltip.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/translucentbackground.svg; do
+  shadow_selector="//*[starts-with(@id, 'shadow-') and not(starts-with(@id, 'shadow-hint-')) and (local-name()='rect' or local-name()='path' or local-name()='g')]"
   test "$(xmllint --xpath "count($shadow_selector)" "$asset")" = 9
   test "$(xmllint --xpath "count(${shadow_selector}[@fill-opacity and number(@fill-opacity) <= 0.001])" "$asset")" = 9
-  test "$(xmllint --xpath "count(//*[@id = 'hint-compose-over-border'])" "$asset")" = 1
 done
+for asset in \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/panel-background.svg; do
+  shadow_selector="//*[starts-with(@id, 'shadow-') and not(starts-with(@id, 'shadow-hint-')) and (local-name()='rect' or local-name()='path' or local-name()='g')]"
+  test "$(xmllint --xpath "count($shadow_selector)" "$asset")" = 9
+  test "$(xmllint --xpath "count(${shadow_selector}[@fill-opacity and number(@fill-opacity) <= 0.001])" "$asset")" = 9
+  test "$(xmllint --xpath "string(//*[@id = 'floating-hint-top-margin']/@height)" "$asset")" = 12
+  test "$(xmllint --xpath "string(//*[@id = 'floating-hint-left-margin']/@width)" "$asset")" = 12
+done
+test "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg)" = 0.66
+test "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/panel-background.svg)" = 1.00
+test "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg)" = 0.90
+test "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/dialogs/background.svg)" = 1.00
+for asset in button lineedit listitem tabbar viewitem; do
+  control_asset=%{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/$asset.svg
+  test "$(xmllint --xpath "count(//*[contains(@id, 'hint-compose-over-border')])" "$control_asset")" = 0
+done
+test "$(xmllint --xpath "count(//*[@fill-opacity and number(@fill-opacity) != 0])" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/tasks.svg)" = 0
+grep -qx 'enabled=true' %{buildroot}%{_datadir}/plasma/desktoptheme/proper/plasmarc
+grep -qx 'contrast=0.72' %{buildroot}%{_datadir}/plasma/desktoptheme/proper/plasmarc
+grep -qx 'intensity=0.82' %{buildroot}%{_datadir}/plasma/desktoptheme/proper/plasmarc
+grep -qx 'saturation=1.15' %{buildroot}%{_datadir}/plasma/desktoptheme/proper/plasmarc
 panel_radius=$(sed -n "s/^radius: {panel: \([0-9][0-9]*\),.*/\1/p" \
   %{buildroot}%{_datadir}/proper-linux/tokens.yaml)
 asset_radius=$(xmllint --xpath "string(//*[@id='top']/*[1]/@height)" \
@@ -136,7 +241,9 @@ test -n "$panel_radius"
 test "$panel_radius" = "$asset_radius"
 test "$panel_radius" = "$mask_radius"
 
-# Proper task states must not fall through to Breeze's filled blue frames.
+# Proper task frames must stay empty because the patched task QML owns each
+# exact line or dot. Visible FrameSvg edge art tiles across the button and is
+# the source of the repeated-line/repeated-dot regression.
 task_asset=%{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/tasks.svg
 xmllint --noout "$task_asset"
 for state in normal focus hover minimized attention progress; do
@@ -144,8 +251,11 @@ for state in normal focus hover minimized attention progress; do
     test "$(xmllint --xpath "count(//*[@id = '$state-$slice'])" "$task_asset")" = 1
   done
 done
-test "$(xmllint --xpath "count(//*[@id = 'focus-bottom']//*[contains(@class, 'ColorScheme-ButtonFocus')])" "$task_asset")" = 1
-test "$(xmllint --xpath "count(//*[@id = 'normal-bottom']//*[contains(@class, 'ColorScheme-Text')])" "$task_asset")" = 1
+visible_task_shapes=$(xmllint --xpath "count(//*[starts-with(@id, 'normal-') or starts-with(@id, 'focus-') or starts-with(@id, 'hover-') or starts-with(@id, 'minimized-') or starts-with(@id, 'attention-') or starts-with(@id, 'progress-')]//*[local-name()='rect' or local-name()='circle' or local-name()='path'][not(@fill-opacity) or number(@fill-opacity) > 0.001])" "$task_asset")
+test "$visible_task_shapes" = 0
+for direction in top bottom left right; do
+  test "$(xmllint --xpath "count(//*[@id = 'group-expander-$direction'])" "$task_asset")" = 1
+done
 
 # The system surfaces are a Plasma Style, not applet forks. Validate the
 # generated supported control payload independently of the upstream QML.
@@ -160,8 +270,31 @@ test "$(xmllint --xpath "count(//*[@id = 'selected-center'])" \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/viewitem.svg)" = 1
 test "$(xmllint --xpath "count(//*[@id = 'active-center'])" \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/switch.svg)" = 1
+lineedit_asset=%{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/lineedit.svg
+test "$(xmllint --xpath "string(//*[@id = 'base-hint-left-margin']/@width)" "$lineedit_asset")" = 7
+for state in hover focus focusframe; do
+  test "$(xmllint --xpath "string(//*[@id = '$state-hint-left-margin']/@width)" "$lineedit_asset")" = 0.001
+  test "$(xmllint --xpath "string(//*[@id = '$state-hint-right-margin']/@width)" "$lineedit_asset")" = 0.001
+  test "$(xmllint --xpath "string(//*[@id = '$state-hint-top-margin']/@height)" "$lineedit_asset")" = 0.001
+  test "$(xmllint --xpath "string(//*[@id = '$state-hint-bottom-margin']/@height)" "$lineedit_asset")" = 0.001
+done
+switch_asset=%{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/switch.svg
+test "$(xmllint --xpath "count(//*[@id = 'inactive-left' or @id = 'inactive-right' or @id = 'active-left' or @id = 'active-right'][local-name()='path'])" "$switch_asset")" = 4
+test "$(xmllint --xpath "string(//*[@id = 'hint-bar-size']/@width)" "$switch_asset")" = 38
+test "$(xmllint --xpath "string(//*[@id = 'hint-bar-size']/@height)" "$switch_asset")" = 16
+test "$(xmllint --xpath "string(//*[@id = 'handle']/@r)" "$switch_asset")" = 8
 test "$(xmllint --xpath "count(//*[@id = 'groove-highlight-center'])" \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/slider.svg)" = 1
+
+# The arrival clock and password masks share Proper's exact square-cell visual
+# grammar while the real password TextField remains the authentication owner.
+lock_root=%{buildroot}%{_datadir}/plasma/shells/com.properlinux.desktop/contents/lockscreen
+test -f "$lock_root/ProperGridClock.qml"
+test -f "$lock_root/ProperPasswordCells.qml"
+grep -Fq 'Accessible.role: Accessible.StaticText' "$lock_root/ProperGridClock.qml"
+grep -Fq 'readonly property int rowCount: 7' "$lock_root/ProperGridClock.qml"
+grep -Fq 'passwordCharacter: "▪"' "$lock_root/LockScreenUi.qml"
+grep -Fq 'passwordLength: passwordBox.text.length' "$lock_root/LockScreenUi.qml"
 
 %files
 %{_datadir}/wallpapers/ProperBlueHour/
@@ -182,6 +315,8 @@ test "$(xmllint --xpath "count(//*[@id = 'groove-highlight-center'])" \
 %{_datadir}/plasma/look-and-feel/com.properlinux.midnight.desktop/
 %{_datadir}/plasma/desktoptheme/proper/
 %{_datadir}/plasma/shells/com.properlinux.desktop/
+%{_datadir}/icons/proper/
+%{_datadir}/icons/proper-dark/
 %config(noreplace) %{_sysconfdir}/xdg/plasma-workspace/env/proper-wallpaper.conf
 %{_datadir}/proper-linux/plasmalogin.conf
 %{_datadir}/proper-linux/tokens.yaml
@@ -200,6 +335,51 @@ test "$(xmllint --xpath "count(//*[@id = 'groove-highlight-center'])" \
 install -m 0644 %{_datadir}/proper-linux/plasmalogin.conf %{_prefix}/lib/plasmalogin/defaults.conf || :
 
 %changelog
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-39
+- Remove shortcut containers from the live welcome and strengthen its hierarchy
+- Enlarge the primary choice row while keeping key hints quiet and legible
+
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-38
+- Give dialogs, tooltips, notifications, and OSDs one uniform seam-safe body
+- Remove translucent centre-under-border composition from shell and controls
+- Add dense popup variants and audit every generated rounded control frame
+- Bump the Plasma Style version so upgraded systems invalidate cached SVGs
+
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-37
+- Render one uniform shelf rim around all four sides and corner arcs
+- Bleed each corner rim into both adjoining slices to remove subpixel breaks
+- Bump the Plasma Style version so upgraded systems invalidate cached SVGs
+
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-36
+- Carry every one-pixel corner rim to the adjoining nine-slice boundary
+- Prevent sub-pixel breaks where curved and straight panel edges meet
+
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-35
+- Bleed each rounded panel corner into its adjoining nine-slice edges
+- Keep that overlap inside one opacity group so cap joins stay invisible
+
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-34
+- Follow Plasma's native tiled-centre panel contract at one uniform opacity
+- Bound rim geometry and neutralize shadow and task textures that exposed joins
+
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-33
+- Present Files with the PM-selected plain blue Breeze folder
+- Preserve Dolphin task grouping and inherit every other icon from Breeze
+
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-32
+- Render the lock-screen time as Proper square-cell numerals and colon
+- Replace round password dots with exact square-cell masks
+
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-31
+- Recompose the floating shelf as lighter, contrast-managed native acrylic
+- Add a directional rim, rounded ambient shadow, and matching dense panel state
+- Generate both panel materials from the canonical Proper design tokens
+
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-30
+- Keep focused line edits inside their owning applet rows
+- Repair switch track composition and rebalance its handle
+- Leave tiled task frames visually empty for exact QML-owned indicators
+
 * Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-29
 - Add the PM-approved photographic Salt-Flat Station wallpaper
 - Keep Proper Blue Hour as the default while expanding the gallery to thirteen choices

@@ -1,0 +1,22 @@
+#!/usr/bin/bash
+# Keep the installed first-run and login review surfaces at the declared VM mode.
+set -u
+
+case "$(id -un)" in
+    plasma-setup|plasmalogin) ;;
+    *) exit 0 ;;
+esac
+
+if ! grep -Eiq 'QEMU|KVM' /sys/class/dmi/id/sys_vendor /sys/class/dmi/id/product_name 2>/dev/null; then
+    exit 0
+fi
+
+for _ in {1..80}; do
+    if /usr/bin/kscreen-doctor output.1.mode.1920x1080@60 output.1.scale.1 >/dev/null 2>&1; then
+        exit 0
+    fi
+    sleep 0.25
+done
+
+exit 0
+

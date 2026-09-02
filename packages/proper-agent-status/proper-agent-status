@@ -1,0 +1,574 @@
+#!/usr/bin/python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""Read supported agent rate limits without handling provider credentials."""
+
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import json
+import math
+import os
+from pathlib import Path
+import selectors
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from typing import Any
+
+
+SCHEMA_VERSION = 1
+HELPER_VERSION = "0.1.0"
+CLAUDE_CAPTURE_COMMAND = "/usr/bin/proper-agent-status --capture-claude"
+MAX_INPUT_BYTES = 1024 * 1024
+CODEX_TIMEOUT_SECONDS = 8.0
+
+
+def _xdg_path(variable: str, fallback: Path) -> Path:
+    value = os.environ.get(variable)
+    return Path(value).expanduser() if value else fallback
+
+
+def cache_root() -> Path:
+    return _xdg_path("XDG_CACHE_HOME", Path.home() / ".cache") / "proper-linux" / "agent-status"
+
+
+def config_root() -> Path:
+    return _xdg_path("XDG_CONFIG_HOME", Path.home() / ".config") / "proper-linux" / "agent-status"
+
+
+def claude_cache_path() -> Path:
+    return cache_root() / "claude.json"
+
+
+def claude_hook_state_path() -> Path:
+    return config_root() / "claude-hook.json"
+
+
+def panel_seed_state_path() -> Path:
+    return config_root() / "panel-seeded.json"
+
+
+def claude_settings_path() -> Path:
+    return Path.home() / ".claude" / "settings.json"
+
+
+def _atomic_json_write(path: Path, value: Any) -> None:
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(path.parent, 0o700)
+    descriptor, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            json.dump(value, handle, ensure_ascii=False, separators=(",", ":"))
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chmod(temporary_name, 0o600)
+        os.replace(temporary_name, path)
+    finally:
+        try:
+            os.unlink(temporary_name)
+        except FileNotFoundError:
+            pass
+
+
+def _read_json(path: Path) -> Any:
+    with path.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def _find_agent_binary(name: str) -> str | None:
+    found = shutil.which(name)
+    if found:
+        return found
+    for candidate in (Path.home() / ".local" / "bin" / name, Path("/usr/local/bin") / name):
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return str(candidate)
+    return None
+
+
+def _clamp_percent(value: Any) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return round(min(100.0, max(0.0, number)), 1)
+
+
+def _epoch(value: Any) -> int | None:
+    if isinstance(value, (int, float)) and math.isfinite(value):
+        return int(value / 1000 if value > 10_000_000_000 else value)
+    if not isinstance(value, str) or not value.strip():
+        return None
+    text = value.strip().replace("Z", "+00:00")
+    try:
+        parsed = dt.datetime.fromisoformat(text)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=dt.timezone.utc)
+    return int(parsed.timestamp())
+
+
+def _window_label(duration_minutes: Any, fallback: str) -> str:
+    try:
+        duration = int(duration_minutes)
+    except (TypeError, ValueError):
+        return fallback
+    if duration == 300:
+        return "5-hour"
+    if duration == 10_080:
+        return "7-day"
+    if duration >= 1440 and duration % 1440 == 0:
+        return f"{duration // 1440}-day"
+    if duration >= 60 and duration % 60 == 0:
+        return f"{duration // 60}-hour"
+    return f"{duration}-minute"
+
+
+def _normalized_window(
+    identifier: str,
+    label: str,
+    used: Any,
+    resets_at: Any,
+    duration_minutes: Any = None,
+) -> dict[str, Any] | None:
+    used_percent = _clamp_percent(used)
+    reset_epoch = _epoch(resets_at)
+    if used_percent is None or reset_epoch is None:
+        return None
+    window: dict[str, Any] = {
+        "id": identifier,
+        "label": label,
+        "used_percent": used_percent,
+        "remaining_percent": round(100.0 - used_percent, 1),
+        "resets_at": reset_epoch,
+    }
+    if isinstance(duration_minutes, (int, float)):
+        window["duration_minutes"] = int(duration_minutes)
+    return window
+
+
+def _write_rpc(handle: Any, message: dict[str, Any]) -> None:
+    handle.write(json.dumps(message, separators=(",", ":")) + "\n")
+    handle.flush()
+
+
+def read_codex_rate_limits(binary: str, timeout: float = CODEX_TIMEOUT_SECONDS) -> dict[str, Any]:
+    process = subprocess.Popen(
+        [binary, "app-server", "--stdio"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+        encoding="utf-8",
+        bufsize=1,
+    )
+    assert process.stdin is not None
+    assert process.stdout is not None
+    selector = selectors.DefaultSelector()
+    selector.register(process.stdout, selectors.EVENT_READ)
+    deadline = time.monotonic() + timeout
+    initialized = False
+    try:
+        _write_rpc(
+            process.stdin,
+            {
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "clientInfo": {
+                        "name": "proper-agent-status",
+                        "title": "Proper Agent Status",
+                        "version": HELPER_VERSION,
+                    }
+                },
+            },
+        )
+        while time.monotonic() < deadline:
+            events = selector.select(max(0.0, deadline - time.monotonic()))
+            if not events:
+                break
+            line = process.stdout.readline()
+            if not line:
+                if process.poll() is not None:
+                    break
+                continue
+            if len(line) > 131_072:
+                continue
+            try:
+                message = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if message.get("id") == 1 and not initialized:
+                if "error" in message:
+                    raise RuntimeError("Codex rejected the local status connection")
+                _write_rpc(process.stdin, {"method": "initialized", "params": {}})
+                _write_rpc(process.stdin, {"id": 2, "method": "account/rateLimits/read", "params": {}})
+                initialized = True
+                continue
+            if message.get("id") == 2:
+                if "error" in message:
+                    raise RuntimeError("Codex rate limits are unavailable")
+                result = message.get("result")
+                if not isinstance(result, dict):
+                    raise RuntimeError("Codex returned an invalid rate-limit response")
+                return result
+        raise TimeoutError("Codex did not return rate limits in time")
+    finally:
+        selector.close()
+        try:
+            process.stdin.close()
+        except OSError:
+            pass
+        if process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=0.5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=0.5)
+        process.stdout.close()
+
+
+def _codex_windows(result: dict[str, Any]) -> tuple[list[dict[str, Any]], str | None]:
+    limits: dict[str, Any] | None = None
+    by_id = result.get("rateLimitsByLimitId")
+    if isinstance(by_id, dict):
+        preferred = by_id.get("codex")
+        if isinstance(preferred, dict):
+            limits = preferred
+        elif by_id:
+            first = next(iter(by_id.values()))
+            limits = first if isinstance(first, dict) else None
+    if limits is None and isinstance(result.get("rateLimits"), dict):
+        limits = result["rateLimits"]
+    if limits is None:
+        limits = result
+
+    windows: list[dict[str, Any]] = []
+    for identifier, fallback in (("primary", "Current"), ("secondary", "Long-term")):
+        raw = limits.get(identifier)
+        if not isinstance(raw, dict):
+            continue
+        duration = raw.get("windowDurationMins")
+        normalized = _normalized_window(
+            identifier,
+            _window_label(duration, fallback),
+            raw.get("usedPercent"),
+            raw.get("resetsAt"),
+            duration,
+        )
+        if normalized:
+            windows.append(normalized)
+    plan = limits.get("planType")
+    return windows, str(plan) if plan else None
+
+
+def codex_provider(now: int | None = None) -> dict[str, Any]:
+    current = int(time.time()) if now is None else now
+    binary = _find_agent_binary("codex")
+    provider: dict[str, Any] = {
+        "id": "codex",
+        "label": "Codex",
+        "installed": binary is not None,
+        "status": "not_installed" if binary is None else "loading",
+        "source": "codex-app-server",
+        "windows": [],
+    }
+    if binary is None:
+        return provider
+    try:
+        result = read_codex_rate_limits(binary)
+        windows, plan = _codex_windows(result)
+        windows = [window for window in windows if window["resets_at"] > current]
+        provider["windows"] = windows
+        provider["status"] = "ok" if windows else "waiting"
+        if plan:
+            provider["plan"] = plan
+        if not windows:
+            provider["message"] = "Usage appears after Codex has connected."
+    except (OSError, RuntimeError, TimeoutError) as error:
+        provider["status"] = "error"
+        provider["message"] = str(error)
+    return provider
+
+
+def _claude_windows(rate_limits: Any) -> list[dict[str, Any]]:
+    if not isinstance(rate_limits, dict):
+        return []
+    windows: list[dict[str, Any]] = []
+    for identifier, label in (("five_hour", "5-hour"), ("seven_day", "7-day")):
+        raw = rate_limits.get(identifier)
+        if not isinstance(raw, dict):
+            continue
+        normalized = _normalized_window(
+            identifier,
+            label,
+            raw.get("used_percentage"),
+            raw.get("resets_at"),
+            300 if identifier == "five_hour" else 10_080,
+        )
+        if normalized:
+            windows.append(normalized)
+    return windows
+
+
+def _claude_hook_is_installed() -> bool:
+    try:
+        settings = _read_json(claude_settings_path())
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
+        return False
+    status_line = settings.get("statusLine") if isinstance(settings, dict) else None
+    return isinstance(status_line, dict) and status_line.get("command") == CLAUDE_CAPTURE_COMMAND
+
+
+def claude_provider(now: int | None = None) -> dict[str, Any]:
+    current = int(time.time()) if now is None else now
+    installed = _find_agent_binary("claude") is not None
+    provider: dict[str, Any] = {
+        "id": "claude",
+        "label": "Claude",
+        "installed": installed,
+        "status": "not_installed" if not installed else "waiting",
+        "source": "claude-status-line",
+        "windows": [],
+    }
+    if not installed:
+        return provider
+    connected = _claude_hook_is_installed()
+    provider["connected"] = connected
+    try:
+        cached = _read_json(claude_cache_path())
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
+        if connected:
+            provider["message"] = "Open Claude once to populate its current limits."
+        else:
+            provider["message"] = "Connect Claude to show its current limits."
+            provider["action"] = "connect"
+        return provider
+    windows = _claude_windows(cached.get("rate_limits") if isinstance(cached, dict) else None)
+    windows = [window for window in windows if window["resets_at"] > current]
+    if windows:
+        provider["status"] = "ok"
+        provider["windows"] = windows
+        captured_at = cached.get("captured_at")
+        if isinstance(captured_at, (int, float)):
+            provider["updated_at"] = int(captured_at)
+    else:
+        provider["message"] = "Open Claude once to refresh its limits."
+    return provider
+
+
+def snapshot() -> dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "generated_at": int(time.time()),
+        "providers": [codex_provider(), claude_provider()],
+    }
+
+
+def ensure_panel() -> int:
+    """Seed the native Plasma panel once, after a supported agent appears."""
+    state_path = panel_seed_state_path()
+    if state_path.exists():
+        return 0
+    current = snapshot()
+    if not any(provider.get("installed") for provider in current["providers"]):
+        return 0
+
+    qdbus = shutil.which("qdbus-qt6")
+    if qdbus is None:
+        return 1
+    script = """
+let found = false;
+panels().forEach(panel => {
+    if (panel.widgets("com.properlinux.agentstatus").length > 0) {
+        found = true;
+    }
+});
+if (!found) {
+    const panel = new Panel("org.kde.panel");
+    panel.location = "bottom";
+    panel.alignment = "right";
+    panel.screen = 0;
+    panel.height = 56;
+    panel.lengthMode = "fit";
+    panel.minimumLength = 132;
+    panel.maximumLength = 260;
+    panel.hiding = "normal";
+    panel.floating = true;
+    panel.opacity = "adaptive";
+    panel.addWidget("com.properlinux.agentstatus");
+}
+print("proper-agent-panel-ready");
+""".strip()
+    try:
+        completed = subprocess.run(
+            [
+                qdbus,
+                "org.kde.plasmashell",
+                "/PlasmaShell",
+                "org.kde.PlasmaShell.evaluateScript",
+                script,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            timeout=8.0,
+            check=False,
+            text=True,
+        )
+        if completed.returncode != 0 or "proper-agent-panel-ready" not in completed.stdout:
+            return 1
+        _atomic_json_write(
+            state_path,
+            {"schema_version": SCHEMA_VERSION, "seeded_at": int(time.time())},
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return 1
+    return 0
+
+
+def _read_bounded_stdin() -> bytes:
+    raw = sys.stdin.buffer.read(MAX_INPUT_BYTES + 1)
+    if len(raw) > MAX_INPUT_BYTES:
+        raise ValueError("status input is too large")
+    return raw
+
+
+def _previous_claude_command() -> str | None:
+    try:
+        state = _read_json(claude_hook_state_path())
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
+        return None
+    previous = state.get("previous_status_line") if isinstance(state, dict) else None
+    command = previous.get("command") if isinstance(previous, dict) else None
+    if isinstance(command, str) and command.strip() and command.strip() != CLAUDE_CAPTURE_COMMAND:
+        return command
+    return None
+
+
+def capture_claude() -> int:
+    try:
+        raw = _read_bounded_stdin()
+        payload = json.loads(raw)
+        windows = _claude_windows(payload.get("rate_limits") if isinstance(payload, dict) else None)
+        if windows:
+            rate_limits: dict[str, dict[str, Any]] = {}
+            for window in windows:
+                rate_limits[window["id"]] = {
+                    "used_percentage": window["used_percent"],
+                    "resets_at": window["resets_at"],
+                }
+            _atomic_json_write(
+                claude_cache_path(),
+                {"schema_version": SCHEMA_VERSION, "captured_at": int(time.time()), "rate_limits": rate_limits},
+            )
+    except (ValueError, OSError, json.JSONDecodeError):
+        raw = locals().get("raw", b"")
+
+    previous = _previous_claude_command()
+    if previous:
+        try:
+            completed = subprocess.run(
+                ["/bin/sh", "-c", previous],
+                input=raw,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                timeout=4.0,
+                check=False,
+            )
+            sys.stdout.buffer.write(completed.stdout[:65_536])
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    return 0
+
+
+def install_claude_hook() -> int:
+    settings_path = claude_settings_path()
+    try:
+        settings = _read_json(settings_path)
+    except FileNotFoundError:
+        settings = {}
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"Could not read Claude settings: {error}", file=sys.stderr)
+        return 1
+    if not isinstance(settings, dict):
+        print("Claude settings are not a JSON object.", file=sys.stderr)
+        return 1
+
+    current = settings.get("statusLine")
+    if isinstance(current, dict) and current.get("command") == CLAUDE_CAPTURE_COMMAND:
+        return 0
+    state_path = claude_hook_state_path()
+    previous = current
+    status_line = dict(current) if isinstance(current, dict) else {}
+    status_line.update({"type": "command", "command": CLAUDE_CAPTURE_COMMAND})
+    settings["statusLine"] = status_line
+    try:
+        _atomic_json_write(
+            state_path,
+            {"schema_version": SCHEMA_VERSION, "settings_path": str(settings_path), "previous_status_line": previous},
+        )
+        _atomic_json_write(settings_path, settings)
+    except OSError as error:
+        print(f"Could not update Claude settings: {error}", file=sys.stderr)
+        return 1
+    print("Claude usage connection enabled. Open Claude once to populate it.")
+    return 0
+
+
+def remove_claude_hook() -> int:
+    try:
+        state = _read_json(claude_hook_state_path())
+        settings = _read_json(claude_settings_path())
+    except FileNotFoundError:
+        return 0
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"Could not read Claude settings: {error}", file=sys.stderr)
+        return 1
+    current = settings.get("statusLine") if isinstance(settings, dict) else None
+    if not isinstance(current, dict) or current.get("command") != CLAUDE_CAPTURE_COMMAND:
+        print("Claude status line changed after Proper connected it; leaving it untouched.", file=sys.stderr)
+        return 1
+    previous = state.get("previous_status_line") if isinstance(state, dict) else None
+    if previous is None:
+        settings.pop("statusLine", None)
+    else:
+        settings["statusLine"] = previous
+    try:
+        _atomic_json_write(claude_settings_path(), settings)
+        claude_hook_state_path().unlink(missing_ok=True)
+    except OSError as error:
+        print(f"Could not restore Claude settings: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    actions = parser.add_mutually_exclusive_group()
+    actions.add_argument("--capture-claude", action="store_true", help=argparse.SUPPRESS)
+    actions.add_argument("--install-claude-hook", action="store_true", help="connect Claude's supported status line")
+    actions.add_argument("--remove-claude-hook", action="store_true", help="restore the previous Claude status line")
+    actions.add_argument("--ensure-panel", action="store_true", help=argparse.SUPPRESS)
+    arguments = parser.parse_args(argv)
+    if arguments.capture_claude:
+        return capture_claude()
+    if arguments.install_claude_hook:
+        return install_claude_hook()
+    if arguments.remove_claude_hook:
+        return remove_claude_hook()
+    if arguments.ensure_panel:
+        return ensure_panel()
+    json.dump(snapshot(), sys.stdout, ensure_ascii=False, separators=(",", ":"))
+    sys.stdout.write("\n")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

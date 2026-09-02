@@ -17,7 +17,7 @@ Window Maximize=Meta+Up,Meta+PgUp,Maximise Window
 Window Restore=Meta+Down,Meta+Backspace,Restore Window
 Window Minimize=Meta+H,Meta+PgDown,Minimise Window
 Edit Tiles=Meta+T,Meta+T,Toggle Tiles Editor
-Overview=Meta+W,Meta+W,Toggle Overview
+Overview=Meta+O,Meta+O,Toggle Overview
 Grid View=Meta+G,Meta+G,Toggle Grid View
 Show Desktop=Meta+D,Meta+D,Peek at Desktop
 

@@ -1,6 +1,6 @@
 Name:           proper-launchers
 Version:        0.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        Proper Linux launcher and window workflow defaults
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -89,6 +89,10 @@ done
 systemctl --global enable vicinae.service >/dev/null 2>&1 || :
 
 %changelog
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-16
+- Move keyboard Overview to Meta+O so Meta+W can arrange the workspace
+- Update the searchable shortcut references for the new bindings
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-15
 - Make the Meta summon shortcut dismiss Vicinae on a second press
 - Register Meta+Return for Ghostty, Meta+/ for the shortcut pane, and single-modifier quadrant tiling

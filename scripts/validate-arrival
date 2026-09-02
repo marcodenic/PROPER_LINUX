@@ -9,6 +9,8 @@ profile="$project_root/packages/proper-release/proper-anaconda.conf"
 media_patch="$project_root/image/descriptions/proper-media.patch"
 live_hook="$project_root/image/descriptions/proper-live-config.sh"
 firmware_lock="$project_root/image/firmware/edk2-ovmf-fedora44.lock"
+lock_root="$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/lockscreen"
+login_root="$project_root/packages/plasma-login-manager"
 
 for binary in desktop-file-validate identify xmllint; do
   command -v "$binary" >/dev/null 2>&1 || {
@@ -52,18 +54,33 @@ grep -q '<ignore name="fedora-logos"/>' "$project_root/image/descriptions/proper
 
 grep -qx 'ModuleName=two-step' "$project_root/packages/proper-branding/proper.plymouth"
 grep -qx 'BackgroundStartColor=0x050608' "$project_root/packages/proper-branding/proper.plymouth"
-grep -qx 'EDK2_SOURCE_NEVRA="edk2-20260508-8.fc44"' "$firmware_lock"
-grep -qx 'EDK2_SOURCE_RPM_SHA256="2dc18705f149274cccb0ecd5a184bb9602e4fde57e0f448b9af674502117b5a4"' "$firmware_lock"
-grep -qx 'EDK2_SOURCE_DATE_EPOCH="1785888000"' "$firmware_lock"
+grep -qx 'EDK2_SOURCE_NEVRA="edk2-20260812-4.fc44"' "$firmware_lock"
+grep -qx 'EDK2_SOURCE_RPM_SHA256="8d44c0dc5e55a6e32753b142a6f53698ebeba9bb3882127a68652ec18eb42349"' "$firmware_lock"
+grep -qx 'EDK2_SOURCE_DATE_EPOCH="1787702400"' "$firmware_lock"
 grep -q 'proper-ovmf-logo.bmp' "$project_root/scripts/build-vm-firmware"
 grep -q -- '-compress none "BMP3:$logo"' "$project_root/scripts/build-vm-firmware"
 grep -q 'firmware_profile="${PROPER_VM_FIRMWARE:-proper}"' "$project_root/scripts/run-vm"
 grep -q '/EFI/fedora/shimx64.efi' "$project_root/image/firmware/quiet-successful-boot.patch"
 grep -qx 'background-opacity = 0.50' "$project_root/packages/proper-terminal/ghostty.conf"
 grep -qx 'background-blur = false' "$project_root/packages/proper-terminal/ghostty.conf"
+grep -qx 'window-padding-x = 0' "$project_root/packages/proper-terminal/ghostty.conf"
+grep -qx 'window-padding-y = 0' "$project_root/packages/proper-terminal/ghostty.conf"
+grep -qx 'window-padding-balance = false' "$project_root/packages/proper-terminal/ghostty.conf"
+grep -Fq 'terminal-inset-v1-applied' "$project_root/packages/proper-terminal/proper-terminal-inset-repair"
 grep -qx 'minimumLength=560' "$project_root/packages/proper-defaults/plasma-org.kde.plasma.desktop-appletsrc"
 grep -qx 'plugin=org.kde.plasma.panelspacer' "$project_root/packages/proper-defaults/plasma-org.kde.plasma.desktop-appletsrc"
 grep -qx 'length=86' "$project_root/packages/proper-defaults/plasma-org.kde.plasma.desktop-appletsrc"
+! grep -qx 'plugin=com.properlinux.agentstatus' "$project_root/packages/proper-defaults/plasma-org.kde.plasma.desktop-appletsrc"
+grep -Fq 'new Panel("org.kde.panel")' "$project_root/packages/proper-agent-status/proper-agent-status"
+grep -Fq 'panel.alignment = "right"' "$project_root/packages/proper-agent-status/proper-agent-status"
+grep -Fq 'panel.height = 56' "$project_root/packages/proper-agent-status/proper-agent-status"
+grep -Fq 'panel.minimumLength = 132' "$project_root/packages/proper-agent-status/proper-agent-status"
+grep -Fq 'panel.floating = true' "$project_root/packages/proper-agent-status/proper-agent-status"
+grep -Fq 'panel.opacity = "adaptive"' "$project_root/packages/proper-agent-status/proper-agent-status"
+grep -qx 'OnUnitActiveSec=5min' "$project_root/packages/proper-agent-status/proper-agent-panel.timer"
+grep -Fq '"method": "account/rateLimits/read"' "$project_root/packages/proper-agent-status/proper-agent-status"
+grep -Fq 'payload.get("rate_limits")' "$project_root/packages/proper-agent-status/proper-agent-status"
+! rg -q 'access[_-]?token|refresh[_-]?token|oauth' "$project_root/packages/proper-agent-status"
 grep -Fq 'panel.minimumLength === 320' "$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/updates/02-expand-proper-panel.js"
 grep -Fq 'panel.minimumLength = 560' "$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/updates/02-expand-proper-panel.js"
 grep -Fq 'spacer.writeConfig("length", 86)' "$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/updates/02-expand-proper-panel.js"
@@ -72,14 +89,26 @@ test "$(xmllint --xpath 'count(//*[local-name() = "rect"])' "$project_root/packa
 grep -qx 'StartupNotify=false' "$project_root/packages/proper-launchers/vicinae.desktop"
 grep -qx 'X-KDE-Shortcuts=Meta,Meta+Space' "$project_root/packages/proper-launchers/proper-vicinae-shortcut.desktop"
 grep -Fq $'_launch=Meta\tMeta+Space' "$project_root/packages/proper-launchers/kglobalshortcutsrc"
-grep -Fq '"Meta+M"' "$project_root/packages/proper-defaults/proper-workspace-arranger/contents/code/main.js"
+grep -Fq '"Meta+W"' "$project_root/packages/proper-defaults/proper-workspace-arranger/contents/code/main.js"
+grep -Fq 'let lastLayout = "halves"' "$project_root/packages/proper-defaults/proper-workspace-arranger/contents/code/main.js"
+grep -Fq 'tiles[i].manage(entries[i].window)' "$project_root/packages/proper-defaults/proper-workspace-arranger/contents/code/main.js"
+grep -Fxq 'Overview=Meta+O,Meta+O,Toggle Overview' "$project_root/packages/proper-launchers/kglobalshortcutsrc"
 grep -q 'org.freedesktop.ScreenSaver' "$project_root/packages/proper-welcome/main.cpp"
 grep -q 'org.freedesktop.PowerManagement.Inhibit' "$project_root/packages/proper-welcome/main.cpp"
-grep -Fq 'new QLabel("Proper Linux 0.1")' "$project_root/packages/proper-welcome/main.cpp"
+! grep -Fq 'new QLabel("Proper Linux 0.1")' "$project_root/packages/proper-welcome/main.cpp"
+! grep -Fq 'new QLabel("LIVE SESSION")' "$project_root/packages/proper-welcome/main.cpp"
+! grep -Fq 'Close welcome and try Proper Linux' "$project_root/packages/proper-welcome/main.cpp"
 ! grep -Fq 'Built on Fedora Linux' "$project_root/packages/proper-welcome/main.cpp"
 grep -Fq 'centre->setMinimumWidth(680)' "$project_root/packages/proper-welcome/main.cpp"
 grep -Fq 'headline->setMinimumHeight(56)' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'new QLabel("Linux, considered.")' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'Fedora’s solid foundation. KDE, carefully curated.' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'A calmer desktop with thoughtful defaults — and nothing in your way.' "$project_root/packages/proper-welcome/main.cpp"
+! grep -Fq 'constexpr int step = 40' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'QWidget#properWelcome QFrame#shortcutLine {{ background: transparent; border: 0; }}' "$project_root/packages/proper-look-and-feel/generate-ui-assets.py"
 grep -Fq 'output.1.mode.1920x1080' "$project_root/packages/proper-welcome/proper-welcome-launch"
+grep -Fq 'output.1.mode.1920x1080@60 output.1.scale.1' "$project_root/packages/proper-defaults/proper-qemu-review-display"
+grep -qx 'Environment=PLASMALOGIN_GREETER_EXEC=/usr/bin/proper-plasma-login-greeter' "$project_root/packages/proper-defaults/proper-plasmalogin-review-display.conf"
 grep -q 'QProcess::startDetached("/usr/bin/liveinst"' "$project_root/packages/proper-welcome/main.cpp"
 grep -q 'application.arguments().contains("--guide")' "$project_root/packages/proper-welcome/main.cpp"
 grep -q 'Exec=/usr/bin/proper-welcome --guide' "$project_root/packages/proper-welcome/proper-start.desktop"
@@ -88,11 +117,25 @@ grep -q 'proper-web.css' "$project_root/packages/proper-launchers/proper-shortcu
 grep -q 'generate-ui-assets.py' "$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
 grep -q 'function revealAuthentication()' "$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml"
 grep -q 'onPressed: lockScreenUi.revealAuthentication()' "$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml"
+for arrival_root in "$lock_root" "$login_root"; do
+  grep -Fq 'readonly property int rowCount: 7' "$arrival_root/ProperGridClock.qml"
+  grep -Fq 'Accessible.role: Accessible.StaticText' "$arrival_root/ProperGridClock.qml"
+  grep -Fq 'readonly property int visibleCellCount:' "$arrival_root/ProperPasswordCells.qml"
+done
+cmp <(sed '/SPDX-License-Identifier:/d' "$lock_root/ProperGridClock.qml") \
+    <(sed '/SPDX-License-Identifier:/d' "$login_root/ProperGridClock.qml")
+cmp <(sed '/SPDX-License-Identifier:/d' "$lock_root/ProperPasswordCells.qml") \
+    <(sed '/SPDX-License-Identifier:/d' "$login_root/ProperPasswordCells.qml")
+grep -Fq 'passwordCharacter: "▪"' "$lock_root/LockScreenUi.qml"
+grep -Fq 'passwordLength: passwordBox.text.length' "$lock_root/LockScreenUi.qml"
+grep -Fq 'passwordCharacter: "▪"' "$login_root/ProperMain.qml"
+grep -Fq 'passwordLength: passwordBox.text.length' "$login_root/ProperMain.qml"
 grep -q 'proper-logo-icon.svg' "$project_root/packages/proper-look-and-feel/Splash.qml"
 grep -qx 'Theme=com.properlinux.dark.desktop' "$project_root/packages/proper-defaults/ksplashrc"
 ! rg -q 'Theme=org[.]fedoraproject' "$project_root/packages/proper-look-and-feel" "$project_root/packages/proper-defaults"
 
 desktop-file-validate \
+  "$project_root/packages/proper-terminal/proper-terminal-inset-repair.desktop" \
   "$project_root/packages/proper-welcome/proper-welcome.desktop" \
   "$project_root/packages/proper-welcome/proper-install.desktop" \
   "$project_root/packages/proper-welcome/proper-start.desktop"
@@ -100,8 +143,30 @@ desktop-file-validate \
 bash -n \
   "$project_root/packages/proper-branding/generate-plymouth-assets.sh" \
   "$project_root/packages/proper-welcome/proper-welcome-launch" \
+  "$project_root/packages/proper-terminal/proper-terminal-inset-repair" \
   "$project_root/scripts/build-vm-firmware" \
   "$project_root/scripts/run-vm" \
   "$live_hook"
+
+terminal_test_root="$(mktemp -d)"
+trap 'rm -r -- "$terminal_test_root"' EXIT
+mkdir -p "$terminal_test_root/legacy/ghostty" "$terminal_test_root/custom/ghostty"
+cp "$project_root/packages/proper-terminal/ghostty.conf" "$terminal_test_root/legacy/ghostty/config"
+cp "$project_root/packages/proper-terminal/ghostty.conf" "$terminal_test_root/custom/ghostty/config"
+sed -i \
+  -e 's/window-padding-x = 0/window-padding-x = 12/' \
+  -e 's/window-padding-y = 0/window-padding-y = 10/' \
+  -e 's/window-padding-balance = false/window-padding-balance = true/' \
+  "$terminal_test_root/legacy/ghostty/config"
+sed -i 's/window-padding-x = 0/window-padding-x = 8/' "$terminal_test_root/custom/ghostty/config"
+XDG_CONFIG_HOME="$terminal_test_root/legacy" "$project_root/packages/proper-terminal/proper-terminal-inset-repair"
+XDG_CONFIG_HOME="$terminal_test_root/custom" "$project_root/packages/proper-terminal/proper-terminal-inset-repair"
+grep -qx 'window-padding-x = 0' "$terminal_test_root/legacy/ghostty/config"
+grep -qx 'window-padding-y = 0' "$terminal_test_root/legacy/ghostty/config"
+grep -qx 'window-padding-balance = false' "$terminal_test_root/legacy/ghostty/config"
+grep -qx 'window-padding-x = 8' "$terminal_test_root/custom/ghostty/config"
+grep -qx 'window-padding-y = 0' "$terminal_test_root/custom/ghostty/config"
+test -f "$terminal_test_root/legacy/proper-linux/terminal-inset-v1-applied"
+test -f "$terminal_test_root/custom/proper-linux/terminal-inset-v1-applied"
 
 printf 'Proper arrival valid: canonical grid mark, product identity, installer inheritance, Plymouth, media, and live welcome.\n'

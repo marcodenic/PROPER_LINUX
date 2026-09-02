@@ -1,0 +1,43 @@
+#!/usr/bin/python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""Deterministic app-server fixture for package and graphical acceptance."""
+
+import json
+import sys
+import time
+
+
+now = int(time.time())
+for line in sys.stdin:
+    try:
+        message = json.loads(line)
+    except json.JSONDecodeError:
+        continue
+    if message.get("method") == "initialize":
+        print(json.dumps({"id": message.get("id"), "result": {"platformFamily": "unix", "platformOs": "linux"}}), flush=True)
+    elif message.get("method") == "account/rateLimits/read":
+        print(
+            json.dumps(
+                {
+                    "id": message.get("id"),
+                    "result": {
+                        "rateLimitsByLimitId": {
+                            "codex": {
+                                "planType": "pro",
+                                "primary": {
+                                    "usedPercent": 38,
+                                    "windowDurationMins": 300,
+                                    "resetsAt": now + 4 * 60 * 60,
+                                },
+                                "secondary": {
+                                    "usedPercent": 12,
+                                    "windowDurationMins": 10_080,
+                                    "resetsAt": now + 5 * 24 * 60 * 60,
+                                },
+                            }
+                        }
+                    },
+                }
+            ),
+            flush=True,
+        )

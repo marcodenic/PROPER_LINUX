@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Proper Linux keeps KWin's ordinary floating model. This script only moves
-// normal, visible windows on the current workspace and output, and retains the
-// exact pre-arrangement geometry so the operation is reversible.
+// Proper Linux keeps KWin's ordinary floating model until the user explicitly
+// arranges a workspace. Arranged windows are managed by KWin's native tiles so
+// dragging a shared edge resizes every window on that edge. The exact original
+// floating geometry is retained so the operation remains reversible.
 
-const OUTER_GAP = Math.max(0, Number(readConfig("OuterGap", 14)));
 const INNER_GAP = Math.max(0, Number(readConfig("InnerGap", 12)));
+const TILE_HORIZONTAL = 1;
+const TILE_VERTICAL = 2;
 
 let activeSnapshot = null;
-let lastLayout = "primary";
+let lastLayout = "halves";
 
 function windowsInStackingOrder() {
     if (workspace.stackingOrder) {
@@ -91,16 +93,6 @@ function approximatelyEqual(left, right) {
         Math.abs(left.height - right.height) <= 1;
 }
 
-function usableArea(context) {
-    const area = workspace.clientArea(KWin.MaximizeArea, context.output, context.desktop);
-    return {
-        x: Math.round(area.x + OUTER_GAP),
-        y: Math.round(area.y + OUTER_GAP),
-        width: Math.max(1, Math.round(area.width - (2 * OUTER_GAP))),
-        height: Math.max(1, Math.round(area.height - (2 * OUTER_GAP)))
-    };
-}
-
 function makeRect(x, y, width, height) {
     return {
         x: Math.round(x),
@@ -110,97 +102,103 @@ function makeRect(x, y, width, height) {
     };
 }
 
-function splitRows(x, y, width, height, count) {
-    const result = [];
-    const rowHeight = (height - (INNER_GAP * (count - 1))) / count;
-    for (let row = 0; row < count; row++) {
-        result.push(makeRect(x, y + row * (rowHeight + INNER_GAP), width, rowHeight));
-    }
-    return result;
+function childTiles(tile) {
+    return tile && tile.tiles ? Array.from(tile.tiles) : [];
 }
 
-function gridLayout(area, count) {
+function clearTileChildren(tile) {
+    let children = childTiles(tile);
+    while (children.length > 0) {
+        children[children.length - 1].remove();
+        children = childTiles(tile);
+    }
+}
+
+function resizeLinearTiles(container, tiles, direction) {
+    const area = copyGeometry(container.relativeGeometry);
+    for (let index = 0; index < tiles.length - 1; index++) {
+        const geometry = copyGeometry(tiles[index].relativeGeometry);
+        if (direction === TILE_HORIZONTAL) {
+            const boundary = area.x + area.width * (index + 1) / tiles.length;
+            geometry.width = boundary - geometry.x;
+        } else {
+            const boundary = area.y + area.height * (index + 1) / tiles.length;
+            geometry.height = boundary - geometry.y;
+        }
+        tiles[index].relativeGeometry = geometry;
+    }
+}
+
+function makeLinearTiles(container, direction, count) {
+    if (count < 1) {
+        return [];
+    }
+
+    clearTileChildren(container);
+    container.split(direction);
+    let tiles = childTiles(container);
+
     if (count === 1) {
-        return [makeRect(area.x, area.y, area.width, area.height)];
+        tiles[tiles.length - 1].remove();
+        return childTiles(container);
     }
-    const columns = count === 2 ? 2 : Math.ceil(Math.sqrt(count));
-    const rows = Math.ceil(count / columns);
-    const cellWidth = (area.width - (INNER_GAP * (columns - 1))) / columns;
-    const cellHeight = (area.height - (INNER_GAP * (rows - 1))) / rows;
-    const result = [];
-    for (let index = 0; index < count; index++) {
-        const row = Math.floor(index / columns);
-        const column = index % columns;
-        result.push(makeRect(
-            area.x + column * (cellWidth + INNER_GAP),
-            area.y + row * (cellHeight + INNER_GAP),
-            cellWidth,
-            cellHeight
-        ));
+
+    while (tiles.length < count) {
+        tiles[tiles.length - 1].split(direction);
+        tiles = childTiles(container);
     }
-    return result;
+    resizeLinearTiles(container, tiles, direction);
+    return tiles;
 }
 
-function halvesLayout(area, count) {
+function makeGridTiles(root, count) {
     if (count <= 2) {
-        return gridLayout(area, count);
+        return makeLinearTiles(root, TILE_HORIZONTAL, count);
     }
-    if (count > 4) {
-        return gridLayout(area, count);
+
+    const columnCount = Math.ceil(Math.sqrt(count));
+    const rowCount = Math.ceil(count / columnCount);
+    const rows = makeLinearTiles(root, TILE_VERTICAL, rowCount);
+    let result = [];
+    for (let row = 0; row < rows.length; row++) {
+        result = result.concat(makeLinearTiles(rows[row], TILE_HORIZONTAL, columnCount));
     }
-    const columnWidth = (area.width - INNER_GAP) / 2;
-    const result = [makeRect(area.x, area.y, columnWidth, area.height)];
-    return result.concat(splitRows(
-        area.x + columnWidth + INNER_GAP,
-        area.y,
-        columnWidth,
-        area.height,
-        count - 1
-    ));
+    return result.slice(0, count);
 }
 
-function primaryLayout(area, count) {
+function makeStackTiles(root, count, primaryRatio) {
     if (count === 1) {
-        return gridLayout(area, count);
+        return makeLinearTiles(root, TILE_HORIZONTAL, 1);
     }
     if (count > 4) {
-        return gridLayout(area, count);
+        return makeGridTiles(root, count);
     }
-    const primaryWidth = Math.round((area.width - INNER_GAP) * 2 / 3);
-    const secondaryWidth = area.width - INNER_GAP - primaryWidth;
-    const result = [makeRect(area.x, area.y, primaryWidth, area.height)];
-    return result.concat(splitRows(
-        area.x + primaryWidth + INNER_GAP,
-        area.y,
-        secondaryWidth,
-        area.height,
-        count - 1
-    ));
+
+    const columns = makeLinearTiles(root, TILE_HORIZONTAL, 2);
+    const leftGeometry = copyGeometry(columns[0].relativeGeometry);
+    leftGeometry.width = root.relativeGeometry.width * primaryRatio;
+    columns[0].relativeGeometry = leftGeometry;
+
+    if (count === 2) {
+        return columns;
+    }
+    return [columns[0]].concat(makeLinearTiles(columns[1], TILE_VERTICAL, count - 1));
 }
 
-function columnsLayout(area, count) {
-    if (count > 3) {
-        return gridLayout(area, count);
-    }
-    const width = (area.width - (INNER_GAP * (count - 1))) / count;
-    const result = [];
-    for (let index = 0; index < count; index++) {
-        result.push(makeRect(area.x + index * (width + INNER_GAP), area.y, width, area.height));
-    }
-    return result;
-}
+function nativeTilesFor(layout, root, count) {
+    clearTileChildren(root);
+    root.padding = INNER_GAP;
 
-function geometriesFor(layout, area, count) {
-    if (layout === "halves") {
-        return halvesLayout(area, count);
-    }
-    if (layout === "columns") {
-        return columnsLayout(area, count);
+    if (layout === "columns" && count <= 3) {
+        return makeLinearTiles(root, TILE_HORIZONTAL, count);
     }
     if (layout === "grid") {
-        return gridLayout(area, count);
+        return makeGridTiles(root, count);
     }
-    return primaryLayout(area, count);
+    if (layout === "primary") {
+        return makeStackTiles(root, count, 2 / 3);
+    }
+    return makeStackTiles(root, count, 1 / 2);
 }
 
 function captureSnapshot(context, windows) {
@@ -228,11 +226,21 @@ function liveSnapshotEntries() {
     });
 }
 
+function detachFromTiles(entries) {
+    for (let index = 0; index < entries.length; index++) {
+        const tile = entries[index].window.tile;
+        if (tile) {
+            tile.unmanage(entries[index].window);
+        }
+    }
+}
+
 function restoreSnapshot() {
     if (!activeSnapshot) {
         return false;
     }
     const entries = liveSnapshotEntries();
+    detachFromTiles(entries);
     for (let i = 0; i < entries.length; i++) {
         const entry = entries[i];
         entry.window.setMaximize(false, false);
@@ -256,6 +264,11 @@ function applyLayout(layout) {
         return;
     }
 
+    const root = workspace.rootTile(context.output, context.desktop);
+    if (!root) {
+        return;
+    }
+
     if (activeSnapshot && activeSnapshot.key !== contextKey(context)) {
         restoreSnapshot();
     }
@@ -272,10 +285,16 @@ function applyLayout(layout) {
         entries = activeSnapshot.entries;
     }
 
-    const geometries = geometriesFor(layout, usableArea(context), entries.length);
+    if (entries.length === 0) {
+        activeSnapshot = null;
+        return;
+    }
+
+    detachFromTiles(entries);
+    const tiles = nativeTilesFor(layout, root, entries.length);
     for (let i = 0; i < entries.length; i++) {
         entries[i].window.setMaximize(false, false);
-        entries[i].window.frameGeometry = geometries[i];
+        tiles[i].manage(entries[i].window);
     }
     lastLayout = layout;
 }
@@ -292,7 +311,7 @@ function toggleLastLayout() {
 registerShortcut(
     "ProperArrangeWorkspace",
     "Arrange or restore the current workspace",
-    "Meta+M",
+    "Meta+W",
     toggleLastLayout
 );
 registerShortcut(

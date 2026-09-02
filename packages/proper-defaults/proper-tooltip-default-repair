@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -eu
+
+state_dir="${XDG_CONFIG_HOME:-$HOME/.config}/proper-linux"
+marker="$state_dir/tooltip-policy-v2-applied"
+[[ ! -e "$marker" ]] || exit 0
+
+config_file="${XDG_CONFIG_HOME:-$HOME/.config}/plasmarc"
+current_delay="$(kreadconfig6 --file "$config_file" --group PlasmaToolTips --key Delay 2>/dev/null || true)"
+
+# Proper previously seeded Delay=0, which disables every Plasma ToolTipArea and
+# unintentionally removed task-window previews along with small informational
+# labels. Repair only that exact legacy value. Any other value is a user choice
+# and remains untouched; the marker prevents later changes being revisited.
+if [[ "$current_delay" == 0 ]]; then
+    kwriteconfig6 --file "$config_file" --group PlasmaToolTips --key Delay 900
+fi
+
+mkdir -p "$state_dir"
+: >"$marker"

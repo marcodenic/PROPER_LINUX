@@ -2,3 +2,5 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 singleton PasswordSync 1.0 PasswordSync.qml
+ProperGridClock 1.0 ProperGridClock.qml
+ProperPasswordCells 1.0 ProperPasswordCells.qml

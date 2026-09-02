@@ -10,7 +10,8 @@ shortcuts shipped by Proper Linux.
 | Meta+Left / Right | Quick-tile window to half |
 | Meta+Up / Down | Maximise or restore a window |
 | Meta+1 / 3 / 7 / 9 | Quick-tile window to a quadrant |
-| Meta+M | Arrange or restore the current workspace |
+| Meta+W | Arrange or restore the current workspace |
+| Meta+O | Open Overview |
 | Meta+/ | Show the quick shortcut overview |
 | Meta+T | Open Plasma's visual tile-layout editor |
 | Meta+H | Minimise the active window |

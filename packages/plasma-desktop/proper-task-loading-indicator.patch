@@ -8,16 +8,15 @@
  import org.kde.plasma.core as PlasmaCore
  import org.kde.ksvg as KSvg
  import org.kde.plasma.private.mpris as Mpris
-@@ -338,7 +337,67 @@
+@@ -338,7 +337,62 @@
  
          Component {
              id: busyIndicator
 -            PlasmaComponents3.BusyIndicator {}
 +
-+            // Proper's launch state deliberately shares the shelf's existing
-+            // indicator language: moving dot while launching, solid line when
-+            // active, and a static dot when running in the background.  Keep
-+            // the motion under the icon so it never obscures the artwork.
++            // One dot travels beneath the icon while the application starts.
++            // The path itself is deliberately invisible: launch feedback is a
++            // single mark, not a dot plus a progress track.
 +            Item {
 +                id: launchIndicator
 +
@@ -26,26 +25,22 @@
 +                implicitWidth: Kirigami.Units.gridUnit * 2
 +                implicitHeight: Kirigami.Units.gridUnit * 2
 +
-+                Rectangle {
-+                    id: launchTrack
++                Item {
++                    id: launchPath
 +
 +                    anchors {
 +                        horizontalCenter: parent.horizontalCenter
 +                        bottom: parent.bottom
 +                    }
 +                    width: Math.min(parent.width * 0.55, Kirigami.Units.gridUnit * 1.25)
-+                    height: 2
-+                    radius: 1
-+                    color: Kirigami.Theme.highlightColor
-+                    opacity: 0.30
++                    height: 4
 +
 +                    Rectangle {
 +                        width: 4
 +                        height: 4
 +                        radius: 2
-+                        x: (launchTrack.width - width)
++                        x: (launchPath.width - width)
 +                            * (launchMotion.running ? launchIndicator.travel : 0.5)
-+                        anchors.verticalCenter: parent.verticalCenter
 +                        color: Kirigami.Theme.highlightColor
 +                    }
 +                }
@@ -77,3 +72,76 @@
          }
  
          // Save drag data
+--- a/applets/taskmanager/qml/Task.qml
++++ b/applets/taskmanager/qml/Task.qml
+@@ -80,6 +80,6 @@
+         || (!!tasksRoot.groupDialog && tasksRoot.groupDialog.visualParent === task)
+ 
+-    active: !inPopup && !tasksRoot.groupDialog && task.contextMenu?.status !== PlasmaExtras.Menu.Open
++    active: model.IsWindow && !inPopup && !tasksRoot.groupDialog && task.contextMenu?.status !== PlasmaExtras.Menu.Open
+     interactive: model.IsWindow || mainItem.playerData
+     location: Plasmoid.location
+     mainItem: !Plasmoid.configuration.showToolTips || !model.IsWindow ? pinnedAppToolTipDelegate : openWindowToolTipDelegate
+@@ -519,6 +519,62 @@
+             }
+         }
+     }
++
++    // FrameSvg border slices tile to fill the task button, so visible state
++    // marks cannot live in widgets/tasks.svg without being repeated. Render
++    // one bounded state overlay here instead. Inactive grouped applications
++    // expose a compact window count; the active application always has one
++    // line, and the full set of windows remains available in the preview.
++    Item {
++        id: properStateIndicator
++
++        anchors {
++            horizontalCenter: iconBox.horizontalCenter
++            bottom: parent.bottom
++            bottomMargin: 1
++        }
++        width: Math.min(task.width, Kirigami.Units.gridUnit * 2)
++        height: 4
++        z: 2
++
++        readonly property int windowCount: Math.max(1, task.model.IsGroupParent ? task.childCount : 1)
++        readonly property int visibleDotCount: Math.min(windowCount, 4)
++        readonly property bool demandingAttention: task.model.IsDemandingAttention
++            || (task.smartLauncherItem && task.smartLauncherItem.urgent)
++
++        visible: task.model.IsWindow && !task.model.IsStartup
++
++        Row {
++            anchors.centerIn: parent
++            spacing: 3
++            visible: !task.model.IsActive
++
++            Repeater {
++                model: properStateIndicator.visibleDotCount
++
++                delegate: Rectangle {
++                    required property int index
++
++                    width: 4
++                    height: 4
++                    radius: 2
++                    color: properStateIndicator.demandingAttention
++                        ? Kirigami.Theme.neutralTextColor
++                        : Kirigami.Theme.textColor
++                    opacity: task.model.IsMinimized ? 0.58 : 0.88
++                }
++            }
++        }
++
++        Rectangle {
++            anchors.centerIn: parent
++            width: 18
++            height: 3
++            radius: 1.5
++            color: Kirigami.Theme.highlightColor
++            visible: task.model.IsActive
++        }
++    }
+ 
+     Loader {
+         id: taskProgressOverlayLoader

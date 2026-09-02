@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Proper VM review display
+Exec=/usr/bin/proper-qemu-review-display
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=1
+

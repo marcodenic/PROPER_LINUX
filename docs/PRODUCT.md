@@ -66,18 +66,23 @@ of another settings maze.
 
 ### The shelf and system surfaces
 
-The desktop uses one centred, floating bottom shelf. It contains the Proper
-launcher, pinned and running applications, a terminal shortcut, system status,
-and the clock. Focused, running, and launching applications use restrained
-line, dot, and motion states instead of coloured tiles and halos. The shelf
-grows when needed but keeps visual separation between application tasks and
-status controls.
+The desktop uses one centred, floating bottom shelf. Its quiet resting material
+keeps the wallpaper present through native compositor blur, a restrained tint,
+and a directional rim and shadow; it becomes denser when a window meets it.
+It contains the Proper launcher, pinned and running applications, a terminal
+shortcut, system status, and the clock. The active application has one short line. An inactive
+application has one small dot per window, capped before the count becomes
+visual noise, and an opening application has one oscillating dot. Running
+applications expose their native window previews on hover; status icons retain
+their useful labels after a restrained delay. The shelf grows when needed but
+keeps visual separation between application tasks and status controls.
 
 Network, Bluetooth, audio, power, notifications, authentication, overview, and
 workspace controls remain KDE's maintained components. Proper gives their
-containers and common controls one calmer visual language without rearranging
-or forking their behaviour. This keeps the desktop coherent without taking on
-fragile replacements for security- and hardware-sensitive code.
+containers and common controls one calmer visual language, with bounded focus
+layers and coherent toggles, without rearranging or forking their behaviour.
+This keeps the desktop coherent without taking on fragile replacements for
+security- and hardware-sensitive code.
 
 ### One launcher, many useful paths
 
@@ -96,8 +101,9 @@ into onboarding.
 Windows float, overlap, drag, resize, minimise, maximise, and close normally.
 Edge snapping and quick tiling make halves and quadrants easy with either mouse
 or keyboard. Arrange Workspace can temporarily place eligible windows into a
-chosen layout and restore their previous floating geometry; new windows stay
-floating.
+chosen native KWin layout and restore their previous floating geometry; new
+windows stay floating. Balanced halves is the default for two windows, and
+dragging their shared edge resizes both sides together.
 
 This avoids the false choice between a conventional desktop and a fast tiling
 workflow. The layout editor, window buttons, pointer actions, Vicinae commands,
@@ -107,12 +113,12 @@ and shortcut guide keep the system discoverable.
 
 Dolphin remains the file manager because it has excellent Plasma integration,
 remote locations, previews, tabs, split view, undo, trash, and removable-device
-support. Proper presents it as Files with a restrained toolbar and sidebar,
-hides optional panels and duplicated controls by default, and adds Open in
-Ghostty.
+support. Proper presents it as Files with a plain blue folder identity, a
+restrained toolbar and sidebar, hides optional panels and duplicated controls
+by default, and adds Open in Ghostty.
 
 Chromium is the promoted browser. Ghostty 1.3.1 is the default terminal, with a
-coherent palette, measured padding, uniform translucency, and `btop` included.
+coherent palette, an edge-to-edge terminal canvas, uniform translucency, and `btop` included.
 These are ordinary applications in ordinary windows, not special modes the user
 must learn.
 
@@ -150,6 +156,14 @@ choice, and opens it in Ghostty at the requested directory.
 Provider authentication stays in each agent's normal flow, and Proper never
 silently falls back to a different client.
 
+When a supported agent is installed, a compact meter appears as a right-aligned
+sibling of the taskbar. It has the same height, edge inset, material, and native
+floating-to-attached response while showing the useful part at a glance:
+current remaining usage. A normal rectangular detail panel adds each available
+usage window and its reset time. It does not invent historical charts, expose
+credentials, or add another menu bar. Clicking the meter is the ordinary
+pointer path; installing no agent leaves no visible placeholder.
+
 ## Core shortcuts
 
 | Shortcut | Action |
@@ -159,7 +173,8 @@ silently falls back to a different client.
 | `Meta+Left/Right` | Tile to a half |
 | `Meta+Up/Down` | Maximise or restore |
 | `Meta+1/3/7/9` | Tile to a quadrant |
-| `Meta+M` | Arrange or restore the workspace |
+| `Meta+W` | Arrange or restore the workspace |
+| `Meta+O` | Open Overview |
 | `Meta+T` | Open Plasma's visual tile editor |
 | `Meta+/` | Open the shortcut overview |
 

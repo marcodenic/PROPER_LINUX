@@ -34,6 +34,7 @@ plugin=org.kde.plasma.icontasks
 launchers=applications:vicinae.desktop,applications:org.kde.dolphin.desktop,applications:com.mitchellh.ghostty.desktop
 showOnlyCurrentDesktop=false
 showOnlyCurrentActivity=false
+showToolTips=true
 
 [Containments][2][Applets][4]
 immutability=1
@@ -55,8 +56,8 @@ plugin=org.kde.plasma.showdesktop
 immutability=1
 plugin=org.kde.plasma.digitalclock
 
-[Containments][2][Applets][7][Configuration]
-Appearance.showSeconds=false
-Appearance.showDate=true
-Appearance.dateFormat=custom
-Appearance.customDateFormat=MMMM d
+[Containments][2][Applets][7][Configuration][Appearance]
+showSeconds=false
+showDate=true
+dateFormat=custom
+customDateFormat=MMMM d

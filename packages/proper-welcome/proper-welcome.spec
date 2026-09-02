@@ -1,14 +1,14 @@
 Name:           proper-welcome
 Version:        0.1
-Release:        9%{?dist}
+Release:        11%{?dist}
 Summary:        Proper Linux live-session welcome
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
 BuildRequires:  qt6-qtbase-devel
 Requires:       anaconda-live
 Requires:       proper-branding
-Requires:       proper-look-and-feel >= 0.1-25
-Requires:       proper-launchers >= 0.1-15
+Requires:       proper-look-and-feel >= 0.1-39
+Requires:       proper-launchers >= 0.1-16
 
 %description
 A focused, pointer-accessible live-session choice between exploring the Proper
@@ -37,6 +37,15 @@ install -Dpm 0644 %{_sourcedir}/proper-start.desktop %{buildroot}%{_datadir}/app
 %{_datadir}/applications/proper-start.desktop
 
 %changelog
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-11
+- Show Meta+W for workspace arrangement and Meta+O for keyboard Overview
+
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-10
+- Replace the welcome grid with a soft atmospheric blue-black backdrop
+- Tighten the opening promise and reduce the introduction to two clear lines
+- Promote the install choice before one quiet, unboxed shortcut row
+- Remove duplicate live-session, close, and version chrome around the hero
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-9
 - Surface the complete sub-3 GB live image as evidence of deliberate curation
 - Explain that the lean image omits an office suite, duplicate apps or redundant packages without restricting the catalogue

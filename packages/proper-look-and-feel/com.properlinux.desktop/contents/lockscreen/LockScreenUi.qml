@@ -155,15 +155,10 @@ Item {
         }
         spacing: Math.max(8, parent.height * 0.012)
 
-        PlasmaComponents3.Label {
+        ProperGridClock {
             anchors.horizontalCenter: parent.horizontalCenter
-            color: "#f3f8ff"
-            font.family: lockScreenUi.uiFontFamily
-            font.pixelSize: Math.min(96, Math.max(52, lockScreenUi.height * 0.09))
-            font.weight: Font.Normal
-            text: Qt.formatTime(lockScreenUi.currentDate, "hh:mm")
-            style: Text.Raised
-            styleColor: Qt.rgba(0, 0.02, 0.06, 0.45)
+            cellSize: Math.min(10, Math.max(7, lockScreenUi.height * 0.0093))
+            currentDate: lockScreenUi.currentDate
         }
 
         PlasmaComponents3.Label {
@@ -199,7 +194,7 @@ Item {
             }
             height: 50
             activeFocusOnTab: true
-            color: "#f3f8ff"
+            color: "transparent"
             echoMode: TextInput.Password
             enabled: !authenticator.graceLocked && !lockScreenUi.noPasswordConfirmation
             focus: true
@@ -209,7 +204,7 @@ Item {
             horizontalAlignment: TextInput.AlignHCenter
             leftPadding: 18
             opacity: lockScreenUi.passwordVisible && !lockScreenUi.noPasswordConfirmation ? 1 : 0
-            passwordCharacter: "•"
+            passwordCharacter: "▪"
             placeholderText: ""
             rightPadding: 18
             selectByMouse: false
@@ -270,6 +265,20 @@ Item {
                     passwordBox.text = Qt.binding(() => PasswordSync.password)
                 }
             }
+        }
+
+        ProperPasswordCells {
+            anchors {
+                left: passwordBox.left
+                right: passwordBox.right
+                verticalCenter: passwordBox.verticalCenter
+                leftMargin: passwordBox.leftPadding
+                rightMargin: passwordBox.rightPadding
+            }
+            height: passwordBox.height
+            opacity: passwordBox.opacity
+            passwordLength: passwordBox.text.length
+            visible: !lockScreenUi.noPasswordConfirmation
         }
 
         Binding {

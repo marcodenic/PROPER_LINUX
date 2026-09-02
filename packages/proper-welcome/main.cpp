@@ -172,18 +172,28 @@ protected:
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
 
-        QRadialGradient glow(QPointF(width() * .5, height() * .42), width() * .48);
-        glow.setColorAt(0.0, QColor(24, 46, 73, 210));
-        glow.setColorAt(.48, QColor(9, 15, 24, 235));
-        glow.setColorAt(1.0, QColor("#050608"));
-        painter.fillRect(rect(), glow);
+        painter.fillRect(rect(), QColor("#050608"));
 
-        painter.setPen(QPen(QColor(160, 192, 225, 9), 1));
-        constexpr int step = 40;
-        for (int x = step; x < width(); x += step)
-            painter.drawLine(x, 0, x, height());
-        for (int y = step; y < height(); y += step)
-            painter.drawLine(0, y, width(), y);
+        // Build depth from broad, soft pools of light instead of a visible
+        // pattern. The centre remains calm behind the copy while the darker
+        // perimeter keeps the full-screen live-session choice grounded.
+        QRadialGradient upperGlow(QPointF(width() * .5, height() * .31), width() * .47);
+        upperGlow.setColorAt(0.0, QColor(31, 61, 98, 218));
+        upperGlow.setColorAt(.42, QColor(15, 34, 56, 166));
+        upperGlow.setColorAt(1.0, QColor(5, 6, 8, 0));
+        painter.fillRect(rect(), upperGlow);
+
+        QRadialGradient lowerGlow(QPointF(width() * .5, height() * .68), width() * .68);
+        lowerGlow.setColorAt(0.0, QColor(14, 35, 58, 112));
+        lowerGlow.setColorAt(.58, QColor(8, 18, 31, 62));
+        lowerGlow.setColorAt(1.0, QColor(5, 6, 8, 0));
+        painter.fillRect(rect(), lowerGlow);
+
+        QRadialGradient vignette(QPointF(width() * .5, height() * .48), width() * .74);
+        vignette.setColorAt(0.0, QColor(0, 0, 0, 0));
+        vignette.setColorAt(.62, QColor(0, 0, 0, 8));
+        vignette.setColorAt(1.0, QColor(0, 0, 0, 178));
+        painter.fillRect(rect(), vignette);
 
         QWidget::paintEvent(event);
     }
@@ -203,16 +213,6 @@ public:
         root->setContentsMargins(38, 28, 38, 28);
         root->setSpacing(0);
 
-        auto *top = new QHBoxLayout;
-        auto *live = new QLabel("LIVE SESSION");
-        live->setObjectName("liveBadge");
-        top->addWidget(live);
-        top->addStretch();
-        auto *closeButton = new QPushButton("×");
-        closeButton->setObjectName("close");
-        closeButton->setAccessibleName("Close welcome and try Proper Linux");
-        top->addWidget(closeButton);
-        root->addLayout(top);
         root->addStretch(2);
 
         auto *centre = new QWidget;
@@ -236,7 +236,7 @@ public:
         content->addWidget(linuxLabel);
         content->addSpacing(15);
 
-        auto *headline = new QLabel("Linux, properly put together.");
+        auto *headline = new QLabel("Linux, considered.");
         headline->setObjectName("headline");
         headline->setAlignment(Qt::AlignCenter);
         headline->setWordWrap(true);
@@ -244,46 +244,51 @@ public:
         content->addWidget(headline);
 
         auto *body = new QLabel(
-            "Proper pairs Fedora’s proven hardware, security, and update foundations with a deliberately curated KDE desktop. "
-            "It keeps familiar pointer controls, adds fast keyboard paths, and chooses coherent tools so you can get on with your work instead of assembling the basics."
+            "Fedora’s solid foundation. KDE, carefully curated.\n"
+            "A calmer desktop with thoughtful defaults — and nothing in your way."
         );
         body->setObjectName("body");
         body->setAlignment(Qt::AlignCenter);
         body->setWordWrap(true);
-        body->setMinimumHeight(72);
-        body->setMaximumWidth(740);
+        body->setMinimumHeight(52);
+        body->setMinimumWidth(680);
+        body->setMaximumWidth(760);
         content->addWidget(body, 0, Qt::AlignHCenter);
 
-        auto *shortcuts = new QHBoxLayout;
-        shortcuts->setSpacing(8);
-        shortcuts->addWidget(shortcutHint({"Meta"}, "Search", true));
-        shortcuts->addWidget(shortcutHint({"Meta", "M"}, "Arrange", true));
-        shortcuts->addWidget(shortcutHint({"Meta", "Enter"}, "Terminal", true));
-        content->addLayout(shortcuts);
-        content->addSpacing(12);
+        content->addSpacing(10);
 
         auto *actions = new QHBoxLayout;
-        actions->setSpacing(12);
+        actions->setSpacing(16);
         actions->addStretch();
         auto *tryButton = new QPushButton("Try Proper");
         tryButton->setAccessibleName("Try Proper Linux without installing");
+        tryButton->setMinimumWidth(276);
         auto *installButton = new QPushButton("Install Proper");
         installButton->setObjectName("primary");
         installButton->setAccessibleName("Install Proper Linux");
+        installButton->setMinimumWidth(276);
         actions->addWidget(tryButton);
         actions->addWidget(installButton);
         actions->addStretch();
         content->addLayout(actions);
+        installButton->setFocus();
+
+        content->addSpacing(12);
+
+        auto *shortcuts = new QHBoxLayout;
+        shortcuts->setSpacing(4);
+        shortcuts->addStretch();
+        shortcuts->addWidget(shortcutHint({"Meta"}, "Search", true));
+        shortcuts->addSpacing(20);
+        shortcuts->addWidget(shortcutHint({"Meta", "W"}, "Arrange", true));
+        shortcuts->addSpacing(20);
+        shortcuts->addWidget(shortcutHint({"Meta", "Enter"}, "Terminal", true));
+        shortcuts->addStretch();
+        content->addLayout(shortcuts);
 
         root->addWidget(centre, 0, Qt::AlignHCenter);
         root->addStretch(3);
 
-        auto *footer = new QLabel("Proper Linux 0.1");
-        footer->setObjectName("footer");
-        footer->setAlignment(Qt::AlignCenter);
-        root->addWidget(footer);
-
-        connect(closeButton, &QPushButton::clicked, this, &QWidget::close);
         connect(tryButton, &QPushButton::clicked, this, &QWidget::close);
         connect(installButton, &QPushButton::clicked, this, [this] {
             if (QProcess::startDetached("/usr/bin/liveinst", {}))
@@ -373,7 +378,7 @@ public:
             makeCard("Search anything", "Apps, files, commands, and actions—one calm summon key.",
                      "proper-vicinae", {"Meta"}, [this] { launch("/usr/bin/proper-launcher"); }),
             makeCard("Arrange your workspace", "Choose a layout, then press the same shortcut to restore floating positions.",
-                     "view-grid", {"Meta", "M"}, [this] { launch("/usr/bin/proper-arrange-workspace"); }),
+                     "view-grid", {"Meta", "W"}, [this] { launch("/usr/bin/proper-arrange-workspace"); }),
             makeCard("Open Ghostty", "A fast terminal with Proper’s restrained translucent treatment.",
                      "utilities-terminal", {"Meta", "Enter"}, [this] { launch("/usr/bin/ghostty"); }),
             makeCard("Browse curated apps", "A considered shortlist plus the wider catalogue, with honest install diagnostics.",
@@ -535,12 +540,12 @@ public:
         grid->addWidget(section("Windows", {
             {{"Meta", "← / →"}, "Tile to a half"},
             {{"Meta", "1 / 3 / 7 / 9"}, "Tile to a quadrant"},
-            {{"Meta", "M"}, "Arrange or restore the workspace"},
+            {{"Meta", "W"}, "Arrange or restore the workspace"},
             {{"Meta", "↑ / ↓"}, "Maximise or restore"},
             {{"Meta", "H"}, "Minimise"}
         }), 0, 1);
         grid->addWidget(section("Workspace", {
-            {{"Meta", "W"}, "Overview"},
+            {{"Meta", "O"}, "Overview"},
             {{"Meta", "G"}, "Desktop grid"},
             {{"Meta", "D"}, "Peek at the desktop"},
             {{"Meta", "T"}, "Edit tiling layout"}

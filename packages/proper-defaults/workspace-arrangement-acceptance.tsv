@@ -1,0 +1,4 @@
+# ID	Visible expectation
+balanced-halves	With two ordinary windows open, Meta+W places them side by side at equal widths with the normal Proper gap.
+linked-resize	Dragging the shared vertical edge away from the centre resizes both tiled windows together without overlap or a hole.
+restore-floating	Pressing Meta+W again returns both windows to their exact earlier floating positions and sizes.

@@ -1,0 +1,12 @@
+[Unit]
+Description=Notice newly installed coding agents
+
+[Timer]
+OnStartupSec=20s
+OnUnitActiveSec=5min
+AccuracySec=20s
+Unit=proper-agent-panel.service
+
+[Install]
+WantedBy=timers.target
+

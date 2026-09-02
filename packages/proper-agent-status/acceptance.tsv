@@ -1,0 +1,7 @@
+# ID	Visible expectation
+setup-fullhd	The installed first-run wizard is rendered at 1920x1080 and 100 percent scale, with normally proportioned pages and no 640x480 overflow scrollbars.
+login-fullhd	The installed login screen is rendered at 1920x1080 and 100 percent scale, with the approved capsule occupying a restrained central width.
+agent-panel	At 1920x1080 the compact meter is a native right-aligned panel with the main shelf's 56-pixel height, inset, material, and floating state; its content is only a white provider mark and square-dot remaining-usage strip.
+agent-attached	With an ordinary window maximised, the centred shelf and right agent meter attach to the bottom edge together and retain matching height and material.
+agent-details	A pointer click opens a tight ordinary detail panel above the meter with current windows, remaining percentages, reset times, and no history chart.
+agent-hidden	With Codex and Claude absent, no second panel or agent placeholder is present and the centred bottom shelf remains unchanged.

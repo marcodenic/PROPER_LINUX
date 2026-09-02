@@ -21,6 +21,7 @@ if (panels().length === 0) {
     tasks.writeConfig("launchers", "applications:vicinae.desktop,applications:org.kde.dolphin.desktop,applications:com.mitchellh.ghostty.desktop")
     tasks.writeConfig("showOnlyCurrentDesktop", false)
     tasks.writeConfig("showOnlyCurrentActivity", false)
+    tasks.writeConfig("showToolTips", true)
 
     const spacer = panel.addWidget("org.kde.plasma.panelspacer")
     spacer.currentConfigGroup = ["General"]

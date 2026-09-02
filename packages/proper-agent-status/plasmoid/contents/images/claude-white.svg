@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- One-colour reduction of Anthropic's Claude Code starburst mark. -->
+  <g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+    <path d="M12 3.2v6.1M12 14.7v6.1M3.2 12h6.1M14.7 12h6.1"/>
+    <path d="m5.8 5.8 4.1 4.1m4.2 4.2 4.1 4.1M18.2 5.8l-4.1 4.1m-4.2 4.2-4.1 4.1"/>
+    <path d="m8.7 2.8 2.1 6.4m2.4 5.6 2.1 6.4M2.8 8.7l6.4 2.1m5.6 2.4 6.4 2.1"/>
+  </g>
+  <circle cx="12" cy="12" r="1.65" fill="#fff"/>
+</svg>

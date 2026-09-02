@@ -4,7 +4,7 @@ ShellPackage=com.properlinux.desktop
 [PlasmaViews][Panel 2]
 floating=1
 panelLengthMode=1
-panelOpacity=2
+panelOpacity=0
 shell=com.properlinux.desktop
 
 [PlasmaViews][Panel 2][Defaults]

@@ -191,15 +191,10 @@ Item {
             }
             spacing: Math.max(8, parent.height * 0.012)
 
-            PlasmaComponents.Label {
+            ProperGridClock {
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: "#f3f8ff"
-                font.family: root.uiFontFamily
-                font.pixelSize: Math.min(84, Math.max(48, root.height * 0.08))
-                font.weight: Font.Normal
-                text: Qt.formatTime(root.currentDate, "hh:mm")
-                style: Text.Raised
-                styleColor: Qt.rgba(0, 0.02, 0.06, 0.45)
+                cellSize: Math.min(9, Math.max(7, root.height * 0.0084))
+                currentDate: root.currentDate
             }
 
             PlasmaComponents.Label {
@@ -275,14 +270,14 @@ Item {
                 width: parent.width
                 height: 50
                 activeFocusOnTab: true
-                color: "#f3f8ff"
+                color: "transparent"
                 echoMode: TextInput.Password
                 font.family: root.uiFontFamily
                 font.letterSpacing: 2.4
                 font.pixelSize: 21
                 horizontalAlignment: TextInput.AlignHCenter
                 leftPadding: 18
-                passwordCharacter: "•"
+                passwordCharacter: "▪"
                 placeholderText: ""
                 rightPadding: 18
                 selectByMouse: false
@@ -324,6 +319,18 @@ Item {
                     root.clearAuthentication()
                     PlasmaLogin.GreeterState.timeoutWindow(loginSurface.Window.window)
                 }
+            }
+
+            ProperPasswordCells {
+                anchors {
+                    left: passwordBox.left
+                    right: passwordBox.right
+                    verticalCenter: passwordBox.verticalCenter
+                    leftMargin: passwordBox.leftPadding
+                    rightMargin: passwordBox.rightPadding
+                }
+                height: passwordBox.height
+                passwordLength: passwordBox.text.length
             }
 
             PlasmaComponents.Label {

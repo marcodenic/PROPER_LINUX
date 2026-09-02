@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Reject malformed Plasma SVG assets and rectangular shell-surface regressions.
-# The compose hint makes Plasma clip contrast/blur to the rounded mask; neutral
-# shadow slices suppress Plasma's visible Breeze fallback.
+# Panel masks clip contrast/blur to the rounded frame. Panel art follows
+# Breeze's tiled-centre contract with one equal-opacity fill per frame slice.
 set -Eeuo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -10,16 +10,30 @@ metadata="$style_root/metadata.json"
 spec="$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
 tokens="$project_root/packages/proper-look-and-feel/tokens.yaml"
 plasma_defaults="$project_root/packages/proper-defaults/plasmarc"
+panel_defaults="$project_root/packages/proper-defaults/plasma-org.kde.plasma.desktop-appletsrc"
+defaults_spec="$project_root/packages/proper-defaults/proper-defaults.spec"
+kwin_defaults="$project_root/packages/proper-defaults/kwinrc"
+shell_defaults="$project_root/packages/proper-defaults/plasmashellrc"
 dark_scheme="$style_root/colors"
 default_kdeglobals="$project_root/packages/proper-defaults/kdeglobals"
+light_icon_index="$project_root/packages/proper-look-and-feel/proper.index.theme"
+dark_icon_index="$project_root/packages/proper-look-and-feel/proper-dark.index.theme"
+dark_look_defaults="$project_root/packages/proper-look-and-feel/com.properlinux.dark.desktop/contents/defaults"
+light_look_defaults="$project_root/packages/proper-look-and-feel/com.properlinux.light.desktop/contents/defaults"
+midnight_look_defaults="$project_root/packages/proper-look-and-feel/com.properlinux.midnight.desktop/contents/defaults"
 task_asset="$style_root/widgets/tasks.svg"
 panel_asset="$style_root/widgets/panel-background.svg"
+solid_panel_asset="$style_root/solid/widgets/panel-background.svg"
+popup_asset="$style_root/dialogs/background.svg"
+solid_popup_asset="$style_root/solid/dialogs/background.svg"
 task_loading_patch="$project_root/packages/plasma-desktop/proper-task-loading-indicator.patch"
 control_generator="$project_root/packages/proper-look-and-feel/generate-plasma-controls.py"
+panel_generator="$project_root/packages/proper-look-and-feel/generate-panel-material.py"
 generated_controls="$(mktemp -d /tmp/proper-plasma-controls.XXXXXX)"
-trap 'rm -rf -- "$generated_controls"' EXIT
+generated_panel="$(mktemp -d /tmp/proper-panel-material.XXXXXX)"
+trap 'rm -rf -- "$generated_controls" "$generated_panel"' EXIT
 
-for binary in python3 xmllint; do
+for binary in kreadconfig6 python3 xmllint; do
   command -v "$binary" >/dev/null 2>&1 || {
     printf 'Required command missing: %s\n' "$binary" >&2
     exit 1
@@ -27,6 +41,11 @@ for binary in python3 xmllint; do
 done
 
 python3 "$control_generator" "$tokens" "$generated_controls"
+python3 "$panel_generator" "$tokens" "$generated_panel"
+cmp "$generated_panel/panel-background.svg" "$panel_asset"
+cmp "$generated_panel/solid-panel-background.svg" "$solid_panel_asset"
+cmp "$generated_panel/popup-background.svg" "$popup_asset"
+cmp "$generated_panel/solid-popup-background.svg" "$solid_popup_asset"
 
 while IFS= read -r -d '' asset; do
   xmllint --noout "$asset"
@@ -79,6 +98,68 @@ for state in base hover focus focusframe; do
   done
 done
 
+# Every generated rounded control frame is composed from nine independently
+# rendered slices. Keep the five rectilinear slices and four corner groups on
+# one fill/class/opacity, and bleed corner fills into both slice interfaces.
+check_control_frame() {
+  local asset="$1" prefix="$2"
+  local frame_opacity frame_class matched_rects matched_corners corner_bleeds
+  frame_opacity="$(xmllint --xpath "string(//*[@id='$prefix-center']/@fill-opacity)" "$asset")"
+  frame_class="$(xmllint --xpath "string(//*[@id='$prefix-center']/@class)" "$asset")"
+  matched_rects="$(xmllint --xpath "count(//*[@id='$prefix-center' or @id='$prefix-top' or @id='$prefix-bottom' or @id='$prefix-left' or @id='$prefix-right'][@fill-opacity='$frame_opacity' and @class='$frame_class'])" "$asset")"
+  matched_corners="$(xmllint --xpath "count(//*[@id='$prefix-topleft' or @id='$prefix-topright' or @id='$prefix-bottomleft' or @id='$prefix-bottomright'][@opacity='$frame_opacity'])" "$asset")"
+  corner_bleeds="$(xmllint --xpath "count(//*[@id='$prefix-topleft' or @id='$prefix-topright' or @id='$prefix-bottomleft' or @id='$prefix-bottomright']/*[local-name()='rect' and @class='$frame_class'])" "$asset")"
+  [[ -n "$frame_opacity" && -n "$frame_class" && "$matched_rects" == 5 &&
+     "$matched_corners" == 4 && "$corner_bleeds" == 8 ]] || {
+    printf '%s frame %s must use one seam-safe fill across all nine slices.\n' "$asset" "$prefix" >&2
+    exit 1
+  }
+}
+
+for state in normal hover pressed section; do
+  check_control_frame "$generated_controls/listitem.svg" "$state"
+done
+for state in normal hover selected selected+hover; do
+  check_control_frame "$generated_controls/viewitem.svg" "$state"
+done
+for state in normal hover pressed focus toolbutton-hover toolbutton-pressed toolbutton-focus mask-normal shadow; do
+  check_control_frame "$generated_controls/button.svg" "$state"
+done
+for state in base hover focus focusframe; do
+  check_control_frame "$generated_controls/lineedit.svg" "$state"
+done
+for state in north-active-tab south-active-tab east-active-tab west-active-tab; do
+  check_control_frame "$generated_controls/tabbar.svg" "$state"
+done
+while IFS= read -r -d '' asset; do
+  [[ "$(xmllint --xpath "count(//*[contains(@id, 'hint-compose-over-border')])" "$asset")" == 0 ]] || {
+    printf '%s must not double-composite a translucent control centre beneath filled borders.\n' "$asset" >&2
+    exit 1
+  }
+done < <(find "$generated_controls" -type f -name '*.svg' -print0)
+
+# Plasma's TextField expands hover/focus layers by their FrameSvg margins.
+# Those overlay margins must be effectively zero or a focused password field
+# will paint outside its owning Networks row. The base keeps normal padding.
+[[ "$(xmllint --xpath "string(//*[@id='base-hint-left-margin']/@width)" "$generated_controls/lineedit.svg")" == 7 ]] || {
+  printf 'Proper line-edit base padding must remain seven pixels.\n' >&2
+  exit 1
+}
+for state in hover focus focusframe; do
+  for side in left right; do
+    [[ "$(xmllint --xpath "string(//*[@id='$state-hint-$side-margin']/@width)" "$generated_controls/lineedit.svg")" == 0.001 ]] || {
+      printf 'Proper line-edit %s %s overlay margin must stay inside the control.\n' "$state" "$side" >&2
+      exit 1
+    }
+  done
+  for side in top bottom; do
+    [[ "$(xmllint --xpath "string(//*[@id='$state-hint-$side-margin']/@height)" "$generated_controls/lineedit.svg")" == 0.001 ]] || {
+      printf 'Proper line-edit %s %s overlay margin must stay inside the control.\n' "$state" "$side" >&2
+      exit 1
+    }
+  done
+done
+
 for state in groove groove-highlight; do
   for slice in center top bottom left right topleft topright bottomleft bottomright; do
     [[ "$(xmllint --xpath "count(//*[@id='$state-$slice'])" "$generated_controls/slider.svg")" == 1 ]] || {
@@ -94,6 +175,19 @@ for element in inactive-left inactive-center inactive-right active-left active-c
     exit 1
   }
 done
+[[ "$(xmllint --xpath "string(//*[@id='hint-bar-size']/@width)" "$generated_controls/switch.svg")" == 38 &&
+   "$(xmllint --xpath "string(//*[@id='hint-bar-size']/@height)" "$generated_controls/switch.svg")" == 16 ]] || {
+  printf 'Proper switch track must retain the reviewed 38x16 contract.\n' >&2
+  exit 1
+}
+[[ "$(xmllint --xpath "count(//*[@id='inactive-left' or @id='inactive-right' or @id='active-left' or @id='active-right'][local-name()='path'])" "$generated_controls/switch.svg")" == 4 ]] || {
+  printf 'Proper switch end caps must be half-pill paths, not doubly-rounded frame slices.\n' >&2
+  exit 1
+}
+[[ "$(xmllint --xpath "string(//*[@id='handle']/@r)" "$generated_controls/switch.svg")" == 8 ]] || {
+  printf 'Proper switch handle must remain balanced inside the 16-pixel track.\n' >&2
+  exit 1
+}
 
 for direction in north south east west; do
   for slice in center top bottom left right topleft topright bottomleft bottomright; do
@@ -109,9 +203,11 @@ done
   exit 1
 }
 
-shadow_assets=(
-  "$style_root/widgets/panel-background.svg"
-  "$style_root/dialogs/background.svg"
+surface_assets=(
+  "$panel_asset"
+  "$solid_panel_asset"
+  "$popup_asset"
+  "$solid_popup_asset"
 )
 
 package_version="$(awk '$1 == "Version:" { print $2; exit }' "$spec")"
@@ -133,7 +229,7 @@ required_ids=(
   mask-topleft mask-topright mask-bottomleft mask-bottomright
 )
 
-for asset in "${shadow_assets[@]}"; do
+for asset in "${surface_assets[@]}"; do
   for required_id in "${required_ids[@]}"; do
     count="$(xmllint --xpath "count(//*[@id='$required_id'])" "$asset")"
     [[ "$count" == 1 ]] || {
@@ -142,20 +238,115 @@ for asset in "${shadow_assets[@]}"; do
       exit 1
     }
   done
-  shadow_selector="//*[starts-with(@id, 'shadow-') and not(starts-with(@id, 'shadow-hint-'))]"
+done
+
+for asset in "${surface_assets[@]}"; do
+  [[ "$(xmllint --xpath "count(//*[@id = 'hint-compose-over-border'])" "$asset")" == 0 ]] || {
+    printf '%s must not double-composite its centre beneath filled borders.\n' "$asset" >&2
+    exit 1
+  }
+  [[ "$(xmllint --xpath "count(//*[@id = 'hint-tile-center'])" "$asset")" == 1 ]] || {
+    printf '%s must use Plasma\x27s standard tiled-centre panel contract.\n' "$asset" >&2
+    exit 1
+  }
+  centre_opacity="$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$asset")"
+  matched_edge_fills="$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[1][@fill-opacity='$centre_opacity'])" "$asset")"
+  matched_corner_groups="$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1][@opacity='$centre_opacity'])" "$asset")"
+  [[ "$matched_edge_fills" == 4 && "$matched_corner_groups" == 4 ]] || {
+    printf '%s must use centre opacity %s on all eight border fills.\n' "$asset" "$centre_opacity" >&2
+    exit 1
+  }
+  [[ "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$asset")" == 8 ]] || {
+    printf '%s must bleed each corner fill into both adjoining slice edges.\n' "$asset" >&2
+    exit 1
+  }
+  rim_color="$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill)" "$asset")"
+  rim_opacity="$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill-opacity)" "$asset")"
+  matched_edge_rims="$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[2][@fill='$rim_color' and @fill-opacity='$rim_opacity'])" "$asset")"
+  matched_corner_rim_groups="$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2][@opacity='$rim_opacity'])" "$asset")"
+  matched_corner_rim_bleeds="$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2]/*[local-name()='rect' and @fill='$rim_color'])" "$asset")"
+  matched_corner_rim_paths="$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and @stroke='$rim_color'])" "$asset")"
+  [[ "$matched_edge_rims" == 4 && "$matched_corner_rim_groups" == 4 &&
+     "$matched_corner_rim_bleeds" == 8 && "$matched_corner_rim_paths" == 4 ]] || {
+    printf '%s must post-composite one identical seam-safe rim around every slice.\n' "$asset" >&2
+    exit 1
+  }
+  [[ "$(xmllint --xpath "count(//*[local-name()='linearGradient'])" "$asset")" == 0 ]] || {
+    printf '%s must not vary the surface rim treatment between slices.\n' "$asset" >&2
+    exit 1
+  }
+  [[ "$(xmllint --xpath "count(//*[@id='mask-topleft' or @id='mask-topright' or @id='mask-bottomleft' or @id='mask-bottomright']/*[local-name()='rect'])" "$asset")" == 8 ]] || {
+    printf '%s must bleed every mask corner into both adjoining slices.\n' "$asset" >&2
+    exit 1
+  }
+done
+
+[[ "$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$popup_asset")" == 0.90 &&
+   "$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$solid_popup_asset")" == 1.00 ]] || {
+  printf 'Proper popup materials must retain their reviewed translucent and dense optical states.\n' >&2
+  exit 1
+}
+
+for asset in "$panel_asset" "$solid_panel_asset"; do
+  [[ "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$asset")" == 'M16 .5H15C6.99.5.5 6.99.5 15V16' &&
+     "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$asset")" == 'M0 .5H1c8.01 0 14.5 6.49 14.5 14.5V16' &&
+     "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$asset")" == 'M16 15.5H15C6.99 15.5.5 9.01.5 1V0' &&
+     "$(xmllint --xpath "string(//*[@id='rim-bottomright']/@d)" "$asset")" == 'M0 15.5H1c8.01 0 14.5-6.49 14.5-14.5V0' ]] || {
+    printf '%s must carry every corner rim exactly to its adjoining slice boundary.\n' "$asset" >&2
+    exit 1
+  }
+done
+
+dialog_shadow_selector="//*[starts-with(@id, 'shadow-') and not(starts-with(@id, 'shadow-hint-')) and (local-name()='rect' or local-name()='path' or local-name()='g')]"
+for asset in "$popup_asset" "$solid_popup_asset"; do
+  dialog_shadow_count="$(xmllint --xpath "count($dialog_shadow_selector)" "$asset")"
+  neutral_dialog_shadow_count="$(xmllint --xpath "count(${dialog_shadow_selector}[@fill-opacity and number(@fill-opacity) <= 0.001])" "$asset")"
+  [[ "$dialog_shadow_count" == 9 && "$neutral_dialog_shadow_count" == 9 ]] || {
+    printf '%s must retain nine neutral shadow-suppression slices.\n' "$asset" >&2
+    exit 1
+  }
+done
+
+for asset in "$panel_asset" "$solid_panel_asset"; do
+  shadow_selector="//*[starts-with(@id, 'shadow-') and not(starts-with(@id, 'shadow-hint-')) and (local-name()='rect' or local-name()='path' or local-name()='g')]"
   shadow_count="$(xmllint --xpath "count($shadow_selector)" "$asset")"
   neutral_shadow_count="$(xmllint --xpath "count(${shadow_selector}[@fill-opacity and number(@fill-opacity) <= 0.001])" "$asset")"
   [[ "$shadow_count" == 9 && "$neutral_shadow_count" == 9 ]] || {
-    printf '%s must define nine neutral shadow-suppression slices; found %s total and %s neutral.\n' \
-      "$asset" "$shadow_count" "$neutral_shadow_count" >&2
-    printf 'Visible shell shadows are forbidden until their rounded alpha masks have render regression tests.\n' >&2
+    printf '%s must keep all nine shadow slices neutral and seam-free.\n' "$asset" >&2
     exit 1
   }
-  compose_hint_count="$(xmllint --xpath "count(//*[@id = 'hint-compose-over-border'])" "$asset")"
-  [[ "$compose_hint_count" == 1 ]] || {
-    printf '%s must define hint-compose-over-border exactly once; found %s.\n' \
-      "$asset" "$compose_hint_count" >&2
-    printf 'Without it Plasma can expose square contrast and blur regions behind rounded corners.\n' >&2
+  for side in top bottom; do
+    [[ "$(xmllint --xpath "string(//*[@id='floating-hint-$side-margin']/@height)" "$asset")" == 12 ]] || {
+      printf '%s floating %s padding must retain the complete twelve-pixel shadow.\n' "$asset" "$side" >&2
+      exit 1
+    }
+  done
+  for side in left right; do
+    [[ "$(xmllint --xpath "string(//*[@id='floating-hint-$side-margin']/@width)" "$asset")" == 12 ]] || {
+      printf '%s floating %s padding must retain the complete twelve-pixel shadow.\n' "$asset" "$side" >&2
+      exit 1
+    }
+  done
+done
+
+[[ "$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$panel_asset")" == 0.66 ]] || {
+  printf 'Proper translucent shelf must use the reviewed 0.66 tint opacity.\n' >&2
+  exit 1
+}
+[[ "$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$solid_panel_asset")" == 1.00 ]] || {
+  printf 'Proper dense shelf state must remain fully opaque.\n' >&2
+  exit 1
+}
+for contrast_setting in enabled=true contrast=0.72 intensity=0.82 saturation=1.15; do
+  grep -qx "$contrast_setting" "$style_root/plasmarc" || {
+    printf 'Proper Plasma material is missing contrast setting %s.\n' "$contrast_setting" >&2
+    exit 1
+  }
+done
+grep -qx 'panelOpacity=0' "$shell_defaults"
+for blur_setting in BlurStrength=15 NoiseStrength=5 Saturation=150; do
+  grep -qx "$blur_setting" "$kwin_defaults" || {
+    printf 'Proper KWin material is missing blur setting %s.\n' "$blur_setting" >&2
     exit 1
   }
 done
@@ -189,17 +380,38 @@ for state in normal focus hover minimized attention progress; do
     }
   done
 done
-[[ "$(xmllint --xpath "count(//*[@id='focus-bottom']//*[contains(@class, 'ColorScheme-ButtonFocus')])" "$task_asset")" == 1 ]]
-[[ "$(xmllint --xpath "count(//*[@id='normal-bottom']//*[contains(@class, 'ColorScheme-Text')])" "$task_asset")" == 1 ]]
+visible_task_shapes="$(xmllint --xpath "count(//*[starts-with(@id, 'normal-') or starts-with(@id, 'focus-') or starts-with(@id, 'hover-') or starts-with(@id, 'minimized-') or starts-with(@id, 'attention-') or starts-with(@id, 'progress-')]//*[self::rect or self::circle or self::path][not(@fill-opacity) or number(@fill-opacity) > 0.001])" "$task_asset")"
+[[ "$visible_task_shapes" == 0 ]] || {
+  printf 'Proper task FrameSvg edge slices must be visually empty; found %s visible shapes.\n' "$visible_task_shapes" >&2
+  exit 1
+}
+nonzero_task_geometry="$(xmllint --xpath "count(//*[starts-with(@id, 'normal-') or starts-with(@id, 'focus-') or starts-with(@id, 'hover-') or starts-with(@id, 'minimized-') or starts-with(@id, 'attention-') or starts-with(@id, 'progress-')]//*[@fill-opacity and number(@fill-opacity) != 0])" "$task_asset")"
+[[ "$nonzero_task_geometry" == 0 ]] || {
+  printf 'Proper task geometry must be exactly transparent; found %s nonzero shapes.\n' "$nonzero_task_geometry" >&2
+  exit 1
+}
+for direction in top bottom left right; do
+  [[ "$(xmllint --xpath "count(//*[@id='group-expander-$direction'])" "$task_asset")" == 1 ]] || {
+    printf 'Proper task asset must suppress the inherited %s group badge.\n' "$direction" >&2
+    exit 1
+  }
+done
 [[ "$(xmllint --xpath "count(//*[starts-with(@id, 'hover-')]//*[@class='ColorScheme-ButtonFocus' or @class='ColorScheme-ButtonHover'])" "$task_asset")" == 0 ]] || {
   printf 'Proper hover task state must not contain a filled blue focus or hover shape.\n' >&2
   exit 1
 }
 
 grep -q 'id: launchIndicator' "$task_loading_patch"
-grep -q 'id: launchTrack' "$task_loading_patch"
+grep -q 'id: launchPath' "$task_loading_patch"
 grep -q 'id: launchMotion' "$task_loading_patch"
 grep -q 'duration: 700' "$task_loading_patch"
+grep -q 'id: properStateIndicator' "$task_loading_patch"
+grep -q 'visibleDotCount: Math.min(windowCount, 4)' "$task_loading_patch"
+grep -q 'active: model.IsWindow' "$task_loading_patch"
+! grep -q 'id: launchTrack' "$task_loading_patch" || {
+  printf 'Proper launch feedback must not draw a visible track behind its dot.\n' >&2
+  exit 1
+}
 ! grep -q '^+.*PlasmaComponents3[.]BusyIndicator' "$task_loading_patch" || {
   printf 'Proper task startup patch must replace Plasma\x27s circular busy indicator.\n' >&2
   exit 1
@@ -210,11 +422,33 @@ tooltip_delay="$(awk '
   /^\[/ { in_group = 0 }
   in_group && /^Delay=/ { sub(/^Delay=/, ""); print; exit }
 ' "$plasma_defaults")"
-[[ "$tooltip_delay" == 0 ]] || {
-  printf 'Proper shell hover tooltips must default to Delay=0; found %s.\n' \
+[[ "$tooltip_delay" == 900 ]] || {
+  printf 'Proper shell hover tooltips must use the reviewed 900ms delay; found %s.\n' \
     "${tooltip_delay:-unset}" >&2
   exit 1
 }
+grep -qx 'TooltipPolicyVersion=2' "$plasma_defaults"
+grep -qx 'showToolTips=true' "$panel_defaults"
+grep -q 'current_delay.*== 0' "$project_root/packages/proper-defaults/proper-tooltip-default-repair"
+grep -q 'key Delay 900' "$project_root/packages/proper-defaults/proper-tooltip-default-repair"
+grep -q 'proper-tooltip-default-repair.desktop' "$defaults_spec"
+[[ "$(kreadconfig6 --file "$panel_defaults" \
+     --group Containments --group 2 --group Applets --group 7 \
+     --group Configuration --group Appearance --key dateFormat --default missing)" == custom &&
+   "$(kreadconfig6 --file "$panel_defaults" \
+     --group Containments --group 2 --group Applets --group 7 \
+     --group Configuration --group Appearance --key customDateFormat --default missing)" == "MMMM d" ]] || {
+  printf 'Proper digital-clock defaults must use Plasma\x27s nested Appearance group and written month format.\n' >&2
+  exit 1
+}
+! grep -q '^Appearance[.]dateFormat=' "$panel_defaults" || {
+  printf 'Proper digital-clock defaults still contain the malformed literal Appearance.dateFormat key.\n' >&2
+  exit 1
+}
+grep -q 'legacy_format.*== custom' "$project_root/packages/proper-defaults/proper-clock-date-default-repair"
+grep -q 'current_format.*== __proper_missing__' "$project_root/packages/proper-defaults/proper-clock-date-default-repair"
+grep -q 'proper-clock-date-default-repair.desktop' "$defaults_spec"
+grep -q 'proper-look-and-feel >= 0.1-38' "$defaults_spec"
 
 dark_window_rgb="$(awk '
   /^\[Colors:Window\]$/ { in_window = 1; next }
@@ -240,5 +474,14 @@ default_view_rgb="$(awk '
 }
 
 grep -qx 'ColorScheme=Proper' "$default_kdeglobals"
+grep -qx 'Theme=proper-dark' "$default_kdeglobals"
+grep -qx 'Inherits=breeze' "$light_icon_index"
+grep -qx 'Inherits=breeze-dark' "$dark_icon_index"
+grep -qx 'Theme=proper-dark' "$dark_look_defaults"
+grep -qx 'Theme=proper' "$light_look_defaults"
+grep -qx 'Theme=proper-dark' "$midnight_look_defaults"
+grep -Fq '../../../breeze/places/$size/folder-blue.svg' "$spec"
+grep -Fq '../../../breeze-dark/places/$size/folder-blue.svg' "$spec"
+grep -Fq 'org.kde.dolphin.svg' "$spec"
 
-printf 'Plasma theme valid: materialized dark palette, symmetric shelf, launch/active/running task states, matched masks, neutral shadows, and hover tooltips disabled.\n'
+printf 'Plasma UX valid: generated adaptive shelf material, bounded controls, exact task indicators, delayed previews/tooltips, and matched masks.\n'

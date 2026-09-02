@@ -1,0 +1,224 @@
+#!/usr/bin/env bash
+# Record and enforce graphical acceptance evidence from one installed Proper VM.
+# Static validators still run first; this gate exists so a successful build can
+# never be reported as proof of a user-visible interaction.
+set -Eeuo pipefail
+
+usage() {
+  printf '%s\n' \
+    'Usage:' \
+    '  scripts/verify-ux begin EVIDENCE_DIR ISO DISK QMP_SOCKET MONITOR_SOCKET ACCEPTANCE.tsv' \
+    '  scripts/verify-ux capture EVIDENCE_DIR CHECK_ID' \
+    '  scripts/verify-ux pass EVIDENCE_DIR CHECK_ID OBSERVATION' \
+    '  scripts/verify-ux finalize EVIDENCE_DIR' >&2
+  exit 2
+}
+
+mode="${1:-}"
+[[ -n "$mode" ]] || usage
+shift
+
+require_evidence_dir() {
+  evidence_dir="$(realpath -m "${1:?Evidence directory is required.}")"
+  metadata="$evidence_dir/session.tsv"
+  acceptance="$evidence_dir/acceptance.tsv"
+  results="$evidence_dir/results.tsv"
+}
+
+metadata_value() {
+  local key="$1"
+  awk -F '\t' -v key="$key" '$1 == key { sub(/^[^\t]*\t/, ""); print; exit }' "$metadata"
+}
+
+check_id_is_valid() {
+  [[ "$1" =~ ^[a-z0-9][a-z0-9-]*$ ]] || {
+    printf 'Acceptance check IDs must use lowercase letters, numbers, and hyphens: %s\n' "$1" >&2
+    exit 1
+  }
+}
+
+case "$mode" in
+  begin)
+    (( $# == 6 )) || usage
+    require_evidence_dir "$1"
+    iso="$(realpath -e "$2")"
+    disk="$(realpath -e "$3")"
+    qmp_socket="$(realpath -e "$4")"
+    monitor_socket="$(realpath -e "$5")"
+    acceptance_source="$(realpath -e "$6")"
+
+    for binary in awk identify magick sha256sum socat; do
+      command -v "$binary" >/dev/null 2>&1 || {
+        printf 'Required graphical-acceptance command is missing: %s\n' "$binary" >&2
+        exit 1
+      }
+    done
+    [[ -f "$iso" && -f "$disk" && -S "$qmp_socket" && -S "$monitor_socket" ]] || {
+      printf 'ISO, installed disk, and both live VM sockets are required.\n' >&2
+      exit 1
+    }
+    [[ -s "$acceptance_source" ]] || {
+      printf 'Acceptance file is empty: %s\n' "$acceptance_source" >&2
+      exit 1
+    }
+
+    declare -A seen_checks=()
+    check_count=0
+    while IFS=$'\t' read -r check_id expectation extra; do
+      [[ -n "$check_id" && "${check_id:0:1}" != '#' ]] || continue
+      check_id_is_valid "$check_id"
+      [[ -n "$expectation" && -z "${extra:-}" ]] || {
+        printf 'Each acceptance row needs exactly ID<TAB>visible expectation: %s\n' "$check_id" >&2
+        exit 1
+      }
+      [[ -z "${seen_checks[$check_id]:-}" ]] || {
+        printf 'Duplicate acceptance check ID: %s\n' "$check_id" >&2
+        exit 1
+      }
+      seen_checks[$check_id]=1
+      ((check_count += 1))
+    done < "$acceptance_source"
+    (( check_count > 0 )) || {
+      printf 'No acceptance checks found in %s.\n' "$acceptance_source" >&2
+      exit 1
+    }
+
+    mapfile -t qemu_processes < <(ps -eo pid=,args= | grep '[q]emu-system-x86_64' || true)
+    (( ${#qemu_processes[@]} == 1 )) || {
+      printf 'Graphical acceptance requires exactly one Proper VM; found %d QEMU processes.\n' "${#qemu_processes[@]}" >&2
+      exit 1
+    }
+    qemu_line="${qemu_processes[0]}"
+    qemu_pid="$(awk '{print $1}' <<<"$qemu_line")"
+    [[ "$qemu_line" == *"file=$disk"* && "$qemu_line" == *"unix:$qmp_socket"* && "$qemu_line" == *"unix:$monitor_socket"* ]] || {
+      printf 'The sole VM does not use the exact installed disk and sockets supplied for review.\n' >&2
+      exit 1
+    }
+
+    [[ ! -e "$metadata" && ! -e "$acceptance" && ! -e "$results" ]] || {
+      printf 'Evidence session already exists; use a fresh directory: %s\n' "$evidence_dir" >&2
+      exit 1
+    }
+    mkdir -p "$evidence_dir"
+    install -m 0644 "$acceptance_source" "$acceptance"
+    {
+      printf 'ISO\t%s\n' "$iso"
+      printf 'ISO_SHA256\t%s\n' "$(sha256sum "$iso" | awk '{print $1}')"
+      printf 'DISK\t%s\n' "$disk"
+      printf 'PID\t%s\n' "$qemu_pid"
+      printf 'QMP_SOCKET\t%s\n' "$qmp_socket"
+      printf 'MONITOR_SOCKET\t%s\n' "$monitor_socket"
+      printf 'EXPECTED_FRAMEBUFFER\t1920x1080\n'
+      printf 'STARTED_UTC\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    } > "$metadata"
+    : > "$results"
+    printf 'UX evidence session ready: %s (%d required checks).\n' "$evidence_dir" "$check_count"
+    ;;
+
+  capture)
+    (( $# == 2 )) || usage
+    require_evidence_dir "$1"
+    check_id="$2"
+    check_id_is_valid "$check_id"
+    [[ -f "$metadata" && -f "$acceptance" && -f "$results" ]] || {
+      printf 'Begin the UX evidence session before capturing it: %s\n' "$evidence_dir" >&2
+      exit 1
+    }
+    awk -F '\t' -v id="$check_id" '$1 == id { found = 1 } END { exit !found }' "$acceptance" || {
+      printf 'Unknown acceptance check: %s\n' "$check_id" >&2
+      exit 1
+    }
+    if awk -F '\t' -v id="$check_id" '$1 == "CAPTURE" && $2 == id { found = 1 } END { exit !found }' "$results"; then
+      printf 'Refusing to overwrite existing UX evidence for %s.\n' "$check_id" >&2
+      exit 1
+    fi
+    monitor_socket="$(metadata_value MONITOR_SOCKET)"
+    qemu_pid="$(metadata_value PID)"
+    [[ -S "$monitor_socket" && -d "/proc/$qemu_pid" ]] || {
+      printf 'The recorded VM is no longer available for capture.\n' >&2
+      exit 1
+    }
+
+    ppm="$evidence_dir/$check_id.ppm"
+    png="$evidence_dir/$check_id.png"
+    printf 'screendump %s\n' "$ppm" | socat - UNIX-CONNECT:"$monitor_socket" >/dev/null
+    for _ in {1..40}; do
+      [[ -s "$ppm" ]] && break
+      read -r -t 0.25 _ </dev/null || true
+    done
+    [[ -s "$ppm" ]] || {
+      printf 'QEMU did not produce a framebuffer capture for %s.\n' "$check_id" >&2
+      exit 1
+    }
+    dimensions="$(identify -format '%wx%h' "$ppm")"
+    [[ "$dimensions" == "$(metadata_value EXPECTED_FRAMEBUFFER)" ]] || {
+      printf 'UX evidence must be the fullhd 1920x1080 review surface; found %s.\n' "$dimensions" >&2
+      exit 1
+    }
+    magick "$ppm" -strip "$png"
+    rm -- "$ppm"
+    digest="$(sha256sum "$png" | awk '{print $1}')"
+    printf 'CAPTURE\t%s\t%s\t%s\t%s\n' "$check_id" "$dimensions" "$digest" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$results"
+    printf 'Captured %s. Inspect it before recording PASS: %s\n' "$check_id" "$png"
+    ;;
+
+  pass)
+    (( $# == 3 )) || usage
+    require_evidence_dir "$1"
+    check_id="$2"
+    observation="$3"
+    check_id_is_valid "$check_id"
+    [[ -n "$observation" && "$observation" != *$'\t'* && "$observation" != *$'\n'* ]] || {
+      printf 'A concise one-line visual observation is required.\n' >&2
+      exit 1
+    }
+    [[ -f "$evidence_dir/$check_id.png" ]] &&
+      awk -F '\t' -v id="$check_id" '$1 == "CAPTURE" && $2 == id { found = 1 } END { exit !found }' "$results" || {
+        printf 'Capture and inspect %s before recording PASS.\n' "$check_id" >&2
+        exit 1
+      }
+    if awk -F '\t' -v id="$check_id" '$1 == "PASS" && $2 == id { found = 1 } END { exit !found }' "$results"; then
+      printf 'PASS was already recorded for %s.\n' "$check_id" >&2
+      exit 1
+    fi
+    printf 'PASS\t%s\t%s\t%s\n' "$check_id" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$observation" >> "$results"
+    printf 'Recorded inspected result for %s.\n' "$check_id"
+    ;;
+
+  finalize)
+    (( $# == 1 )) || usage
+    require_evidence_dir "$1"
+    [[ -f "$metadata" && -f "$acceptance" && -f "$results" ]] || {
+      printf 'UX evidence session is incomplete: %s\n' "$evidence_dir" >&2
+      exit 1
+    }
+    failures=0
+    declare -A seen_digests=()
+    while IFS=$'\t' read -r check_id expectation extra; do
+      [[ -n "$check_id" && "${check_id:0:1}" != '#' ]] || continue
+      capture_count="$(awk -F '\t' -v id="$check_id" '$1 == "CAPTURE" && $2 == id { count += 1 } END { print count + 0 }' "$results")"
+      pass_count="$(awk -F '\t' -v id="$check_id" '$1 == "PASS" && $2 == id { count += 1 } END { print count + 0 }' "$results")"
+      if [[ "$capture_count" != 1 || "$pass_count" != 1 || ! -f "$evidence_dir/$check_id.png" ]]; then
+        printf 'Missing one inspected 1920x1080 result for %s: %s\n' "$check_id" "$expectation" >&2
+        failures=1
+        continue
+      fi
+      digest="$(sha256sum "$evidence_dir/$check_id.png" | awk '{print $1}')"
+      recorded_digest="$(awk -F '\t' -v id="$check_id" '$1 == "CAPTURE" && $2 == id { print $4; exit }' "$results")"
+      [[ "$digest" == "$recorded_digest" ]] || {
+        printf 'Captured evidence changed after inspection: %s\n' "$check_id" >&2
+        failures=1
+      }
+      [[ -z "${seen_digests[$digest]:-}" ]] || {
+        printf 'Two UX checks contain the identical framebuffer: %s and %s.\n' "${seen_digests[$digest]}" "$check_id" >&2
+        failures=1
+      }
+      seen_digests[$digest]="$check_id"
+    done < "$acceptance"
+    (( failures == 0 )) || exit 1
+    sha256sum "$metadata" "$acceptance" "$results" "$evidence_dir"/*.png > "$evidence_dir/VERIFIED.sha256"
+    printf 'UX evidence finalized: %s\n' "$evidence_dir"
+    ;;
+
+  *) usage ;;
+esac

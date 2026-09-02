@@ -2,13 +2,13 @@
 # The branded build changes only the built-in logo and successful-boot console
 # chatter; guest-visible UEFI behaviour continues to come from Fedora's exact
 # edk2 source package and patch set.
-EDK2_SOURCE_NEVRA="edk2-20260508-8.fc44"
-EDK2_SOURCE_RPM="edk2-20260508-8.fc44.src.rpm"
-EDK2_SOURCE_RPM_SHA256="2dc18705f149274cccb0ecd5a184bb9602e4fde57e0f448b9af674502117b5a4"
-EDK2_SOURCE_COMMIT="b03a21a63e3b"
-EDK2_SOURCE_DATE_EPOCH="1785888000"
-EDK2_FIRMWARE_BUILD_ID="edk2-20260508-8.fc44-proper1"
-EDK2_RELEASE_DATE="05/08/2026"
-EDK2_BUILDER_IMAGE="localhost/proper-vm-firmware-builder:fedora44-edk2-20260508"
+EDK2_SOURCE_NEVRA="edk2-20260812-4.fc44"
+EDK2_SOURCE_RPM="edk2-20260812-4.fc44.src.rpm"
+EDK2_SOURCE_RPM_SHA256="8d44c0dc5e55a6e32753b142a6f53698ebeba9bb3882127a68652ec18eb42349"
+EDK2_SOURCE_COMMIT="2970e5699ba6"
+EDK2_SOURCE_DATE_EPOCH="1787702400"
+EDK2_FIRMWARE_BUILD_ID="edk2-20260812-4.fc44-proper1"
+EDK2_RELEASE_DATE="08/12/2026"
+EDK2_BUILDER_IMAGE="localhost/proper-vm-firmware-builder:fedora44-edk2-20260812"
 EDK2_BUILDER_BASE="quay.io/fedora/fedora"
 EDK2_BUILDER_BASE_DIGEST="sha256:a669925a10c2716481d60a46fc93cbbe4cfb9aade058b2ba28cf3f0de0345de2"

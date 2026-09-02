@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+# The wrapper retains Plasma Login Manager's greeter and only corrects QEMU's
+# inherited 640x480 firmware mode in the already-running greeter session.
+/usr/bin/proper-qemu-review-display >/dev/null 2>&1 &
+exec /usr/libexec/plasma-login-greeter "$@"
+

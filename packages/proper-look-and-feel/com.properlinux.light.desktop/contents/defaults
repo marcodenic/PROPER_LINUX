@@ -5,7 +5,7 @@ widgetStyle=Breeze
 ColorScheme=ProperLight
 
 [kdeglobals][Icons]
-Theme=breeze
+Theme=proper
 
 [plasmarc][Theme]
 name=proper

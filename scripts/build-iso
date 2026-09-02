@@ -20,6 +20,7 @@ done
 [[ -n "$UPSTREAM_COMMIT" ]] || { printf 'Fedora input is not pinned. Run scripts/pin-fedora-base, review the lock, then rerun.\n' >&2; exit 1; }
 [[ "$UPSTREAM_COMMIT" =~ ^[0-9a-f]{40}$ ]] || { printf 'Invalid UPSTREAM_COMMIT in image/upstream/fedora-kde-44.lock\n' >&2; exit 1; }
 
+if [[ "${PROPER_VALIDATE_EXISTING:-0}" != 1 ]]; then
 mkdir -p "$cache_root" "$iso_dir"
 if [[ ! -d "$source_dir/.git" ]]; then
   git clone "$UPSTREAM_URL" "$source_dir"
@@ -106,6 +107,9 @@ if (( using_container == 0 )); then
   local_kiwi_file="${kiwi_file#/source}"
   "${runner[@]}" "$build_source_dir/kiwi-build" --kiwi-file="$build_source_dir$local_kiwi_file" --image-type="$IMAGE_TYPE" --image-profile="$IMAGE_PROFILE" --output-dir="$iso_dir"
 fi
+else
+  printf 'Validating existing release image without recomposing it: %s\n' "$iso_dir"
+fi
 
 mapfile -t images < <(find "$iso_dir" -maxdepth 3 -type f -name '*.iso' -print)
 (( ${#images[@]} == 1 )) || { printf 'Expected exactly one ISO in %s; found %d.\n' "$iso_dir" "${#images[@]}" >&2; exit 1; }
@@ -135,11 +139,11 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       exit 1
     }
   done
-  grep -Eq '^proper-look-and-feel\|\(none\)\|0[.]1\|29[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the thirteen-wallpaper Proper artwork release.\n' >&2
+  grep -Eq '^proper-look-and-feel\|\(none\)\|0[.]1\|39[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the refined welcome style release.\n' >&2
     exit 1
   }
-  for upstream_applet in plasma-nm bluedevil plasma-pa powerdevil kscreen; do
+  for upstream_applet in plasma-nm bluedevil plasma-pa kscreen; do
     upstream_epoch='\(none\)'
     [[ "$upstream_applet" == kscreen ]] && upstream_epoch='1'
     grep -Eq "^${upstream_applet}\\|${upstream_epoch}\\|6[.]7[.]4\\|1[.]fc44\\|" "${package_manifests[0]}" || {
@@ -147,15 +151,23 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       exit 1
     }
   done
-  grep -Eq '^proper-defaults\|\(none\)\|0[.]1\|24[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the shelf and Meta+M desktop defaults release.\n' >&2
+  grep -Eq '^powerdevil\|\(none\)\|6[.]7[.]4\|2[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not retain the reviewed Fedora powerdevil Qt 6 rebuild unchanged.\n' >&2
     exit 1
   }
-  grep -Eq '^plasma-desktop\|\(none\)\|6[.]7[.]4\|1[.]fc44[.]proper1\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the pinned Proper task-launch indicator patch.\n' >&2
+  grep -Eq '^proper-agent-status\|\(none\)\|0[.]1\|2[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Proper agent-status package differs from the reviewed integration.\n' >&2
     exit 1
   }
-  grep -Eq '^plasma-login-manager\|\(none\)\|6[.]7[.]4\|1[.]proper4[.]fc44\|' "${package_manifests[0]}" || {
+  grep -Eq '^proper-defaults\|\(none\)\|0[.]1\|31[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the native balanced-halves arrangement default.\n' >&2
+    exit 1
+  }
+  grep -Eq '^plasma-desktop\|\(none\)\|6[.]7[.]4\|1[.]fc44[.]proper2\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the pinned exact task-state and preview patch.\n' >&2
+    exit 1
+  }
+  grep -Eq '^plasma-login-manager\|\(none\)\|6[.]7[.]4\|1[.]proper5[.]fc44\|' "${package_manifests[0]}" || {
     printf 'Built image does not contain the Inter-based Proper login composition.\n' >&2
     exit 1
   }
@@ -163,12 +175,12 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image does not contain the Inter-based Proper boot branding release.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-terminal\|\(none\)\|1[.]3[.]1\|5[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the clear-translucency Ghostty release.\n' >&2
+  grep -Eq '^proper-terminal\|\(none\)\|1[.]3[.]1\|6[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the edge-to-edge Ghostty release.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-welcome\|\(none\)\|0[.]1\|9[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the lean-image Start Here release.\n' >&2
+  grep -Eq '^proper-welcome\|\(none\)\|0[.]1\|11[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the current shortcut references.\n' >&2
     exit 1
   }
   grep -Eq '^proper-apps\|\(none\)\|0[.]1\|11[.]fc44\|' "${package_manifests[0]}" || {
@@ -179,8 +191,8 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image does not contain the thirteen-wallpaper Appearance release.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-launchers\|\(none\)\|0[.]1\|15[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the centred Vicinae and Meta shortcut release.\n' >&2
+  grep -Eq '^proper-launchers\|\(none\)\|0[.]1\|16[.]fc44\|' "${package_manifests[0]}" || {
+    printf 'Built image does not contain the Meta+W arrangement shortcut release.\n' >&2
     exit 1
   }
   grep -Eq '^rsms-inter-fonts\|\(none\)\|4[.]1\|3[.]fc44\|' "${package_manifests[0]}" || {
@@ -220,6 +232,34 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
   image_dark_scheme="$iso_dir/image-build/build/image-root/usr/share/color-schemes/Proper.colors"
   image_kdeglobals="$iso_dir/image-build/build/image-root/etc/xdg/kdeglobals"
   image_root="$iso_dir/image-build/build/image-root"
+  light_files_icon="$image_root/usr/share/icons/proper/apps/64/org.kde.dolphin.svg"
+  dark_files_icon="$image_root/usr/share/icons/proper-dark/apps/64/org.kde.dolphin.svg"
+  [[ -f "$image_root/usr/share/icons/proper/index.theme" &&
+     -f "$image_root/usr/share/icons/proper-dark/index.theme" &&
+     -L "$light_files_icon" &&
+     -L "$dark_files_icon" &&
+     "$(readlink "$light_files_icon")" == '../../../breeze/places/64/folder-blue.svg' &&
+     "$(readlink "$dark_files_icon")" == '../../../breeze-dark/places/64/folder-blue.svg' ]] || {
+    printf 'Built image does not map Dolphin to the selected Breeze folder icon.\n' >&2
+    exit 1
+  }
+  grep -qx 'Theme=proper-dark' "$image_kdeglobals" || {
+    printf 'Built image does not select the Proper dark icon layer for new profiles.\n' >&2
+    exit 1
+  }
+  [[ -x "$image_root/usr/bin/proper-agent-status" &&
+     -f "$image_root/usr/share/plasma/plasmoids/com.properlinux.agentstatus/metadata.json" &&
+     -f "$image_root/usr/share/plasma/plasmoids/com.properlinux.agentstatus/contents/ui/main.qml" &&
+     -f "$image_root/usr/lib/systemd/user/proper-agent-panel.timer" &&
+     -x "$image_root/usr/bin/proper-qemu-review-display" &&
+     -f "$image_root/usr/lib/systemd/system/plasmalogin.service.d/20-proper-review-display.conf" ]] || {
+    printf 'Built image is missing the agent usage helper or Plasma widget.\n' >&2
+    exit 1
+  }
+  if grep -qx 'plugin=com.properlinux.agentstatus' "$image_root/etc/xdg/plasma-org.kde.plasma.desktop-appletsrc"; then
+    printf 'Built image still seeds the obsolete tall desktop agent card.\n' >&2
+    exit 1
+  fi
   [[ "$(readlink "$image_root/etc/localtime")" == "../usr/share/zoneinfo/Europe/London" ]] || {
     printf 'Built image does not use the reviewed Europe/London v0.1 time-zone default.\n' >&2
     exit 1
@@ -295,6 +335,8 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     exit 1
   }
   image_lock_qml="$image_root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml"
+  image_lock_grid="$image_root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/ProperGridClock.qml"
+  image_lock_password="$image_root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/ProperPasswordCells.qml"
   grep -Fq 'readonly property string uiFontFamily: "Inter"' "$image_lock_qml" || {
     printf 'Built lock screen does not select Inter explicitly.\n' >&2
     exit 1
@@ -305,10 +347,26 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       printf 'Built login greeter does not embed the explicit Inter family.\n' >&2
       exit 1
     }
+  [[ -f "$image_lock_grid" && -f "$image_lock_password" ]] &&
+    grep -Fq 'readonly property int rowCount: 7' "$image_lock_grid" &&
+    grep -Fq 'passwordCharacter: "▪"' "$image_lock_qml" || {
+      printf 'Built lock screen lacks the Proper square-cell clock or password masks.\n' >&2
+      exit 1
+    }
+  grep -Fxq 'glyphPattern' <<<"$image_login_strings" &&
+    grep -Fxq 'visibleCellCount' <<<"$image_login_strings" || {
+      printf 'Built login greeter lacks the embedded Proper square-cell components.\n' >&2
+      exit 1
+    }
   image_task_strings="$(strings -el \
     "$iso_dir/image-build/build/image-root/usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.taskmanager.so")"
   grep -Fxq 'launchIndicator' <<<"$image_task_strings" || {
       printf 'Built task manager plugin lacks the Proper moving-dot launch state.\n' >&2
+      exit 1
+    }
+  grep -Fxq 'properStateIndicator' <<<"$image_task_strings" &&
+    grep -Fxq 'visibleDotCount' <<<"$image_task_strings" || {
+      printf 'Built task manager plugin lacks the bounded line and window-count dot states.\n' >&2
       exit 1
     }
   image_ghostty_config="$iso_dir/image-build/build/image-root/etc/xdg/ghostty/config"
@@ -324,15 +382,89 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image still blurs the desktop behind Ghostty.\n' >&2
     exit 1
   }
+  grep -qx 'window-padding-x = 0' "$image_ghostty_config" &&
+    grep -qx 'window-padding-y = 0' "$image_ghostty_config" &&
+    grep -qx 'window-padding-balance = false' "$image_ghostty_config" || {
+      printf 'Built image still leaves a visible inset around the terminal grid.\n' >&2
+      exit 1
+    }
+  [[ -x "$image_root/usr/bin/proper-terminal-inset-repair" &&
+     -f "$image_root/etc/xdg/autostart/proper-terminal-inset-repair.desktop" ]] || {
+    printf 'Built image cannot repair the former terminal inset for existing users.\n' >&2
+    exit 1
+  }
   [[ -x "$iso_dir/image-build/build/image-root/usr/bin/proper-welcome-launch" ]] || {
     printf 'Built image is missing the live welcome display launcher.\n' >&2
     exit 1
   }
   image_task_asset="$iso_dir/image-build/build/image-root/usr/share/plasma/desktoptheme/proper/widgets/tasks.svg"
   [[ -f "$image_task_asset" ]] &&
-    xmllint --xpath "count(//*[@id = 'focus-bottom'])" "$image_task_asset" 2>/dev/null | grep -qx 1 &&
-    xmllint --xpath "count(//*[@id = 'normal-bottom'])" "$image_task_asset" 2>/dev/null | grep -qx 1 || {
-      printf 'Built image is missing the approved active-line and running-dot task states.\n' >&2
+    [[ "$(xmllint --xpath "count(//*[starts-with(@id, 'normal-') or starts-with(@id, 'focus-') or starts-with(@id, 'hover-') or starts-with(@id, 'minimized-') or starts-with(@id, 'attention-') or starts-with(@id, 'progress-')]//*[local-name()='rect' or local-name()='circle' or local-name()='path'][not(@fill-opacity) or number(@fill-opacity) > 0.001])" "$image_task_asset")" == 0 ]] &&
+    [[ "$(xmllint --xpath "count(//*[@id = 'group-expander-top' or @id = 'group-expander-bottom' or @id = 'group-expander-left' or @id = 'group-expander-right'])" "$image_task_asset")" == 4 ]] || {
+      printf 'Built image task frames could repeat state marks or inherit a group badge.\n' >&2
+      exit 1
+    }
+  image_panel_asset="$image_root/usr/share/plasma/desktoptheme/proper/widgets/panel-background.svg"
+  image_solid_panel_asset="$image_root/usr/share/plasma/desktoptheme/proper/solid/widgets/panel-background.svg"
+  image_popup_assets=(
+    "$image_root/usr/share/plasma/desktoptheme/proper/dialogs/background.svg"
+    "$image_root/usr/share/plasma/desktoptheme/proper/widgets/tooltip.svg"
+    "$image_root/usr/share/plasma/desktoptheme/proper/widgets/translucentbackground.svg"
+    "$image_root/usr/share/plasma/desktoptheme/proper/solid/dialogs/background.svg"
+    "$image_root/usr/share/plasma/desktoptheme/proper/solid/widgets/tooltip.svg"
+    "$image_root/usr/share/plasma/desktoptheme/proper/solid/widgets/translucentbackground.svg"
+  )
+  image_theme_material="$image_root/usr/share/plasma/desktoptheme/proper/plasmarc"
+  for panel_material in "$image_panel_asset" "$image_solid_panel_asset"; do
+    [[ -f "$panel_material" ]] && xmllint --noout "$panel_material" || {
+      printf 'Built image is missing a valid Proper adaptive shelf material: %s\n' "$panel_material" >&2
+      exit 1
+    }
+    panel_shadow_selector="//*[starts-with(@id, 'shadow-') and not(starts-with(@id, 'shadow-hint-')) and (local-name()='rect' or local-name()='path' or local-name()='g')]"
+    [[ "$(xmllint --xpath "count($panel_shadow_selector)" "$panel_material")" == 9 &&
+       "$(xmllint --xpath "count(${panel_shadow_selector}[@fill-opacity and number(@fill-opacity) <= 0.001])" "$panel_material")" == 9 &&
+       "$(xmllint --xpath "count(//*[@id = 'hint-compose-over-border'])" "$panel_material")" == 0 &&
+       "$(xmllint --xpath "count(//*[@id = 'hint-tile-center'])" "$panel_material")" == 1 &&
+       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$panel_material")" == 8 &&
+       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2]/*[local-name()='rect'])" "$panel_material")" == 8 &&
+       "$(xmllint --xpath "count(//*[starts-with(@id, 'rim-')])" "$panel_material")" == 4 &&
+       "$(xmllint --xpath "string(//*[@id = 'floating-hint-bottom-margin']/@height)" "$panel_material")" == 12 ]] || {
+      printf 'Built image shelf material lacks the seam-safe tiled frame or floating clearance.\n' >&2
+      exit 1
+    }
+  done
+  for popup_material in "${image_popup_assets[@]}"; do
+    [[ -f "$popup_material" ]] && xmllint --noout "$popup_material" || {
+      printf 'Built image is missing a valid Proper popup material: %s\n' "$popup_material" >&2
+      exit 1
+    }
+    popup_opacity="$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$popup_material")"
+    popup_rim_color="$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill)" "$popup_material")"
+    popup_rim_opacity="$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill-opacity)" "$popup_material")"
+    [[ "$(xmllint --xpath "count(//*[@id = 'hint-compose-over-border'])" "$popup_material")" == 0 &&
+       "$(xmllint --xpath "count(//*[@id = 'hint-tile-center'])" "$popup_material")" == 1 &&
+       "$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[1][@fill-opacity='$popup_opacity'])" "$popup_material")" == 4 &&
+       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1][@opacity='$popup_opacity'])" "$popup_material")" == 4 &&
+       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$popup_material")" == 8 &&
+       "$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[2][@fill='$popup_rim_color' and @fill-opacity='$popup_rim_opacity'])" "$popup_material")" == 4 &&
+       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2][@opacity='$popup_rim_opacity']/*[local-name()='rect' and @fill='$popup_rim_color'])" "$popup_material")" == 8 ]] || {
+      printf 'Built image popup material is not a uniform seam-safe nine-slice frame: %s\n' "$popup_material" >&2
+      exit 1
+    }
+  done
+  [[ "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" "$image_panel_asset")" == 0.66 &&
+     "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" "$image_solid_panel_asset")" == 1.00 ]] || {
+    printf 'Built image shelf does not contain the reviewed translucent and dense optical states.\n' >&2
+    exit 1
+  }
+  grep -qx 'contrast=0.72' "$image_theme_material" &&
+    grep -qx 'intensity=0.82' "$image_theme_material" &&
+    grep -qx 'saturation=1.15' "$image_theme_material" &&
+    grep -qx 'panelOpacity=0' "$image_root/etc/xdg/plasmashellrc" &&
+    grep -qx 'BlurStrength=15' "$image_root/etc/xdg/kwinrc" &&
+    grep -qx 'NoiseStrength=5' "$image_root/etc/xdg/kwinrc" &&
+    grep -qx 'Saturation=150' "$image_root/etc/xdg/kwinrc" || {
+      printf 'Built image does not contain the complete adaptive KWin shelf recipe.\n' >&2
       exit 1
     }
   image_control_root="$image_root/usr/share/plasma/desktoptheme/proper/widgets"
@@ -340,6 +472,10 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     image_control_asset="$image_control_root/$control_asset.svg"
     [[ -f "$image_control_asset" ]] && xmllint --noout "$image_control_asset" || {
       printf 'Built image is missing a valid Proper Plasma control: %s.svg\n' "$control_asset" >&2
+      exit 1
+    }
+    [[ "$(xmllint --xpath "count(//*[contains(@id, 'hint-compose-over-border')])" "$image_control_asset")" == 0 ]] || {
+      printf 'Built image control asset double-composites translucent frame slices: %s\n' "$image_control_asset" >&2
       exit 1
     }
   done
@@ -355,6 +491,37 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       exit 1
     }
   done
+  [[ "$(xmllint --xpath "count(//*[@id = 'inactive-left' or @id = 'inactive-right' or @id = 'active-left' or @id = 'active-right'][local-name()='path'])" "$image_control_root/switch.svg")" == 4 &&
+     "$(xmllint --xpath "string(//*[@id = 'hint-bar-size']/@width)" "$image_control_root/switch.svg")" == 38 &&
+     "$(xmllint --xpath "string(//*[@id = 'hint-bar-size']/@height)" "$image_control_root/switch.svg")" == 16 &&
+     "$(xmllint --xpath "string(//*[@id = 'handle']/@r)" "$image_control_root/switch.svg")" == 8 ]] || {
+    printf 'Built image switch track or handle geometry is not the reviewed bounded design.\n' >&2
+    exit 1
+  }
+  for lineedit_state in hover focus focusframe; do
+    [[ "$(xmllint --xpath "string(//*[@id = '$lineedit_state-hint-left-margin']/@width)" "$image_control_root/lineedit.svg")" == 0.001 &&
+       "$(xmllint --xpath "string(//*[@id = '$lineedit_state-hint-right-margin']/@width)" "$image_control_root/lineedit.svg")" == 0.001 &&
+       "$(xmllint --xpath "string(//*[@id = '$lineedit_state-hint-top-margin']/@height)" "$image_control_root/lineedit.svg")" == 0.001 &&
+       "$(xmllint --xpath "string(//*[@id = '$lineedit_state-hint-bottom-margin']/@height)" "$image_control_root/lineedit.svg")" == 0.001 ]] || {
+      printf 'Built image %s line-edit layer can escape its owning applet row.\n' "$lineedit_state" >&2
+      exit 1
+    }
+  done
+  image_plasmarc="$image_root/etc/xdg/plasmarc"
+  grep -qx 'Delay=900' "$image_plasmarc" &&
+    grep -qx 'TooltipPolicyVersion=2' "$image_plasmarc" || {
+      printf 'Built image does not restore delayed task previews and status tooltips.\n' >&2
+      exit 1
+    }
+  grep -qx 'showToolTips=true' "$image_root/etc/xdg/plasma-org.kde.plasma.desktop-appletsrc" || {
+    printf 'Built image does not enable native task-window previews.\n' >&2
+    exit 1
+  }
+  [[ -x "$image_root/usr/bin/proper-tooltip-default-repair" &&
+     -f "$image_root/etc/xdg/autostart/proper-tooltip-default-repair.desktop" ]] || {
+    printf 'Built image cannot repair the former Delay=0 default for existing users.\n' >&2
+    exit 1
+  }
   image_splash="$iso_dir/image-build/build/image-root/usr/share/plasma/look-and-feel/com.properlinux.dark.desktop/contents/splash/Splash.qml"
   image_ksplash="$iso_dir/image-build/build/image-root/etc/xdg/ksplashrc"
   [[ -f "$image_splash" ]] && grep -q 'proper-logo-icon.svg' "$image_splash" &&
@@ -362,6 +529,22 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       printf 'Built image does not select the Proper session splash.\n' >&2
       exit 1
     }
+  image_panel_defaults="$image_root/etc/xdg/plasma-org.kde.plasma.desktop-appletsrc"
+  [[ "$(kreadconfig6 --file "$image_panel_defaults" \
+       --group Containments --group 2 --group Applets --group 7 \
+       --group Configuration --group Appearance --key dateFormat --default missing)" == custom &&
+     "$(kreadconfig6 --file "$image_panel_defaults" \
+       --group Containments --group 2 --group Applets --group 7 \
+       --group Configuration --group Appearance --key customDateFormat --default missing)" == "MMMM d" &&
+     -x "$image_root/usr/bin/proper-clock-date-default-repair" &&
+     -f "$image_root/etc/xdg/autostart/proper-clock-date-default-repair.desktop" ]] || {
+      printf 'Built image does not seed and narrowly repair the written clock date format.\n' >&2
+      exit 1
+    }
+  ! grep -q '^Appearance[.]dateFormat=' "$image_panel_defaults" || {
+    printf 'Built image retains the malformed literal clock Appearance.dateFormat key.\n' >&2
+    exit 1
+  }
   grep -q 'function revealAuthentication()' \
     "$iso_dir/image-build/build/image-root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml" || {
       printf 'Built image lock screen lacks the pointer authentication reveal path.\n' >&2

@@ -1,0 +1,21 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Proper Linux"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Current usage limits for locally installed coding agents",
+        "FormFactors": [
+            "horizontal"
+        ],
+        "Icon": "proper-agent",
+        "Id": "com.properlinux.agentstatus",
+        "License": "GPL-3.0-or-later",
+        "Name": "Agent Usage",
+        "Website": "https://github.com/proper-linux/proper-linux"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

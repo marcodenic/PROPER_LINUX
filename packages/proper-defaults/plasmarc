@@ -1,5 +1,8 @@
 [PlasmaToolTips]
-Delay=0
+Delay=900
+
+[ProperDefaults]
+TooltipPolicyVersion=2
 
 [Theme]
 name=proper

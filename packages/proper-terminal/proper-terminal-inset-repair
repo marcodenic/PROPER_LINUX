@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -eu
+
+state_dir="${XDG_CONFIG_HOME:-$HOME/.config}/proper-linux"
+marker="$state_dir/terminal-inset-v1-applied"
+[[ ! -e "$marker" ]] || exit 0
+
+config_file="${XDG_CONFIG_HOME:-$HOME/.config}/ghostty/config"
+
+# Proper previously seeded a 12-by-10-point inset with balanced remainder.
+# Repair only that exact legacy combination. Any other padding is a user choice
+# and remains untouched; the marker prevents later changes being revisited.
+if [[ -f "$config_file" ]] &&
+   [[ "$(grep -Ec '^window-padding-x[[:space:]]*=[[:space:]]*12[[:space:]]*$' "$config_file")" == 1 ]] &&
+   [[ "$(grep -Ec '^window-padding-y[[:space:]]*=[[:space:]]*10[[:space:]]*$' "$config_file")" == 1 ]] &&
+   [[ "$(grep -Ec '^window-padding-balance[[:space:]]*=[[:space:]]*true[[:space:]]*$' "$config_file")" == 1 ]]; then
+    sed -i \
+        -e 's/^window-padding-x[[:space:]]*=[[:space:]]*12[[:space:]]*$/window-padding-x = 0/' \
+        -e 's/^window-padding-y[[:space:]]*=[[:space:]]*10[[:space:]]*$/window-padding-y = 0/' \
+        -e 's/^window-padding-balance[[:space:]]*=[[:space:]]*true[[:space:]]*$/window-padding-balance = false/' \
+        "$config_file"
+fi
+
+mkdir -p "$state_dir"
+: >"$marker"

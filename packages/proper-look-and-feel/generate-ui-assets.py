@@ -181,19 +181,16 @@ def welcome_qss(palette: dict[str, str], radius: dict[str, str], typography: dic
     return f"""/* Generated from tokens.yaml; do not edit. */
 QWidget#properWelcome {{ color: {text}; background: transparent; font-family: {qss_font}; }}
 QWidget#properWelcome QLabel#eyebrow {{ color: {muted}; font-size: 11px; font-weight: 700; letter-spacing: 2px; }}
-QWidget#properWelcome QLabel#headline {{ color: {text}; font-size: 31px; font-weight: 650; }}
+QWidget#properWelcome QLabel#headline {{ color: {text}; font-size: 35px; font-weight: 650; }}
 QWidget#properWelcome QLabel#body {{ color: {muted}; font-size: 15px; }}
-QWidget#properWelcome QLabel#liveBadge {{ color: {text}; background: {rgba(accent, 0.120)}; border: 1px solid {rgba(accent, 0.260)}; border-radius: {control_radius + 4}px; font-size: 11px; font-weight: 650; padding: 5px 10px; }}
-QWidget#properWelcome QLabel#footer {{ color: {rgba(muted, 0.520)}; font-size: 11px; }}
-QWidget#properWelcome QFrame#shortcutLine {{ background: {rgba(surface, 0.640)}; border: 1px solid {rgba(muted, 0.170)}; border-radius: {control_radius + 2}px; }}
+QWidget#properWelcome QFrame#shortcutLine {{ background: transparent; border: 0; }}
 QWidget#properWelcome QLabel#shortcutAction {{ color: {muted}; font-size: 11px; }}
 QWidget#properWelcome QLabel#keyJoin {{ color: {muted}; font-size: 10px; }}
 QWidget#properWelcome QLabel#keycap {{ color: {text}; background: {rgba(surface, 0.920)}; border: 1px solid {rgba(muted, 0.330)}; border-bottom: 2px solid {rgba(muted, 0.420)}; border-radius: 6px; min-width: 18px; min-height: 18px; padding: 1px 5px; font-family: "{typography['mono']}"; font-size: 10px; font-weight: 650; }}
-QWidget#properWelcome QPushButton {{ min-height: 48px; min-width: 176px; padding: 0 24px; border-radius: {control_radius + 3}px; border: 1px solid {rgba(muted, 0.200)}; background: {rgba(surface, 0.880)}; color: {text}; font-family: {qss_font}; font-size: 14px; font-weight: 600; }}
+QWidget#properWelcome QPushButton {{ min-height: 54px; min-width: 176px; padding: 0 24px; border-radius: {control_radius + 3}px; border: 1px solid {rgba(muted, 0.220)}; background: {rgba(surface, 0.760)}; color: {text}; font-family: {qss_font}; font-size: 14px; font-weight: 600; }}
 QWidget#properWelcome QPushButton:hover {{ background: {rgba(accent, 0.150)}; border-color: {rgba(accent, 0.450)}; }}
 QWidget#properWelcome QPushButton:focus {{ border: 2px solid {accent}; }}
 QWidget#properWelcome QPushButton#primary {{ background: {accent}; color: {base}; border-color: {accent}; }}
-QWidget#properWelcome QPushButton#close {{ min-width: 38px; max-width: 38px; min-height: 38px; max-height: 38px; padding: 0; border-radius: 19px; font-size: 22px; font-weight: 400; color: {muted}; background: {rgba(surface, 0.600)}; }}
 """
 
 

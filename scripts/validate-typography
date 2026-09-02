@@ -55,8 +55,10 @@ fi
 
 grep -Fq 'readonly property string uiFontFamily: "Inter"' "$lock_qml"
 grep -Fq 'readonly property string uiFontFamily: "Inter"' "$login_qml"
-[[ "$(rg -c 'font[.]family: lockScreenUi[.]uiFontFamily' "$lock_qml")" -ge 5 ]]
+[[ "$(rg -c 'font[.]family: lockScreenUi[.]uiFontFamily' "$lock_qml")" -ge 4 ]]
 [[ "$(rg -c 'font[.]family: root[.]uiFontFamily' "$login_qml")" -ge 9 ]]
+grep -Fq 'ProperGridClock {' "$lock_qml"
+grep -Fq 'ProperGridClock {' "$login_qml"
 
 generated_root="$(mktemp -d /tmp/proper-typography.XXXXXX)"
 trap 'rm -rf -- "$generated_root"' EXIT

@@ -1,6 +1,6 @@
 Name: proper-terminal
 Version: 1.3.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Ghostty terminal and Proper developer essentials
 License: MIT
 URL: https://ghostty.org/
@@ -11,6 +11,8 @@ Source3: proper-terminal-dolphin.desktop
 Source4: https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz
 Source5: https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz.minisig
 Source6: https://release.files.ghostty.org/1.3.1/ghostty-1.3.1.tar.gz.minisig
+Source7: proper-terminal-inset-repair
+Source8: proper-terminal-inset-repair.desktop
 Patch0: ghostty-ext-background-effect.patch
 BuildRequires: gcc
 BuildRequires: gtk4-devel
@@ -59,13 +61,21 @@ install -Dpm 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/skel/.config/ghostty/con
 install -Dpm 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/xdg/ghostty/config
 install -Dpm 0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/proper-terminal.desktop
 install -Dpm 0644 %{SOURCE3} %{buildroot}%{_datadir}/kio/servicemenus/proper-terminal-dolphin.desktop
+install -Dpm 0755 %{SOURCE7} %{buildroot}%{_bindir}/proper-terminal-inset-repair
+install -Dpm 0644 %{SOURCE8} %{buildroot}%{_sysconfdir}/xdg/autostart/proper-terminal-inset-repair.desktop
 %files
 %{_bindir}/ghostty
 %{_datadir}/
 %{_userunitdir}/app-com.mitchellh.ghostty.service
+%{_bindir}/proper-terminal-inset-repair
+%{_sysconfdir}/xdg/autostart/proper-terminal-inset-repair.desktop
 %config(noreplace) %{_sysconfdir}/skel/.config/ghostty/config
 %config(noreplace) %{_sysconfdir}/xdg/ghostty/config
 %changelog
+* Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 1.3.1-6
+- Remove the terminal grid inset and balanced edge slack completely
+- Repair only profiles carrying the exact former Proper padding defaults
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 1.3.1-5
 - Make terminal cell and padding translucency uniform, including full-screen btop
 - Tighten the deliberate breathing room to 12 by 10 pixels

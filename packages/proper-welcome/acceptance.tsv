@@ -1,0 +1,3 @@
+# ID	Visible expectation
+welcome-default	The live welcome screen shows the Proper Linux wordmark, “Linux, considered.”, the two-line foundation copy, Try Proper and Install Proper, and one unboxed shortcut row over a smooth blue-black backdrop with no visible grid.
+welcome-try	Activating Try Proper closes the welcome and reveals the normal Plasma desktop.

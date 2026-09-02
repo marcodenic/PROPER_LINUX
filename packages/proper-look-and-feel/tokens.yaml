@@ -3,9 +3,12 @@ name: Proper Horizon
 colour:
   light: {base: '#f6f7fb', surface: '#ffffff', text: '#18202b', muted: '#687386', accent: '#3b68d9', urgent: '#c33d52'}
   dark: {base: '#11151d', surface: '#1b222d', text: '#f1f4f8', muted: '#a8b2c2', accent: '#91b4ff', urgent: '#ff7184'}
-opacity: {panel: 0.72, panel_edge: 0.09, panel_highlight: 0.18, popup: 0.90, hover: 0.12, active: 0.18}
-radius: {panel: 16, popup: 14, control: 9}
-blur: {panel: 24, popup: 32}
+material: {panel_tint: '#141a22', panel_dense: '#18202a', panel_edge: '#a6afbd', popup_tint: '#181d25'}
+opacity: {panel: 0.66, panel_dense: 1.00, panel_edge: 0.14, popup: 0.90, popup_edge: 0.18, hover: 0.12, active: 0.18}
+radius: {panel: 16, popup: 0, control: 9}
+blur: {kwin_strength: 15, noise: 5, saturation: 150}
+contrast: {panel: 0.72, panel_intensity: 0.82, panel_saturation: 1.15}
+shadow: {panel_margin: 12, panel_ambient: 0.08, panel_contact: 0.20}
 spacing: {unit: 4, panel: 10, panel_end: 14, item: 8, section: 16}
 animation: {fast: 120, normal: 180, slow: 260}
 typography: {ui: 'Inter', fallback: 'Noto Sans', mono: 'JetBrains Mono', body_size: 10}

@@ -38,13 +38,14 @@ KDE continue to deliver their mature infrastructure and security updates.
 | `packages/proper-branding/` | Boot, installer, system-logo, and platform artwork |
 | `packages/proper-look-and-feel/` | Design tokens, global themes, Plasma Style, wallpapers, lock screen, colours, and generated shared UI assets |
 | `packages/proper-appearance/` | Preview-first style, text-size, and wallpaper control plus the bounded login-wallpaper helper |
+| `packages/proper-agent-status/` | Agent usage normalizer, supported Codex and Claude adapters, and the native Plasma panel widget |
 | `packages/proper-defaults/` | Panel, KWin, shortcuts, Files, natural scrolling, default applications, and narrowly scoped migrations |
 | `packages/proper-launchers/` | Pinned Vicinae build, reliable opener, desktop actions, arrangement, OCR, and shortcut reference |
 | `packages/proper-terminal/` | Pinned Ghostty build, terminal defaults, `btop`, and Files integration |
 | `packages/proper-apps/` | Curated catalogue UI, provider execution, state reconciliation, web apps, and agent selection |
 | `packages/proper-welcome/` | Passive Start Here hub and live install entry point |
 | `packages/plasma-login-manager/` | Fedora source-package pin and the narrow Proper login composition patch |
-| `packages/plasma-desktop/` | Fedora source-package pin and the narrow task-launch indicator patch |
+| `packages/plasma-desktop/` | Fedora source-package pin and the narrow exact task-state and preview-filter patch |
 | `apps/` | Catalogue schema and data plus the application-icon provenance ledger |
 | `artwork/` | Shipped identity, wallpaper, and preview assets |
 | `scripts/` | Build, validation, VM, and source-pinning tools |
@@ -62,9 +63,22 @@ shell controls, notifications, tray, OSDs, overview, network, Bluetooth, audio,
 power, and authentication keep their upstream behaviour. Missing Proper theme
 assets fall back to Breeze.
 
+The shelf material is generated from the shared design tokens as matched
+translucent and solid Plasma SVG frames. Plasma supplies the supported adaptive
+panel transition, while KWin owns the masked blur, saturation, noise, and
+background-contrast pass. Proper does not copy the panel shell or sample the
+desktop through an application-level shader.
+
+A narrow Proper icon-theme layer inherits Breeze and remaps only Dolphin's
+existing application identity to Breeze's plain blue folder. The link retains
+upstream size-specific artwork and task grouping; every other icon continues
+to resolve through the independently updateable Breeze themes.
+
 Windows remain in KWin's normal floating model. Snapping and native tiling are
-configured defaults; Arrange Workspace is a reversible KWin script that affects
-only eligible windows on the current workspace and display.
+configured defaults; Arrange Workspace is a reversible KWin script that moves
+only eligible windows on the current workspace and display into native KWin
+tiles. KWin therefore owns shared-edge resizing while Proper retains the exact
+floating geometry needed by Restore.
 
 ### Deliberate source-package exceptions
 
@@ -75,9 +89,11 @@ supported theme hook:
   Proper rebuilds Fedora's exact source RPM with one entry-point QML patch while
   retaining upstream authentication, session, accessibility, power, service,
   and package behaviour.
-- Plasma Desktop 6.7.4 does not expose a task-specific startup-indicator theme
-  hook. Proper carries one QML patch for the shelf's restrained launch state
-  without changing the system-wide busy indicator.
+- Plasma Desktop 6.7.4 does not expose task-specific hooks for exact bounded
+  state marks. Proper carries one QML patch for the shelf's active line,
+  inactive window-count dots, travelling startup dot, and running-window
+  preview filter without changing the system-wide busy indicator or preview
+  implementation.
 
 Each exception is version-pinned, checksum-verified, built as a normal RPM, and
 must be rebased and retested when Fedora updates its source. It should be
@@ -103,6 +119,25 @@ Proper Apps runs allow-listed commands without a shell, uses the system's
 normal privilege prompt, never pipes remote scripts into a privileged shell,
 and checks real installed state after a provider exits. Optional software keeps
 the update mechanism of its chosen provider.
+
+### Agent usage integration
+
+The bottom-right Agent Usage meter is a Proper-owned Plasma applet inside a
+native fit-content panel rather than a port of a macOS menu-bar application or
+a Waybar module. Its helper exposes a
+small versioned JSON shape containing only provider identity, percentages, and
+reset times. Codex data comes from the installed client's supported local
+`app-server` JSON-RPC method. Claude data comes from its supported status-line
+payload and is reduced before a private user cache is written; an existing
+status-line command is retained and proxied. The helper never reads or stores
+provider credentials, prompts, workspace paths, or conversation data.
+
+The package notices a supported installed agent and seeds the right-aligned
+panel once. Plasma therefore owns the same height, edge inset, theme material,
+and floating/attached behaviour as the main shelf. No agent means no panel;
+later movement, resizing, or removal belongs to the user and is never repaired.
+Current values are not persisted as history, so the visualisation is a scalar
+remaining-usage value and not a trend chart.
 
 ## Builds, updates, and releases
 
@@ -133,6 +168,19 @@ Use the cheapest loop that can answer the question:
    a new user and a user with custom settings.
 3. Rebuild the ISO when image composition, boot, login, live behaviour,
    installer behaviour, or the complete installed journey is in scope.
+
+Every visible UX change also defines named observable states before graphical
+review. `scripts/verify-ux` binds those checks to the exact ISO, installed disk,
+single QEMU PID, and VM sockets; captures a distinct 1920×1080 framebuffer for
+each state; and refuses to finalize until every capture has an explicit visual
+observation. The evidence stays in the generated build area, while the
+acceptance criteria and implementation remain versioned. This is a required
+gate, not a substitute for product-manager visual judgement.
+
+The QEMU review path corrects the firmware's inherited 640×480 mode from inside
+the Plasma Setup and Plasma Login Manager sessions before visual capture. The
+hook is gated by both the special setup/greeter account and QEMU/KVM DMI, so it
+does not impose a display mode or scale on installed users or physical hardware.
 
 A package compiling is not proof that the product works. A release candidate
 must, from the committed repository:
