@@ -1,12 +1,12 @@
 Name:           proper-appearance
 Version:        0.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Proper Linux appearance, text sizing, and arrival sync
 License:        GPL-3.0-or-later
 BuildRequires:  qt6-qtbase-devel
 Requires:       plasma-workspace
 Requires:       polkit
-Requires:       proper-look-and-feel >= 0.1-29
+Requires:       proper-look-and-feel >= 0.1-42
 Requires:       /usr/bin/kwriteconfig6
 
 %description
@@ -32,6 +32,9 @@ install -Dpm 0755 %{_sourcedir}/proper-set-login-wallpaper %{buildroot}%{_libexe
 %{_datadir}/applications/proper-appearance.desktop
 
 %changelog
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-10
+- Render every desktop-style preview from the installed semantic palette
+
 * Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-9
 - Add Salt-Flat Station to the wallpaper gallery and authenticated login sync
 - Require the artwork package that contains the thirteenth wallpaper

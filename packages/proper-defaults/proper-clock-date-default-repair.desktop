@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Proper clock date default repair
-Exec=/usr/bin/proper-clock-date-default-repair
-OnlyShowIn=KDE;
-X-KDE-autostart-phase=1
-NoDisplay=true

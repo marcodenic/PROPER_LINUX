@@ -1,8 +1,0 @@
-[providers]
-enabled = ["applications", "files", "clipboard"]
-
-[theme]
-name = "system"
-
-[favorites]
-items = ["applications", "files", "terminal", "proper-shortcuts"]

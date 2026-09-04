@@ -1,5 +1,5 @@
 # ID	Visible expectation
-login-idle	The installed login screen shows the current time as four 5-by-7 square-cell digits with a two-cell square colon; no conventional font-rendered time remains.
+login-idle	The installed login screen shows the current time as four chunky 5-by-7 square-cell digits with a two-cell square colon; no conventional font-rendered time remains.
 login-password	Typing in the installed login password field produces centred, evenly spaced square cells with no circular bullets and does not move or resize the field.
-lock-idle	The installed lock screen shows the current time as four 5-by-7 square-cell digits with a two-cell square colon; no conventional font-rendered time remains.
+lock-idle	The installed lock screen shows the current time as four chunky 5-by-7 square-cell digits with a two-cell square colon; no conventional font-rendered time remains.
 lock-password	Typing in the installed lock-screen password field produces centred, evenly spaced square cells with no circular bullets and does not move or resize the field.

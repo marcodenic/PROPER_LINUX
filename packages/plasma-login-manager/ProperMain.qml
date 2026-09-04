@@ -25,7 +25,7 @@ Item {
     property int selectedSessionIndex: PlasmaLogin.GreeterState.sessionIndex
     property string notificationMessage: ""
 
-    readonly property string uiFontFamily: "Inter"
+    readonly property string uiFontFamily: properTokens.uiFont
     readonly property int userCount: PlasmaLogin.UserModel.rowCount()
     readonly property bool uiVisible: PlasmaLogin.GreeterState.activeWindow === loginSurface.Window.window
     readonly property string selectedUsername: userData(PlasmaLogin.UserModel.NameRole)
@@ -38,6 +38,10 @@ Item {
 
     Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
     Kirigami.Theme.inherit: false
+
+    ProperTokens {
+        id: properTokens
+    }
 
     Component.onCompleted: Qt.callLater(() => passwordBox.forceActiveFocus())
 
@@ -189,23 +193,25 @@ Item {
                 top: parent.top
                 topMargin: parent.height * 0.14
             }
-            spacing: Math.max(8, parent.height * 0.012)
+            spacing: Math.max(properTokens.spacingItem, parent.height * 0.012)
 
             ProperGridClock {
                 anchors.horizontalCenter: parent.horizontalCenter
                 cellSize: Math.min(9, Math.max(7, root.height * 0.0084))
+                cellColor: properTokens.text
                 currentDate: root.currentDate
+                shadowColor: properTokens.alpha(properTokens.base, 0.45)
             }
 
             PlasmaComponents.Label {
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: Qt.rgba(0.93, 0.97, 1, 0.72)
+                color: properTokens.alpha(properTokens.text, 0.72)
                 font.family: root.uiFontFamily
                 font.pixelSize: Math.min(17, Math.max(12, root.height * 0.015))
                 font.weight: Font.Normal
                 text: Qt.formatDate(root.currentDate, "dddd, d MMMM")
                 style: Text.Raised
-                styleColor: Qt.rgba(0, 0.02, 0.06, 0.42)
+                styleColor: properTokens.alpha(properTokens.base, 0.42)
             }
         }
 
@@ -220,7 +226,7 @@ Item {
             // It responds only when the whole screen is too narrow; password
             // length never changes its geometry.
             width: Math.min(324, parent.width - 48)
-            spacing: 8
+            spacing: 10
             // Keep the focused field live while the greeter is in its idle
             // state. The global event filter deliberately lets ordinary key
             // presses continue to their target, so the first character both
@@ -229,14 +235,15 @@ Item {
             opacity: root.uiVisible ? 1 : 0
 
             Behavior on opacity {
-                NumberAnimation { duration: 150 }
+                NumberAnimation { duration: properTokens.animationFast }
             }
 
             PlasmaComponents.Label {
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: Qt.rgba(0.94, 0.97, 1, 0.72)
+                width: parent.width
+                color: properTokens.alpha(properTokens.text, 0.72)
                 font.family: root.uiFontFamily
                 font.pixelSize: Math.min(15, Math.max(12, root.height * 0.014))
+                horizontalAlignment: Text.AlignHCenter
                 text: root.manualUser
                     ? i18nd("plasma_login", "Other user")
                     : root.selectedDisplayName
@@ -248,7 +255,7 @@ Item {
                 width: parent.width
                 height: 46
                 activeFocusOnTab: true
-                color: "#f3f8ff"
+                color: properTokens.text
                 font.family: root.uiFontFamily
                 font.pixelSize: 16
                 horizontalAlignment: TextInput.AlignHCenter
@@ -256,10 +263,10 @@ Item {
                 visible: root.manualUser
 
                 background: Rectangle {
-                    border.color: Qt.rgba(0.85, 0.92, 0.98, 0.22)
+                    border.color: properTokens.alpha(properTokens.border, 0.22)
                     border.width: 1
-                    color: Qt.rgba(0.02, 0.07, 0.13, 0.38)
-                    radius: 13
+                    color: properTokens.alpha(properTokens.base, 0.38)
+                    radius: properTokens.controlRadius + 4
                 }
 
                 onAccepted: passwordBox.forceActiveFocus()
@@ -284,13 +291,13 @@ Item {
 
                 background: Rectangle {
                     border.color: root.notificationMessage.length > 0
-                        ? Qt.rgba(1, 0.45, 0.42, 0.62)
+                        ? properTokens.alpha(properTokens.urgent, 0.62)
                         : passwordBox.activeFocus
-                            ? Qt.rgba(0.68, 0.82, 0.98, 0.28)
-                            : Qt.rgba(0.85, 0.92, 0.98, 0.12)
+                            ? properTokens.alpha(properTokens.accent, 0.28)
+                            : properTokens.alpha(properTokens.border, 0.12)
                     border.width: 1
-                    color: Qt.rgba(0.02, 0.065, 0.12, 0.38)
-                    radius: 16
+                    color: properTokens.alpha(properTokens.base, 0.38)
+                    radius: properTokens.controlRadius + 7
 
                     Rectangle {
                         anchors {
@@ -299,7 +306,7 @@ Item {
                             top: parent.top
                             margins: 1
                         }
-                        color: Qt.rgba(1, 1, 1, 0.035)
+                        color: properTokens.alpha(properTokens.text, 0.035)
                         height: 1
                         radius: 1
                     }
@@ -319,25 +326,27 @@ Item {
                     root.clearAuthentication()
                     PlasmaLogin.GreeterState.timeoutWindow(loginSurface.Window.window)
                 }
-            }
 
-            ProperPasswordCells {
-                anchors {
-                    left: passwordBox.left
-                    right: passwordBox.right
-                    verticalCenter: passwordBox.verticalCenter
-                    leftMargin: passwordBox.leftPadding
-                    rightMargin: passwordBox.rightPadding
+                ProperPasswordCells {
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        verticalCenter: parent.verticalCenter
+                        leftMargin: parent.leftPadding
+                        rightMargin: parent.rightPadding
+                    }
+                    height: parent.height
+                    passwordLength: parent.text.length
+                    cellColor: properTokens.text
+                    shadowColor: properTokens.alpha(properTokens.base, 0.42)
                 }
-                height: passwordBox.height
-                passwordLength: passwordBox.text.length
             }
 
             PlasmaComponents.Label {
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: root.notificationMessage.length > 0
-                    ? Qt.rgba(1, 0.72, 0.7, 0.94)
-                    : Qt.rgba(0.93, 0.97, 1, 0.74)
+                    ? properTokens.alpha(properTokens.urgent, 0.94)
+                    : properTokens.alpha(properTokens.text, 0.74)
                 font.family: root.uiFontFamily
                 font.pixelSize: 13
                 text: capsLockState.locked
@@ -358,7 +367,7 @@ Item {
             height: 42
 
             Behavior on opacity {
-                NumberAnimation { duration: 150 }
+                NumberAnimation { duration: properTokens.animationFast }
             }
 
             Rectangle {
@@ -370,21 +379,21 @@ Item {
                 }
                 width: systemRow.width + 10
                 height: 42
-                border.color: Qt.rgba(0.85, 0.92, 0.98, 0.14)
+                border.color: properTokens.alpha(properTokens.border, 0.14)
                 border.width: 1
-                color: Qt.rgba(0.02, 0.07, 0.13, 0.42)
+                color: properTokens.alpha(properTokens.base, 0.42)
                 opacity: root.systemMenuOpen ? 1 : 0
                 radius: 15
                 visible: opacity > 0
 
                 Behavior on opacity {
-                    NumberAnimation { duration: 130 }
+                    NumberAnimation { duration: properTokens.animationFast }
                 }
 
                 Row {
                     id: systemRow
                     anchors.centerIn: parent
-                    spacing: 3
+                    spacing: properTokens.spacingUnit - 1
 
                     SystemButton {
                         id: userButton
@@ -503,16 +512,16 @@ Item {
                 text: "•••"
 
                 background: Rectangle {
-                    border.color: Qt.rgba(0.85, 0.92, 0.98, 0.14)
+                    border.color: properTokens.alpha(properTokens.border, 0.14)
                     border.width: 1
                     color: moreButton.hovered || root.systemMenuOpen
-                        ? Qt.rgba(0.04, 0.11, 0.19, 0.5)
-                        : Qt.rgba(0.02, 0.07, 0.13, 0.28)
-                    radius: 12
+                        ? properTokens.alpha(properTokens.surface_alt, 0.5)
+                        : properTokens.alpha(properTokens.base, 0.28)
+                    radius: properTokens.controlRadius + 3
                 }
 
                 contentItem: PlasmaComponents.Label {
-                    color: Qt.rgba(0.94, 0.97, 1, 0.8)
+                    color: properTokens.alpha(properTokens.text, 0.8)
                     font.family: root.uiFontFamily
                     horizontalAlignment: Text.AlignHCenter
                     text: moreButton.text
@@ -546,8 +555,8 @@ Item {
         icon.name: iconName
 
         background: Rectangle {
-            color: systemButton.hovered ? Qt.rgba(0.1, 0.19, 0.29, 0.58) : "transparent"
-            radius: 10
+            color: systemButton.hovered ? properTokens.alpha(properTokens.selection, 0.58) : "transparent"
+            radius: properTokens.controlRadius + 1
         }
 
         onClicked: systemButton.triggered()

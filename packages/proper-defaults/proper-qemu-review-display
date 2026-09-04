@@ -1,15 +1,83 @@
 #!/usr/bin/bash
-# Keep the installed first-run and login review surfaces at the declared VM mode.
-set -u
-
-case "$(id -un)" in
-    plasma-setup|plasmalogin) ;;
-    *) exit 0 ;;
-esac
+# Keep Proper's QEMU review surfaces at the declared Full HD mode. The login
+# manager is prepared before its KWin session starts; kscreen-doctor remains
+# confined to the interactive first-run session where its DBus API exists.
+set -eu
 
 if ! grep -Eiq 'QEMU|KVM' /sys/class/dmi/id/sys_vendor /sys/class/dmi/id/product_name 2>/dev/null; then
     exit 0
 fi
+
+if [[ "${1:-}" == "--prepare-login" ]]; then
+    [[ "$(id -u)" == 0 ]] || exit 0
+    config_dir=/var/lib/plasmalogin/.config
+    config_path="$config_dir/kwinoutputconfig.json"
+    install -d -m 0700 -o plasmalogin -g plasmalogin "$config_dir"
+    /usr/bin/python3 - "$config_path" <<'PY'
+import json
+import os
+from pathlib import Path
+import sys
+import tempfile
+
+path = Path(sys.argv[1])
+try:
+    document = json.loads(path.read_text(encoding="utf-8"))
+except (FileNotFoundError, json.JSONDecodeError, OSError):
+    document = []
+
+outputs = next((item for item in document if item.get("name") == "outputs"), None)
+if outputs is None:
+    outputs = {"data": [], "name": "outputs"}
+    document.append(outputs)
+output = next((item for item in outputs["data"] if item.get("connectorName") == "Virtual-1"), None)
+if output is None:
+    output = {
+        "connectorName": "Virtual-1",
+        "edidHash": "e25c3c8bd10161b3fcca41d3ade69acb",
+        "edidIdentifier": "RHT 4660 0 42 2014 0",
+    }
+    outputs["data"].append(output)
+output["mode"] = {"flags": 0, "height": 1080, "refreshRate": 60000, "width": 1920}
+output["scale"] = 1
+output["transform"] = "Normal"
+
+setups = next((item for item in document if item.get("name") == "setups"), None)
+if setups is None:
+    setups = {"data": [], "name": "setups"}
+    document.append(setups)
+if not setups["data"]:
+    setups["data"].append({
+        "lidClosed": False,
+        "outputs": [{
+            "enabled": True,
+            "outputIndex": outputs["data"].index(output),
+            "position": {"x": 0, "y": 0},
+            "priority": 0,
+            "replicationSource": "",
+        }],
+    })
+
+descriptor, temporary = tempfile.mkstemp(prefix=".kwinoutputconfig.", dir=path.parent)
+try:
+    with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+        json.dump(document, handle, indent=4)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.chmod(temporary, 0o600)
+    os.replace(temporary, path)
+finally:
+    try:
+        os.unlink(temporary)
+    except FileNotFoundError:
+        pass
+PY
+    chown plasmalogin:plasmalogin "$config_path"
+    exit 0
+fi
+
+[[ "$(id -un)" == plasma-setup ]] || exit 0
 
 for _ in {1..80}; do
     if /usr/bin/kscreen-doctor output.1.mode.1920x1080@60 output.1.scale.1 >/dev/null 2>&1; then
@@ -19,4 +87,3 @@ for _ in {1..80}; do
 done
 
 exit 0
-

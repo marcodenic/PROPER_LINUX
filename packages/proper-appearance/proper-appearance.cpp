@@ -6,6 +6,8 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QIcon>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLabel>
 #include <QPainter>
 #include <QPalette>
@@ -72,6 +74,22 @@ static QIcon properIcon(const QString &name) {
     return QIcon::fromTheme(name, QIcon(root + "/" + name + ".svg"));
 }
 
+static QJsonObject properPalette() {
+    const QString root = qEnvironmentVariable("PROPER_UI_STYLE_DIR", "/usr/share/proper-linux/ui");
+    QFile file(root + "/proper-palette.json");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return {};
+    return QJsonDocument::fromJson(file.readAll()).object();
+}
+
+static QColor semanticColour(const QJsonObject &palette, const QString &variant,
+                             const QString &name, const QString &fallback) {
+    const QColor colour(palette.value("colour").toObject()
+                            .value(variant).toObject()
+                            .value(name).toString());
+    return colour.isValid() ? colour : QColor(fallback);
+}
+
 static QPixmap variantPreview(const AppearanceVariant &variant) {
     constexpr int width = 360;
     constexpr int height = 186;
@@ -124,13 +142,26 @@ public:
         resize(1160, 820);
         setMinimumSize(760, 520);
 
+        const QJsonObject palette = properPalette();
         variants = {
             {"com.properlinux.dark.desktop", "Proper", "Blue Hour", "Balanced dark · Proper default", "ProperBlueHour",
-             "/usr/share/wallpapers/ProperBlueHour/contents/images/1920x1080.png", "#11151d", "#1b222d", "#f1f4f8", "#91b4ff"},
+             "/usr/share/wallpapers/ProperBlueHour/contents/images/1920x1080.png",
+             semanticColour(palette, "dark", "base", "#11151d"),
+             semanticColour(palette, "dark", "surface", "#181d25"),
+             semanticColour(palette, "dark", "text", "#f1f4f8"),
+             semanticColour(palette, "dark", "accent", "#91b4ff")},
             {"com.properlinux.light.desktop", "ProperLight", "Alpine Light", "Airy light surfaces · dark shell", "ProperHorizon",
-             "/usr/share/wallpapers/ProperHorizon/contents/images/1920x1080.png", "#f6f7fb", "#ffffff", "#18202b", "#3b68d9"},
+             "/usr/share/wallpapers/ProperHorizon/contents/images/1920x1080.png",
+             semanticColour(palette, "light", "base", "#f6f7fb"),
+             semanticColour(palette, "light", "surface", "#ffffff"),
+             semanticColour(palette, "light", "text", "#18202b"),
+             semanticColour(palette, "light", "accent", "#3b68d9")},
             {"com.properlinux.midnight.desktop", "ProperMidnight", "Midnight", "Deeper contrast · cool blue focus", "summer_1am",
-             "/usr/share/wallpapers/summer_1am/contents/images/2560x1600.jpg", "#090d14", "#141b25", "#f5f7fa", "#79a8ff"},
+             "/usr/share/wallpapers/summer_1am/contents/images/2560x1600.jpg",
+             semanticColour(palette, "midnight", "base", "#090d14"),
+             semanticColour(palette, "midnight", "surface", "#0c1119"),
+             semanticColour(palette, "midnight", "text", "#f5f7fa"),
+             semanticColour(palette, "midnight", "accent", "#79a8ff")},
         };
         wallpapers = {
             {"ProperBlueHour", "Proper Blue Hour", "/usr/share/wallpapers/ProperBlueHour/contents/images/1920x1080.png"},

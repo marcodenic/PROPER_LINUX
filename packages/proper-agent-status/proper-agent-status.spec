@@ -1,7 +1,7 @@
 Name:           proper-agent-status
 Version:        0.2
-Release:        1%{?dist}
-Summary:        Proper Linux status shade and coding-agent usage widget
+Release:        7%{?dist}
+Summary:        Proper Linux Command Centre and coding-agent usage widget
 License:        GPL-3.0-or-later
 BuildArch:      noarch
 BuildRequires:  python3
@@ -11,7 +11,7 @@ Requires:       plasma5support >= 6.7
 Requires:       proper-branding >= 0.1-3
 
 %description
-A native Plasma top-edge status shade, compact coding-agent usage widget, and
+A native Plasma Command Centre, compact coding-agent usage widget, and
 credential-free data normalizer. The shade presents live local system and
 network state alongside supported agent limits. Codex is read through its
 local app-server and Claude through its supported status-line feed.
@@ -51,6 +51,29 @@ ln -s ../proper-agent-panel.timer %{buildroot}%{_userunitdir}/timers.target.want
 %{_userunitdir}/timers.target.wants/proper-agent-panel.timer
 
 %changelog
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.2-7
+- Put Command Centre in the existing shelf and remove the unwanted top handle
+- Keep Meta+S and a normal pointer-opened Plasma applet path
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.2-6
+- Tighten the Status Shade to a content-led 720-pixel maximum
+- Remove redundant monitor labels, empty-agent prose, and the duplicate popup handle
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.2-5
+- Bound the Status Shade to a compact 1440-pixel maximum at Full HD
+- Use one Plasma-owned popup surface instead of stacking a panel frame inside it
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.2-4
+- Use Plasma's exported Applet enum for the full-width constraint
+- Keep a deterministic centred edge handle so one click reaches the shade
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.2-3
+- Make the full top edge a supported pointer target for the Status Shade
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.2-2
+- Let the Global Theme create first-profile panels before status-surface seeding
+- Keep the status helper as a guarded upgrade and conditional agent fallback
+
 * Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.2-1
 - Add the global top-edge status shade with live system and network state
 - Include current Codex and Claude limits without making agents a prerequisite

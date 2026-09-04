@@ -53,8 +53,8 @@ if rg -n 'Noto Sans' "$appearance"; then
   exit 1
 fi
 
-grep -Fq 'readonly property string uiFontFamily: "Inter"' "$lock_qml"
-grep -Fq 'readonly property string uiFontFamily: "Inter"' "$login_qml"
+grep -Fq 'readonly property string uiFontFamily: properTokens.uiFont' "$lock_qml"
+grep -Fq 'readonly property string uiFontFamily: properTokens.uiFont' "$login_qml"
 [[ "$(rg -c 'font[.]family: lockScreenUi[.]uiFontFamily' "$lock_qml")" -ge 4 ]]
 [[ "$(rg -c 'font[.]family: root[.]uiFontFamily' "$login_qml")" -ge 9 ]]
 grep -Fq 'ProperGridClock {' "$lock_qml"

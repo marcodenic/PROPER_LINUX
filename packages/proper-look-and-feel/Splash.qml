@@ -8,8 +8,12 @@ import QtQuick
 Rectangle {
     id: root
 
-    color: "#050608"
+    color: properTokens.arrivalBase
     property int stage: 0
+
+    ProperTokens {
+        id: properTokens
+    }
 
     Image {
         id: logo
@@ -22,7 +26,7 @@ Rectangle {
         source: "file:///usr/share/icons/hicolor/scalable/apps/proper-logo-icon.svg"
 
         Behavior on opacity {
-            NumberAnimation { duration: 220 }
+            NumberAnimation { duration: properTokens.animationNormal }
         }
     }
 }

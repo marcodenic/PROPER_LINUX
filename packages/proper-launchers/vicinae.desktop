@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Applications & Search
 Comment=Search applications, files, commands and actions
-Exec=/usr/bin/proper-launcher
+Exec=/usr/bin/proper-launcher --toggle
 Icon=proper-vicinae
 Terminal=false
 Type=Application

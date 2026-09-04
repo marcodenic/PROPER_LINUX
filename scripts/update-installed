@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+# Build reviewed Proper sources locally and install only the requested RPMs.
+set -Eeuo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+output_root="${PROPER_OUTPUT_DIR:-"$project_root/../proper-linux-build"}"
+repo_root="$output_root/repo"
+dry_run=0
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/update-installed [--dry-run] [PACKAGE ...]
+
+With no package names, rebuilds the complete Proper package set. To update a
+single component, pass its source directory name, for example:
+
+  scripts/update-installed proper-look-and-feel
+
+This updates an installed system through RPM/DNF. It never builds an ISO.
+EOF
+}
+
+packages=()
+for argument in "$@"; do
+  case "$argument" in
+    --dry-run) dry_run=1 ;;
+    -h|--help) usage; exit 0 ;;
+    -*) printf 'Unknown option: %s\n' "$argument" >&2; usage >&2; exit 2 ;;
+    *) packages+=("$argument") ;;
+  esac
+done
+
+[[ -r /etc/os-release ]] || { printf 'Cannot identify the installed operating system.\n' >&2; exit 1; }
+# shellcheck disable=SC1091
+source /etc/os-release
+[[ "${ID:-}" == proper && "${BUILD_ID:-}" == 44 ]] || {
+  printf 'This updater requires an installed Proper Linux system based on Fedora 44.\n' >&2
+  exit 1
+}
+
+if [[ "${PROPER_ALLOW_DIRTY:-0}" != 1 ]] &&
+   [[ -n "$(git -C "$project_root" status --porcelain --untracked-files=no)" ]]; then
+  printf 'The checkout has uncommitted tracked changes; update from a reviewed commit or set PROPER_ALLOW_DIRTY=1.\n' >&2
+  exit 1
+fi
+
+if ((${#packages[@]} == 0)); then
+  read -r -a packages <<<"plasma-login-manager plasma-desktop proper-release proper-branding proper-welcome proper-look-and-feel proper-agent-status proper-defaults proper-launchers proper-terminal proper-apps proper-appearance"
+fi
+
+for package in "${packages[@]}"; do
+  [[ "$package" =~ ^[a-z0-9][a-z0-9-]*$ && -d "$project_root/packages/$package" ]] || {
+    printf 'Unknown Proper source package: %s\n' "$package" >&2
+    exit 2
+  }
+done
+
+spec_value() {
+  local source_file="$1" field="$2"
+  awk -v field="$field" '$1 == field ":" || $1 == "+" field ":" { print $2; exit }' "$source_file"
+}
+
+check_plasma_source() {
+  local package="$1" spec_patch="$2" expected_version expected_release installed_version installed_release normalized_release
+  expected_version="$(spec_value "$spec_patch" Version)"
+  expected_release="$(awk '$1 == "-Release:" { print $2; exit }' "$spec_patch")"
+  expected_release="${expected_release//\%\{?dist\}/.fc44}"
+  installed_version="$(rpm -q --qf '%{VERSION}' "$package" 2>/dev/null || true)"
+  installed_release="$(rpm -q --qf '%{RELEASE}' "$package" 2>/dev/null || true)"
+  [[ -n "$installed_version" && -n "$installed_release" ]] || {
+    printf 'Required installed package is missing: %s\n' "$package" >&2
+    exit 1
+  }
+  normalized_release="$(sed -E 's/[.]proper[0-9]+//g' <<<"$installed_release")"
+  [[ "$installed_version" == "$expected_version" && "$normalized_release" == "$expected_release" ]] || {
+    printf '%s is %s-%s, but this checkout patches Fedora %s-%s. Rebase and validate Proper before updating.\n' \
+      "$package" "$installed_version" "$installed_release" "$expected_version" "$expected_release" >&2
+    exit 1
+  }
+}
+
+for package in "${packages[@]}"; do
+  case "$package" in
+    plasma-desktop)
+      check_plasma_source plasma-desktop "$project_root/packages/plasma-desktop/plasma-desktop.spec.patch"
+      ;;
+    plasma-login-manager)
+      check_plasma_source plasma-login-manager "$project_root/packages/plasma-login-manager/plasma-login-manager.spec.patch"
+      ;;
+  esac
+done
+
+printf 'Reviewed checkout: %s\n' "$(git -C "$project_root" rev-parse --short=12 HEAD)"
+printf 'Packages: %s\n' "${packages[*]}"
+if ((dry_run)); then
+  printf 'Compatibility checks passed; no packages were built or installed.\n'
+  exit 0
+fi
+
+PROPER_RPM_PACKAGES="${packages[*]}" "$project_root/scripts/build-rpms"
+
+install_rpms=()
+while IFS= read -r -d '' rpm_path; do
+  rpm_name="$(rpm -qp --qf '%{NAME}' "$rpm_path")"
+  include=0
+  for package in "${packages[@]}"; do
+    if [[ "$rpm_name" == "$package" ]]; then
+      include=1
+      break
+    fi
+  done
+  if ((include == 0)) && rpm -q "$rpm_name" >/dev/null 2>&1; then
+    include=1
+  fi
+  ((include == 0)) || install_rpms+=("$rpm_path")
+done < <(find "$repo_root" -maxdepth 1 -type f -name '*.rpm' ! -name '*-debuginfo-*' ! -name '*-debugsource-*' -print0)
+
+((${#install_rpms[@]} > 0)) || { printf 'No installable RPMs were produced.\n' >&2; exit 1; }
+if ((EUID == 0)); then
+  dnf install --assumeyes "${install_rpms[@]}"
+else
+  sudo dnf install --assumeyes "${install_rpms[@]}"
+fi
+
+for package in "${packages[@]}"; do
+  rpm -q "$package"
+done
+printf 'Proper packages updated from the local build; no ISO was rebuilt.\n'

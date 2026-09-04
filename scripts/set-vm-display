@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Apply and verify a Plasma display mode through QMP keyboard input.
+# Verify the real QEMU framebuffer selected by the guest display stack.
 #
-# QEMU's virtio-vga xres/yres properties advertise a preferred mode but do not
-# guarantee that Plasma selects it.  This helper opens KRunner in the disposable
-# VM session, applies the requested KScreen mode, and verifies the real QEMU
-# framebuffer dimensions through the HMP screendump command.
+# Proper's QEMU-only guest integration selects the mode through KWin before the
+# login greeter and through KScreen in the first-run session. This host helper
+# is deliberately read-only: keyboard injection cannot safely distinguish a
+# login password field from KRunner.
 set -Eeuo pipefail
 
 qmp_socket="${1:?Usage: scripts/set-vm-display QMP_SOCKET MONITOR_SOCKET WIDTH HEIGHT SCALE [REFRESH] [DELAY]}"
@@ -47,67 +47,6 @@ sleep "$initial_delay"
 temporary_dir="$(mktemp -d --tmpdir proper-vm-display.XXXXXX)"
 trap 'rm -rf -- "$temporary_dir"' EXIT
 
-emit_key_event() {
-  local qcode="$1"
-  local shifted="${2:-false}"
-
-  if [[ "$shifted" == true ]]; then
-    printf '%s\n' "{\"execute\":\"input-send-event\",\"arguments\":{\"events\":[{\"type\":\"key\",\"data\":{\"down\":true,\"key\":{\"type\":\"qcode\",\"data\":\"shift\"}}},{\"type\":\"key\",\"data\":{\"down\":true,\"key\":{\"type\":\"qcode\",\"data\":\"$qcode\"}}},{\"type\":\"key\",\"data\":{\"down\":false,\"key\":{\"type\":\"qcode\",\"data\":\"$qcode\"}}},{\"type\":\"key\",\"data\":{\"down\":false,\"key\":{\"type\":\"qcode\",\"data\":\"shift\"}}}]}}"
-  else
-    printf '%s\n' "{\"execute\":\"input-send-event\",\"arguments\":{\"events\":[{\"type\":\"key\",\"data\":{\"down\":true,\"key\":{\"type\":\"qcode\",\"data\":\"$qcode\"}}},{\"type\":\"key\",\"data\":{\"down\":false,\"key\":{\"type\":\"qcode\",\"data\":\"$qcode\"}}}]}}"
-  fi
-}
-
-emit_character() {
-  local character="$1"
-
-  case "$character" in
-    ' ') emit_key_event spc ;;
-    '-') emit_key_event minus ;;
-    '.') emit_key_event dot ;;
-    # The live image's pinned keytable is US. QMP sends physical qcodes, so the
-    # refresh separator must use the US Shift+2 chord.
-    '@') emit_key_event 2 true ;;
-    [a-z0-9]) emit_key_event "$character" ;;
-    *)
-      printf 'Unsupported character in VM display command: %q\n' "$character" >&2
-      return 1
-      ;;
-  esac
-}
-
-apply_display_mode() {
-  local command_text
-  local index
-  local character
-
-  # KScreen 6.7 requires the refresh suffix when a connector advertises
-  # several modes with the same dimensions. QEMU exposes the requested round
-  # refresh (for example @60) even when the measured vblank is fractional.
-  command_text="kscreen-doctor output.1.mode.${display_width}x${display_height}@${display_refresh} output.1.scale.${display_scale}"
-
-  {
-    printf '%s\n' '{"execute":"qmp_capabilities"}'
-    sleep 0.2
-    # Alt+F2 is unsafe before the graphical session owns the console: Linux
-    # interprets it as a switch to tty2, which can terminate PLM's in-flight
-    # Wayland session via its VT-release signal. Alt+Space opens KRunner in
-    # Plasma without overlapping a kernel VT-switch chord.
-    printf '%s\n' '{"execute":"input-send-event","arguments":{"events":[{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"alt"}}},{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"spc"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"spc"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"alt"}}}]}}'
-    sleep 1
-    # KRunner retains the previous query after a failed execution. Clear it so
-    # the single bounded retry cannot append to a stale calculator result.
-    printf '%s\n' '{"execute":"input-send-event","arguments":{"events":[{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"ctrl"}}},{"type":"key","data":{"down":true,"key":{"type":"qcode","data":"a"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"a"}}},{"type":"key","data":{"down":false,"key":{"type":"qcode","data":"ctrl"}}}]}}'
-    emit_key_event backspace
-    for ((index = 0; index < ${#command_text}; index++)); do
-      character="${command_text:index:1}"
-      emit_character "$character"
-      sleep 0.04
-    done
-    emit_key_event ret
-  } | socat - UNIX-CONNECT:"$qmp_socket" >/dev/null
-}
-
 framebuffer_matches() {
   local dump_path="$temporary_dir/framebuffer.ppm"
   local actual_width
@@ -120,19 +59,13 @@ framebuffer_matches() {
   [[ "$actual_width" == "$display_width" && "$actual_height" == "$display_height" ]]
 }
 
-for attempt in 1 2; do
-  apply_display_mode
-  sleep 5
+for _ in {1..120}; do
   if framebuffer_matches; then
-    printf 'Applied and verified VM display: %sx%s at %s%% scale.\n' \
+    printf 'Verified VM display: %sx%s at %s%% scale.\n' \
       "$display_width" "$display_height" "$(awk "BEGIN { print $display_scale * 100 }")"
     exit 0
   fi
-
-  if [[ "$attempt" == 1 ]]; then
-    printf 'VM display was not ready; making one delayed retry.\n' >&2
-    sleep 10
-  fi
+  sleep 0.5
 done
 
 printf 'Failed to verify VM framebuffer %sx%s. Inspect Plasma/KScreen before retrying.\n' \

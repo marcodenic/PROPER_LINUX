@@ -1,14 +1,14 @@
 Name: proper-apps
 Version: 0.1
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary: Proper Linux curated application catalogue
 License: GPL-3.0-or-later
 BuildRequires: qt6-qtbase-devel
 Requires: flatpak
 Requires: kdialog
 Requires: polkit
-Requires: proper-terminal >= 1.3.1
-Requires: proper-look-and-feel >= 0.1-21
+Requires: proper-terminal >= 1.3.1-7
+Requires: proper-look-and-feel >= 0.1-42
 %description
 Small catalogue front end delegating installs to Fedora, Flatpak, and official vendor paths.
 %prep
@@ -35,6 +35,9 @@ install -pm 0644 %{_sourcedir}/icons/* %{buildroot}%{_datadir}/proper-apps/icons
 %{_datadir}/proper-apps/icons/
 
 %changelog
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-12
+- Use the active semantic selection palette for generated fallback artwork
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-11
 - Preflight offline and critically low-space installs with actionable messages
 - Identify network, disk, missing-package, and stale-provider failures in plain language

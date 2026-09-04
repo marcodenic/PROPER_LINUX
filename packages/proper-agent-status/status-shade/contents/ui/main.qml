@@ -65,10 +65,10 @@ PlasmoidItem {
     preferredRepresentation: compactRepresentation
     Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground
     Plasmoid.status: PlasmaCore.Types.ActiveStatus
-    Plasmoid.icon: "utilities-system-monitor"
-    Plasmoid.title: "Status shade"
-    toolTipMainText: "Status shade"
-    toolTipSubText: "Click or pull down to open · Meta+S"
+    Plasmoid.icon: "dashboard-show"
+    Plasmoid.title: "Command Centre"
+    toolTipMainText: "Command Centre"
+    toolTipSubText: "System and agent status · Meta+S"
 
     compactRepresentation: CompactRepresentation {
         controller: root

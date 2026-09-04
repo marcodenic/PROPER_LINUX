@@ -1,0 +1,15 @@
+# ID	Visible expectation
+login-dark-100	At 100% scale, the installed login screen is centred, legible, token-coloured, and exposes user, session, accessibility, and power actions without clipping.
+desktop-dark-100	At 100% scale, Proper Dark shows the complete floating shelf, wallpaper, task states, clock, and ordinary pointer targets with no seams or overlap.
+menu-dark-100	At 100% scale, the application launcher/menu has coherent dark rows, selection, search, typography, spacing, and bounded edges.
+tray-notification-dark-100	At 100% scale, a system-tray popup and notification use the same rounded dark popup material, legible semantic states, and unbroken edges.
+dialogs-settings-dark-100	At 100% scale, a Plasma dialog and System Settings show coherent controls, lists, headers, focus, and disabled states in Proper Dark.
+file-picker-dark-100	At 100% scale, the KDE file picker is complete, legible, keyboard-focus visible, and visually consistent with Proper Dark.
+gtk-flatpak-dark-100	At 100% scale, representative GTK and sandboxed Flatpak windows follow the dark system palette, font, icons, cursor, and portal dialogs.
+lock-dark-100	At 100% scale, the lock screen idle and revealed authentication states are centred, legible, and expose power actions without clipping.
+desktop-light-100	At 100% scale, Proper Light changes application surfaces and icons coherently while retaining the intended dark shell and complete pointer workflow.
+applications-light-100	At 100% scale, menus, notifications, dialogs, settings, file picker, GTK, and Flatpak surfaces remain legible and internally consistent in Proper Light.
+desktop-dark-200	At 200% scale, the dark desktop and shelf retain complete pointer targets, balanced spacing, and no clipped or overlapping content.
+applications-dark-200	At 200% scale, menus, tray, notifications, dialogs, settings, file picker, GTK, and Flatpak surfaces remain usable without clipping or tiny controls.
+lock-dark-200	At 200% scale, the lock screen clock, authentication capsule, messages, and system actions fit and remain legible.
+login-dark-200	At 200% scale, the installed login screen keeps its clock, authentication controls, user/session choices, and system actions within the viewport.

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sct_properweb1",
+    "name": "Open Website",
+    "icon": "icon://omnicast/globe-01?fill=primary-text",
+    "url": "https://{argument name=\"Website\"}",
+    "app": "chromium-browser",
+    "openCount": 0,
+    "createdAt": 1788393600,
+    "updatedAt": 1788393600
+  }
+]

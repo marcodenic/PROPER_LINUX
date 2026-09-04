@@ -1,6 +1,6 @@
 Name:           proper-branding
 Version:        0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Proper Linux identity, installer, and boot artwork
 License:        CC-BY-SA-4.0 AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -61,6 +61,9 @@ fi
 %{_datadir}/plymouth/themes/proper/
 
 %changelog
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-4
+- Consume the canonical Proper semantic palette for Anaconda colours
+
 * Tue Sep 01 2026 Proper Linux <proper@example.invalid> - 0.1-3
 - Use the packaged Inter family for restrained boot-theme text
 

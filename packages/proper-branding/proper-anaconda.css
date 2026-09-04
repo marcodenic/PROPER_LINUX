@@ -1,6 +1,8 @@
-/* Proper Linux Anaconda GTK fallback branding. */
-@define-color proper_background #07090d;
-@define-color proper_accent #6f9fd0;
+/* Generated from tokens.yaml; do not edit. */
+@define-color proper_background #11151d;
+@define-color proper_surface #181d25;
+@define-color proper_foreground #f1f4f8;
+@define-color proper_accent #91b4ff;
 
 .logo-sidebar {
     background-image: none;
@@ -23,7 +25,7 @@
 AnacondaSpokeWindow #nav-box {
     background-color: @proper_background;
     background-image: none;
-    color: white;
+    color: @proper_foreground;
 }
 
 AnacondaSpokeWindow #nav-box GtkButton:checked {

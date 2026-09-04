@@ -13,8 +13,12 @@ Item {
     property int passwordLength: 0
     property real cellSize: 8
     property real cellGap: 6
-    property color cellColor: "#f3f8ff"
-    property color shadowColor: Qt.rgba(0, 0.02, 0.06, 0.42)
+    property color cellColor: properTokens.text
+    property color shadowColor: properTokens.alpha(properTokens.base, 0.42)
+
+    ProperTokens {
+        id: properTokens
+    }
 
     readonly property int maximumVisibleCells: Math.max(1, Math.floor((width + cellGap) / (cellSize + cellGap)))
     readonly property int visibleCellCount: Math.min(passwordLength, maximumVisibleCells)

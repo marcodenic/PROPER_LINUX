@@ -4,13 +4,18 @@
   "close_on_focus_loss": false,
   "search_files_in_root": false,
   "theme": {
-    "light": { "name": "vicinae-light", "icon_theme": "auto" },
-    "dark": { "name": "vicinae-dark", "icon_theme": "auto" }
+    "light": { "name": "proper-light", "icon_theme": "auto" },
+    "dark": { "name": "proper-dark", "icon_theme": "auto" }
   },
   "launcher_window": {
+    "opacity": 0.66,
+    "rounding": 16,
     "material": "auto",
     "layer_shell": { "enabled": true, "keyboard_interactivity": "exclusive", "layer": "top" }
   },
+  "fallbacks": [
+    "shortcuts:sct_properweb1"
+  ],
   "favorites": [
     "system:browse-apps",
     "applications:proper-start",

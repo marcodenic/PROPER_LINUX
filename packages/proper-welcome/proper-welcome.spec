@@ -1,14 +1,14 @@
 Name:           proper-welcome
 Version:        0.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Proper Linux live-session welcome
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
 BuildRequires:  qt6-qtbase-devel
 Requires:       anaconda-live
-Requires:       proper-branding
-Requires:       proper-look-and-feel >= 0.1-39
-Requires:       proper-launchers >= 0.1-16
+Requires:       proper-branding >= 0.1-4
+Requires:       proper-look-and-feel >= 0.1-42
+Requires:       proper-launchers >= 0.1-17
 
 %description
 A focused, pointer-accessible live-session choice between exploring the Proper
@@ -37,6 +37,9 @@ install -Dpm 0644 %{_sourcedir}/proper-start.desktop %{buildroot}%{_datadir}/app
 %{_datadir}/applications/proper-start.desktop
 
 %changelog
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-12
+- Draw the live welcome atmosphere and wordmark from the shared semantic palette
+
 * Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-11
 - Show Meta+W for workspace arrangement and Meta+O for keyboard Overview
 

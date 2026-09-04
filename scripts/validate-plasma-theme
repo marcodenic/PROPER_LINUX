@@ -11,12 +11,15 @@ heading_asset="$style_root/widgets/plasmoidheading.svg"
 spec="$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec"
 tokens="$project_root/packages/proper-look-and-feel/tokens.yaml"
 plasma_defaults="$project_root/packages/proper-defaults/plasmarc"
-panel_defaults="$project_root/packages/proper-defaults/plasma-org.kde.plasma.desktop-appletsrc"
 defaults_spec="$project_root/packages/proper-defaults/proper-defaults.spec"
 kwin_defaults="$project_root/packages/proper-defaults/kwinrc"
 shell_defaults="$project_root/packages/proper-defaults/plasmashellrc"
-dark_scheme="$style_root/colors"
 default_kdeglobals="$project_root/packages/proper-defaults/kdeglobals"
+desktop_layout="$project_root/packages/proper-look-and-feel/proper-desktop-layout.js"
+panel_migration="$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/updates/00-migrate-proper-panel-v1.js"
+status_migration="$project_root/packages/proper-look-and-feel/com.properlinux.desktop/contents/updates/01-migrate-status-shade-edge-v1.js"
+semantic_generator="$project_root/packages/proper-look-and-feel/generate-semantic-assets.py"
+tooltip_update="$project_root/packages/proper-defaults/proper-defaults.upd"
 light_icon_index="$project_root/packages/proper-look-and-feel/proper.index.theme"
 dark_icon_index="$project_root/packages/proper-look-and-feel/proper-dark.index.theme"
 dark_look_defaults="$project_root/packages/proper-look-and-feel/com.properlinux.dark.desktop/contents/defaults"
@@ -28,17 +31,14 @@ solid_panel_asset="$style_root/solid/widgets/panel-background.svg"
 popup_asset="$style_root/dialogs/background.svg"
 solid_popup_asset="$style_root/solid/dialogs/background.svg"
 task_loading_patch="$project_root/packages/plasma-desktop/proper-task-loading-indicator.patch"
-applet_tooltip_patch="$project_root/packages/plasma-desktop/proper-quiet-applet-tooltips.patch"
-system_tray_tooltip_patch="$project_root/packages/plasma-workspace/proper-quiet-system-tray-tooltips.patch"
-tooltip_layout_patch="$project_root/packages/libplasma/proper-quiet-tooltip-layout.patch"
-rpm_build_script="$project_root/scripts/build-rpms"
 control_generator="$project_root/packages/proper-look-and-feel/generate-plasma-controls.py"
 panel_generator="$project_root/packages/proper-look-and-feel/generate-panel-material.py"
 generated_controls="$(mktemp -d /tmp/proper-plasma-controls.XXXXXX)"
 generated_panel="$(mktemp -d /tmp/proper-panel-material.XXXXXX)"
-trap 'rm -rf -- "$generated_controls" "$generated_panel"' EXIT
+generated_semantic="$(mktemp -d /tmp/proper-semantic.XXXXXX)"
+trap 'rm -rf -- "$generated_controls" "$generated_panel" "$generated_semantic"' EXIT
 
-for binary in kreadconfig6 python3 xmllint; do
+for binary in python3 xmllint; do
   command -v "$binary" >/dev/null 2>&1 || {
     printf 'Required command missing: %s\n' "$binary" >&2
     exit 1
@@ -47,10 +47,20 @@ done
 
 python3 "$control_generator" "$tokens" "$generated_controls"
 python3 "$panel_generator" "$tokens" "$generated_panel"
+python3 "$semantic_generator" "$tokens" "$generated_semantic"
+dark_scheme="$generated_semantic/Proper.colors"
 cmp "$generated_panel/panel-background.svg" "$panel_asset"
 cmp "$generated_panel/solid-panel-background.svg" "$solid_panel_asset"
 cmp "$generated_panel/popup-background.svg" "$popup_asset"
 cmp "$generated_panel/solid-popup-background.svg" "$solid_popup_asset"
+cmp "$generated_semantic/proper-anaconda.css" \
+  "$project_root/packages/proper-branding/proper-anaconda.css"
+cmp "$generated_semantic/ProperTokens.qml" \
+  "$project_root/packages/plasma-login-manager/ProperTokens.qml"
+grep -Fq 'background = "#141a22"' "$generated_semantic/proper-dark.toml"
+grep -Fq 'border = "#282f38"' "$generated_semantic/proper-dark.toml"
+grep -A12 '^\[Colors:Header\]$' "$generated_semantic/Proper.colors" | \
+  grep -Fq 'BackgroundNormal=20,26,34'
 
 while IFS= read -r -d '' asset; do
   xmllint --noout "$asset"
@@ -226,6 +236,15 @@ expected_style_version="$package_version.$package_release"
   printf 'Bump the style version with the RPM release so Plasma cannot reuse stale SVG caches.\n' >&2
   exit 1
 }
+for look_metadata in \
+  "$project_root/packages/proper-look-and-feel/com.properlinux.dark.desktop/metadata.json" \
+  "$project_root/packages/proper-look-and-feel/com.properlinux.light.desktop/metadata.json" \
+  "$project_root/packages/proper-look-and-feel/com.properlinux.midnight.desktop/metadata.json"; do
+  grep -Fq "\"Version\": \"$expected_style_version\"" "$look_metadata" || {
+    printf 'Global Theme metadata does not match the owning RPM: %s\n' "$look_metadata" >&2
+    exit 1
+  }
+done
 
 required_ids=(
   center top bottom left right
@@ -286,22 +305,17 @@ for asset in "${surface_assets[@]}"; do
   }
 done
 
-[[ "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$popup_asset")" == 'M0 0H12V1H1V12H0Z' &&
-   "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$popup_asset")" == 'M0 0H12V12H11V1H0Z' &&
-   "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$popup_asset")" == 'M0 0H1V11H12V12H0Z' &&
-   "$(xmllint --xpath "string(//*[@id='rim-bottomright']/@d)" "$popup_asset")" == 'M11 0H12V12H0V11H11Z' ]] || {
-  printf '%s must use filled one-pixel corner rims that cannot be clipped at slice bounds.\n' "$popup_asset" >&2
-  exit 1
-}
-popup_rim_color="$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill)" "$popup_asset")"
-[[ "$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and @fill='$popup_rim_color' and not(@stroke)])" "$popup_asset")" == 4 ]] || {
-  printf '%s corner rims must be filled shapes rather than boundary-clipped strokes.\n' "$popup_asset" >&2
-  exit 1
-}
-
-[[ "$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$popup_asset")" == 0.90 &&
-   "$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$solid_popup_asset")" == 1.00 ]] || {
-  printf 'Proper popup materials must retain their reviewed translucent and dense optical states.\n' >&2
+popup_fill="$(xmllint --xpath "string(//*[@id='center']/@fill)" "$popup_asset")"
+panel_fill="$(xmllint --xpath "string(//*[@id='center']/@fill)" "$panel_asset")"
+popup_opacity="$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$popup_asset")"
+panel_opacity="$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$panel_asset")"
+solid_popup_fill="$(xmllint --xpath "string(//*[@id='center']/@fill)" "$solid_popup_asset")"
+solid_panel_fill="$(xmllint --xpath "string(//*[@id='center']/@fill)" "$solid_panel_asset")"
+solid_popup_opacity="$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$solid_popup_asset")"
+solid_panel_opacity="$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$solid_panel_asset")"
+[[ "$popup_fill" == "$panel_fill" && "$popup_opacity" == "$panel_opacity" &&
+   "$solid_popup_fill" == "$solid_panel_fill" && "$solid_popup_opacity" == "$solid_panel_opacity" ]] || {
+  printf 'Proper panel popups must use the shelf material in translucent and dense states.\n' >&2
   exit 1
 }
 
@@ -326,7 +340,7 @@ done
   exit 1
 }
 
-for asset in "$panel_asset" "$solid_panel_asset"; do
+for asset in "${surface_assets[@]}"; do
   [[ "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$asset")" == 'M16 .5H15C6.99.5.5 6.99.5 15V16' &&
      "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$asset")" == 'M0 .5H1c8.01 0 14.5 6.49 14.5 14.5V16' &&
      "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$asset")" == 'M16 15.5H15C6.99 15.5.5 9.01.5 1V0' &&
@@ -382,7 +396,7 @@ for contrast_setting in enabled=true contrast=0.72 intensity=0.82 saturation=1.1
     exit 1
   }
 done
-grep -qx 'panelOpacity=0' "$shell_defaults"
+grep -qx 'ShellPackage=com.properlinux.desktop' "$shell_defaults"
 for blur_setting in BlurStrength=15 NoiseStrength=5 Saturation=150; do
   grep -qx "$blur_setting" "$kwin_defaults" || {
     printf 'Proper KWin material is missing blur setting %s.\n' "$blur_setting" >&2
@@ -456,16 +470,22 @@ grep -q 'active: model.IsWindow' "$task_loading_patch"
   exit 1
 }
 
-grep -q '^+    icon: plasmoidItem[.]Plasmoid[.]icon' "$applet_tooltip_patch"
-grep -q 'mainText: systemTrayState[.]expanded.*Hidden icons' "$system_tray_tooltip_patch"
-grep -q 'i18np("%1 background item", "%1 background items", root[.]hiddenModel[.]count)' "$system_tray_tooltip_patch"
-grep -q '^+    icon: applet?.Plasmoid[.]icon' "$system_tray_tooltip_patch"
-grep -q '^+    icon: iconItem[.]source' "$system_tray_tooltip_patch"
-grep -q '^+            Layout[.]preferredWidth: Kirigami[.]Units[.]iconSizes[.]smallMedium' "$tooltip_layout_patch"
-grep -q '^+                maximumLineCount: 1' "$tooltip_layout_patch"
-grep -q '^+                maximumLineCount: 2' "$tooltip_layout_patch"
-grep -q 'libplasma/6[.]7[.]4/1[.]fc44/src/libplasma-6[.]7[.]4-1[.]fc44[.]src[.]rpm' "$rpm_build_script"
-grep -q 'plasma-workspace/6[.]7[.]4/1[.]fc44/src/plasma-workspace-6[.]7[.]4-1[.]fc44[.]src[.]rpm' "$rpm_build_script"
+mapfile -t plasma_spec_patches < <(
+  find "$project_root/packages" -mindepth 2 -maxdepth 2 -type f -name '*.spec.patch' -print | sort
+)
+expected_plasma_spec_patches=(
+  "$project_root/packages/plasma-desktop/plasma-desktop.spec.patch"
+  "$project_root/packages/plasma-login-manager/plasma-login-manager.spec.patch"
+)
+[[ "${plasma_spec_patches[*]}" == "${expected_plasma_spec_patches[*]}" ]] || {
+  printf 'Proper must carry exactly the two documented Plasma source-package exceptions.\n' >&2
+  printf 'Found: %s\n' "${plasma_spec_patches[*]:-none}" >&2
+  exit 1
+}
+! grep -Eq 'libplasma|plasma-workspace' "$project_root/scripts/build-rpms" || {
+  printf 'Unpatched libplasma and plasma-workspace must remain on Fedora\x27s update path.\n' >&2
+  exit 1
+}
 
 tooltip_delay="$(awk '
   /^\[PlasmaToolTips\]$/ { in_group = 1; next }
@@ -477,28 +497,33 @@ tooltip_delay="$(awk '
     "${tooltip_delay:-unset}" >&2
   exit 1
 }
-grep -qx 'TooltipPolicyVersion=2' "$plasma_defaults"
-grep -qx 'showToolTips=true' "$panel_defaults"
+grep -Fq 'tasks.writeConfig("showToolTips", true)' "$desktop_layout"
 grep -q 'current_delay.*== 0' "$project_root/packages/proper-defaults/proper-tooltip-default-repair"
 grep -q 'key Delay 900' "$project_root/packages/proper-defaults/proper-tooltip-default-repair"
-grep -q 'proper-tooltip-default-repair.desktop' "$defaults_spec"
-[[ "$(kreadconfig6 --file "$panel_defaults" \
-     --group Containments --group 2 --group Applets --group 7 \
-     --group Configuration --group Appearance --key dateFormat --default missing)" == custom &&
-   "$(kreadconfig6 --file "$panel_defaults" \
-     --group Containments --group 2 --group Applets --group 7 \
-     --group Configuration --group Appearance --key customDateFormat --default missing)" == "MMMM d" ]] || {
-  printf 'Proper digital-clock defaults must use Plasma\x27s nested Appearance group and written month format.\n' >&2
+grep -qx 'Id=proper-tooltip-delay-v2' "$tooltip_update"
+grep -qx 'Script=proper-tooltip-default-repair,sh' "$tooltip_update"
+grep -q '%{_datadir}/kconf_update/proper-defaults.upd' "$defaults_spec"
+grep -q '%{_prefix}/lib/plasmalogin/plasmalogin.conf.d/50-proper.conf' "$spec"
+! grep -q '/lib/plasmalogin/defaults.conf' "$spec" || {
+  printf 'Proper must not overwrite the Plasma Login Manager defaults owned by Fedora.\n' >&2
   exit 1
 }
-! grep -q '^Appearance[.]dateFormat=' "$panel_defaults" || {
-  printf 'Proper digital-clock defaults still contain the malformed literal Appearance.dateFormat key.\n' >&2
-  exit 1
-}
-grep -q 'legacy_format.*== custom' "$project_root/packages/proper-defaults/proper-clock-date-default-repair"
-grep -q 'current_format.*== __proper_missing__' "$project_root/packages/proper-defaults/proper-clock-date-default-repair"
-grep -q 'proper-clock-date-default-repair.desktop' "$defaults_spec"
-grep -q 'proper-look-and-feel >= 0.1-38' "$defaults_spec"
+grep -qx 'config_dir=/etc/plasmalogin.conf.d' \
+  "$project_root/packages/proper-appearance/proper-set-login-wallpaper"
+grep -Fq 'clock.currentConfigGroup = ["Appearance"]' "$desktop_layout"
+grep -Fq 'clock.writeConfig("dateFormat", "custom")' "$desktop_layout"
+grep -Fq 'clock.writeConfig("customDateFormat", "MMMM d")' "$desktop_layout"
+grep -Fq 'const legacyFormat = clock.readConfig("Appearance.dateFormat", "")' "$panel_migration"
+grep -Fq 'const currentFormat = clock.readConfig("dateFormat", "")' "$panel_migration"
+grep -Fq 'panel.minimumLength === 320' "$panel_migration"
+grep -Fq 'panel.minimumLength = 560' "$panel_migration"
+grep -Fq 'spacer.writeConfig("length", 86)' "$panel_migration"
+grep -Fq 'panel.widgets("com.properlinux.statusshade")' "$status_migration"
+grep -Fq 'panel.hiding === "autohide"' "$status_migration"
+grep -Fq 'panel.lengthMode = "custom"' "$status_migration"
+grep -Fq 'panel.length = 112' "$status_migration"
+grep -Fq 'panel.hiding = "none"' "$status_migration"
+! grep -q 'plasma-org.kde.plasma.desktop-appletsrc' "$defaults_spec"
 
 dark_window_rgb="$(awk '
   /^\[Colors:Window\]$/ { in_window = 1; next }
@@ -516,13 +541,17 @@ default_view_rgb="$(awk '
   /^\[Colors:View\]$/ { in_view = 1; next }
   /^\[/ { in_view = 0 }
   in_view && /^BackgroundNormal=/ { sub(/^BackgroundNormal=/, ""); print; exit }
-' "$default_kdeglobals")"
+' "$dark_scheme")"
 [[ "$default_view_rgb" == "21,26,34" ]] || {
-  printf 'Proper KDE defaults must materialize the dark view palette; found %s.\n' \
+  printf 'Generated Proper Dark scheme must materialize the dark view palette; found %s.\n' \
     "${default_view_rgb:-missing}" >&2
   exit 1
 }
 
+! grep -q '^\[Colors:' "$default_kdeglobals" || {
+  printf 'KDE XDG defaults must select a scheme rather than duplicate its colour groups.\n' >&2
+  exit 1
+}
 grep -qx 'ColorScheme=Proper' "$default_kdeglobals"
 grep -qx 'Theme=proper-dark' "$default_kdeglobals"
 grep -qx 'Inherits=breeze' "$light_icon_index"

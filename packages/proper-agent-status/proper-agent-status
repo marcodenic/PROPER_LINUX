@@ -21,7 +21,7 @@ from typing import Any
 
 
 SCHEMA_VERSION = 1
-HELPER_VERSION = "0.2.0"
+HELPER_VERSION = "0.2.1"
 CLAUDE_CAPTURE_COMMAND = "/usr/bin/proper-agent-status --capture-claude"
 MAX_INPUT_BYTES = 1024 * 1024
 CODEX_TIMEOUT_SECONDS = 8.0
@@ -403,12 +403,13 @@ def _run_plasma_script(script: str, ready_marker: str) -> bool:
 
 
 def ensure_shade() -> int:
-    """Seed the global top-edge status shade once for every Proper profile."""
+    """Add Command Centre to the Proper shelf once it exists."""
     state_path = shade_seed_state_path()
     if state_path.exists():
         return 0
     script = """
 let found = false;
+let shelf = null;
 panels().forEach(panel => {
     const shades = panel.widgets("com.properlinux.statusshade");
     if (shades.length > 0) {
@@ -417,21 +418,21 @@ panels().forEach(panel => {
             shades[0].globalShortcut = "Meta+S";
         }
     }
+    if (panel.widgets("org.kde.plasma.icontasks").length > 0 &&
+        panel.widgets("org.kde.plasma.systemtray").length > 0 &&
+        panel.widgets("org.kde.plasma.digitalclock").length > 0) {
+        shelf = panel;
+    }
 });
-if (!found) {
-    const panel = new Panel("org.kde.panel");
-    panel.location = "top";
-    panel.alignment = "center";
-    panel.screen = 0;
-    panel.height = 8;
-    panel.lengthMode = "fill";
-    panel.hiding = "autohide";
-    panel.floating = false;
-    panel.opacity = "adaptive";
-    const shade = panel.addWidget("com.properlinux.statusshade");
-    shade.globalShortcut = "Meta+S";
+if (!found && shelf === null) {
+    print("proper-desktop-layout-pending");
+} else {
+    if (!found) {
+        const shade = shelf.addWidget("com.properlinux.statusshade");
+        shade.globalShortcut = "Meta+S";
+    }
+    print("proper-status-shade-ready");
 }
-print("proper-status-shade-ready");
 """
     if not _run_plasma_script(script, "proper-status-shade-ready"):
         return 1

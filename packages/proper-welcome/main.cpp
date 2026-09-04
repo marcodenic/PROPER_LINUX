@@ -10,6 +10,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QKeyEvent>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLinearGradient>
 #include <QList>
 #include <QPainter>
@@ -42,6 +44,24 @@ static void applyProperWidgetStyle(QApplication &application) {
 static QIcon properIcon(const QString &name) {
     const QString root = qEnvironmentVariable("PROPER_ICON_DIR", "/usr/share/icons/hicolor/scalable/apps");
     return QIcon::fromTheme(name, QIcon(root + "/" + name + ".svg"));
+}
+
+static QColor semanticColour(const QString &group, const QString &name,
+                             const QString &fallback) {
+    static const QJsonObject palette = [] {
+        const QString root = qEnvironmentVariable("PROPER_UI_STYLE_DIR", "/usr/share/proper-linux/ui");
+        QFile file(root + "/proper-palette.json");
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            return QJsonObject{};
+        return QJsonDocument::fromJson(file.readAll()).object();
+    }();
+    const QColor colour(palette.value(group).toObject().value(name).toString());
+    return colour.isValid() ? colour : QColor(fallback);
+}
+
+static QColor withAlpha(QColor colour, int alpha) {
+    colour.setAlpha(alpha);
+    return colour;
 }
 
 static QLabel *keycap(const QString &text) {
@@ -148,7 +168,7 @@ protected:
         painter.translate(left, top);
         painter.scale(scale, scale);
         painter.setPen(Qt::NoPen);
-        painter.setBrush(QColor("#f7f8fa"));
+        painter.setBrush(semanticColour("welcome", "wordmark", "#f7f8fa"));
 
         for (int letter = 0; letter < word.size(); ++letter) {
             const auto bitmap = glyphs.value(word.at(letter));
@@ -172,27 +192,34 @@ protected:
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
 
-        painter.fillRect(rect(), QColor("#050608"));
+        const QColor base = semanticColour("welcome", "base", "#050608");
+        const QColor glow = semanticColour("welcome", "glow", "#1f3d62");
+        const QColor glowMid = semanticColour("welcome", "glow_mid", "#0f2238");
+        const QColor glowLow = semanticColour("welcome", "glow_low", "#0e233a");
+        const QColor glowLowMid = semanticColour("welcome", "glow_low_mid", "#08121f");
+        const QColor shadow = semanticColour("welcome", "shadow", "#000000");
+
+        painter.fillRect(rect(), base);
 
         // Build depth from broad, soft pools of light instead of a visible
         // pattern. The centre remains calm behind the copy while the darker
         // perimeter keeps the full-screen live-session choice grounded.
         QRadialGradient upperGlow(QPointF(width() * .5, height() * .31), width() * .47);
-        upperGlow.setColorAt(0.0, QColor(31, 61, 98, 218));
-        upperGlow.setColorAt(.42, QColor(15, 34, 56, 166));
-        upperGlow.setColorAt(1.0, QColor(5, 6, 8, 0));
+        upperGlow.setColorAt(0.0, withAlpha(glow, 218));
+        upperGlow.setColorAt(.42, withAlpha(glowMid, 166));
+        upperGlow.setColorAt(1.0, withAlpha(base, 0));
         painter.fillRect(rect(), upperGlow);
 
         QRadialGradient lowerGlow(QPointF(width() * .5, height() * .68), width() * .68);
-        lowerGlow.setColorAt(0.0, QColor(14, 35, 58, 112));
-        lowerGlow.setColorAt(.58, QColor(8, 18, 31, 62));
-        lowerGlow.setColorAt(1.0, QColor(5, 6, 8, 0));
+        lowerGlow.setColorAt(0.0, withAlpha(glowLow, 112));
+        lowerGlow.setColorAt(.58, withAlpha(glowLowMid, 62));
+        lowerGlow.setColorAt(1.0, withAlpha(base, 0));
         painter.fillRect(rect(), lowerGlow);
 
         QRadialGradient vignette(QPointF(width() * .5, height() * .48), width() * .74);
-        vignette.setColorAt(0.0, QColor(0, 0, 0, 0));
-        vignette.setColorAt(.62, QColor(0, 0, 0, 8));
-        vignette.setColorAt(1.0, QColor(0, 0, 0, 178));
+        vignette.setColorAt(0.0, withAlpha(shadow, 0));
+        vignette.setColorAt(.62, withAlpha(shadow, 8));
+        vignette.setColorAt(1.0, withAlpha(shadow, 178));
         painter.fillRect(rect(), vignette);
 
         QWidget::paintEvent(event);

@@ -5,7 +5,7 @@ shortcuts shipped by Proper Linux.
 
 | Shortcut | Action |
 | --- | --- |
-| Meta or Meta+Space | Open Vicinae |
+| Meta or Meta+Space | Open or close Vicinae |
 | Alt+F2 | Open KRunner fallback |
 | Meta+Left / Right | Quick-tile window to half |
 | Meta+Up / Down | Maximise or restore a window |

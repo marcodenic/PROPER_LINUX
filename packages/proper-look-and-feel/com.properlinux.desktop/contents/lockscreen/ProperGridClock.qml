@@ -15,8 +15,12 @@ Item {
     property real cellSize: 10
     property real cellGap: Math.max(2, cellSize * 0.3)
     property real glyphGap: cellSize
-    property color cellColor: "#f3f8ff"
-    property color shadowColor: Qt.rgba(0, 0.02, 0.06, 0.45)
+    property color cellColor: properTokens.text
+    property color shadowColor: properTokens.alpha(properTokens.base, 0.45)
+
+    ProperTokens {
+        id: properTokens
+    }
 
     readonly property int rowCount: 7
     readonly property int digitColumnCount: 5

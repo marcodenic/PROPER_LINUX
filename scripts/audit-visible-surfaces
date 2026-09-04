@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Check that every reviewed surface is connected to the supported theme path.
+set -Eeuo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+look_root="$project_root/packages/proper-look-and-feel"
+lock_root="$look_root/com.properlinux.desktop/contents/lockscreen"
+login_root="$project_root/packages/plasma-login-manager"
+matrix="$look_root/visible-surface-acceptance.tsv"
+
+"$project_root/scripts/validate-plasma-theme"
+"$project_root/scripts/validate-arrival"
+"$project_root/scripts/validate-typography"
+
+required_checks=(
+  login-dark-100 desktop-dark-100 menu-dark-100 tray-notification-dark-100
+  dialogs-settings-dark-100 file-picker-dark-100 gtk-flatpak-dark-100
+  lock-dark-100 desktop-light-100 applications-light-100 desktop-dark-200
+  applications-dark-200 lock-dark-200 login-dark-200
+)
+for check_id in "${required_checks[@]}"; do
+  awk -F '\t' -v id="$check_id" '$1 == id { found = 1 } END { exit !found }' "$matrix" || {
+    printf 'Visible-surface acceptance is missing: %s\n' "$check_id" >&2
+    exit 1
+  }
+done
+! rg -q 'Qt[.]rgba|#[0-9A-Fa-f]{6}|duration: [0-9]+' "$look_root/Splash.qml"
+grep -Fq 'color: properTokens.arrivalBase' "$look_root/Splash.qml"
+grep -Fq 'duration: properTokens.animationNormal' "$look_root/Splash.qml"
+grep -Fq 'spacing: Math.max(properTokens.spacingItem' "$lock_root/LockScreenUi.qml"
+grep -Fq 'spacing: Math.max(properTokens.spacingItem' "$login_root/ProperMain.qml"
+
+# Login and lock own only composition. Their semantic colours, font, radii,
+# and motion come from the generated token component.
+for qml in \
+  "$lock_root/LockScreenUi.qml" \
+  "$lock_root/ProperGridClock.qml" \
+  "$lock_root/ProperPasswordCells.qml" \
+  "$login_root/ProperMain.qml" \
+  "$login_root/ProperGridClock.qml" \
+  "$login_root/ProperPasswordCells.qml"; do
+  ! rg -q 'Qt[.]rgba|#[0-9A-Fa-f]{6}|font[.]family: "Inter"|duration: (120|130|150|180|260)' "$qml" || {
+    printf 'Arrival surface bypasses Proper semantic tokens: %s\n' "$qml" >&2
+    exit 1
+  }
+done
+
+grep -Fq 'proper-palette.json' "$project_root/packages/proper-appearance/proper-appearance.cpp"
+grep -Fq 'proper-palette.json' "$project_root/packages/proper-welcome/main.cpp"
+grep -Fq 'QApplication::palette().color(QPalette::Highlight)' "$project_root/packages/proper-apps/main.cpp"
+grep -Fqx 'gtk-font-name=Inter 10' "$project_root/packages/proper-defaults/gtk-settings.ini"
+
+for variant in dark light midnight; do
+  defaults="$look_root/com.properlinux.$variant.desktop/contents/defaults"
+  grep -Fq '[kdeglobals][General]' "$defaults"
+  grep -Fq '[plasmarc][Theme]' "$defaults"
+done
+
+printf 'Visible surfaces are wired to supported theme/default mechanisms; %d VM observations remain required.\n' \
+  "${#required_checks[@]}"

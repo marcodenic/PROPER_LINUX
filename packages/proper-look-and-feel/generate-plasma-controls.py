@@ -13,24 +13,28 @@ import re
 from pathlib import Path
 
 
-STYLE = """  <style id="current-color-scheme" type="text/css">
-    .ColorScheme-Text { color: #f1f4f8; }
-    .ColorScheme-Background { color: #181d25; }
-    .ColorScheme-Highlight { color: #91b4ff; }
-    .ColorScheme-ViewText { color: #f1f4f8; }
-    .ColorScheme-ViewBackground { color: #151a22; }
-    .ColorScheme-ViewHover { color: #91b4ff; }
-    .ColorScheme-ViewFocus { color: #91b4ff; }
-    .ColorScheme-ButtonText { color: #f1f4f8; }
-    .ColorScheme-ButtonBackground { color: #232933; }
-    .ColorScheme-ButtonHover { color: #91b4ff; }
-    .ColorScheme-ButtonFocus { color: #91b4ff; }
-    .ColorScheme-Frame { color: #a8b2c2; }
+STYLE = ""
+
+
+def plasma_style(palette: dict[str, str], material: dict[str, str]) -> str:
+    return f"""  <style id="current-color-scheme" type="text/css">
+    .ColorScheme-Text {{ color: {palette['text']}; }}
+    .ColorScheme-Background {{ color: {material['popup_tint']}; }}
+    .ColorScheme-Highlight {{ color: {palette['accent']}; }}
+    .ColorScheme-ViewText {{ color: {palette['text']}; }}
+    .ColorScheme-ViewBackground {{ color: {palette['view']}; }}
+    .ColorScheme-ViewHover {{ color: {palette['accent']}; }}
+    .ColorScheme-ViewFocus {{ color: {palette['accent']}; }}
+    .ColorScheme-ButtonText {{ color: {palette['text']}; }}
+    .ColorScheme-ButtonBackground {{ color: {palette['surface_alt']}; }}
+    .ColorScheme-ButtonHover {{ color: {palette['accent']}; }}
+    .ColorScheme-ButtonFocus {{ color: {palette['accent']}; }}
+    .ColorScheme-Frame {{ color: {palette['border']}; }}
   </style>"""
 
 
-def inline_map(source: str, label: str) -> dict[str, str]:
-    match = re.search(rf"^{re.escape(label)}:\s*\{{([^}}]+)\}}$", source, re.MULTILINE)
+def inline_map(source: str, label: str, indent: str = "") -> dict[str, str]:
+    match = re.search(rf"^{re.escape(indent + label)}:\s*\{{([^}}]+)\}}$", source, re.MULTILINE)
     if not match:
         raise ValueError(f"missing token map: {label}")
     values: dict[str, str] = {}
@@ -41,6 +45,8 @@ def inline_map(source: str, label: str) -> dict[str, str]:
 
 
 def document(width: int, height: int, body: str) -> str:
+    if not STYLE:
+        raise RuntimeError("Plasma style tokens were not initialised")
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <!-- SPDX-FileCopyrightText: 2026 Proper Linux contributors -->
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
@@ -290,6 +296,7 @@ GENERATORS = {
 
 
 def main() -> int:
+    global STYLE
     parser = argparse.ArgumentParser()
     parser.add_argument("tokens", type=Path)
     parser.add_argument("output", type=Path)
@@ -297,6 +304,9 @@ def main() -> int:
 
     source = arguments.tokens.read_text(encoding="utf-8")
     radius = inline_map(source, "radius")
+    palette = inline_map(source, "dark", "  ")
+    material = inline_map(source, "material")
+    STYLE = plasma_style(palette, material)
     if int(radius["control"]) != 9:
         raise ValueError("control SVGs are reviewed for the 9px Proper radius")
 

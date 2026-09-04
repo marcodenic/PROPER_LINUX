@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        40%{?dist}
+Release:        53%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -8,7 +8,7 @@ BuildRequires:  libxml2
 BuildRequires:  python3
 Provides:       system-backgrounds-kde
 Requires:       plasma-workspace >= 6.7
-Requires:       proper-branding
+Requires:       proper-branding >= 0.1-4
 Requires:       breeze-icon-theme
 Requires:       google-noto-sans-fonts
 Requires:       rsms-inter-fonts = 4.1-3%{?dist}
@@ -23,6 +23,7 @@ attributed Plasma gallery.
 python3 %{_sourcedir}/generate-ui-assets.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-ui
 python3 %{_sourcedir}/generate-plasma-controls.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-controls
 python3 %{_sourcedir}/generate-panel-material.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-panel
+python3 %{_sourcedir}/generate-semantic-assets.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-semantic
 
 %install
 install -Dpm 0644 %{_sourcedir}/proper-blue-hour.png %{buildroot}%{_datadir}/wallpapers/ProperBlueHour/contents/images/1920x1080.png
@@ -60,18 +61,31 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.midnight.desktop/contents/defaul
 for theme in com.properlinux.dark.desktop com.properlinux.light.desktop com.properlinux.midnight.desktop; do
   install -Dpm 0644 %{_sourcedir}/Splash.qml \
     "%{buildroot}%{_datadir}/plasma/look-and-feel/$theme/contents/splash/Splash.qml"
+  install -Dpm 0644 %{_builddir}/proper-semantic/ProperTokens.qml \
+    "%{buildroot}%{_datadir}/plasma/look-and-feel/$theme/contents/splash/ProperTokens.qml"
+  install -Dpm 0644 %{_sourcedir}/proper-desktop-layout.js \
+    "%{buildroot}%{_datadir}/plasma/look-and-feel/$theme/contents/layouts/org.kde.plasma.desktop-layout.js"
+  # ShellCorona selects a Global Theme layout by the active ShellPackage ID.
+  # Proper uses its own supported shell extension for the lock screen, so make
+  # that exact lookup available from the same authoritative source.
+  install -Dpm 0644 %{_sourcedir}/proper-desktop-layout.js \
+    "%{buildroot}%{_datadir}/plasma/look-and-feel/$theme/contents/layouts/com.properlinux.desktop-layout.js"
 done
 install -Dpm 0644 %{_sourcedir}/proper-wallpaper.conf %{buildroot}%{_sysconfdir}/xdg/plasma-workspace/env/proper-wallpaper.conf
-# Fedora 44 PLM reads the distro default from this exact file. Its README
-# documents /etc/plasmalogin.conf as the administrator override and
-# /usr/lib/plasmalogin/defaults.conf as the shipped default.
-install -Dpm 0644 %{_sourcedir}/plasmalogin.conf %{buildroot}%{_datadir}/proper-linux/plasmalogin.conf
+# Plasma Login Manager loads system drop-ins before administrator overrides
+# from /etc/plasmalogin.conf.d. Keep Proper's default separate from the Fedora
+# settings package so both RPMs retain clean file ownership.
+install -Dpm 0644 %{_sourcedir}/plasmalogin.conf \
+  %{buildroot}%{_prefix}/lib/plasmalogin/plasmalogin.conf.d/50-proper.conf
 install -Dpm 0644 %{_sourcedir}/tokens.yaml %{buildroot}%{_datadir}/proper-linux/tokens.yaml
 install -d %{buildroot}%{_datadir}/proper-linux/ui
 install -pm 0644 %{_builddir}/proper-ui/* %{buildroot}%{_datadir}/proper-linux/ui/
-install -Dpm 0644 %{_sourcedir}/proper/colors %{buildroot}%{_datadir}/color-schemes/Proper.colors
-install -Dpm 0644 %{_sourcedir}/ProperLight.colors %{buildroot}%{_datadir}/color-schemes/ProperLight.colors
-install -Dpm 0644 %{_sourcedir}/ProperMidnight.colors %{buildroot}%{_datadir}/color-schemes/ProperMidnight.colors
+install -pm 0644 %{_builddir}/proper-semantic/proper-palette.json %{buildroot}%{_datadir}/proper-linux/ui/proper-palette.json
+install -Dpm 0644 %{_builddir}/proper-semantic/Proper.colors %{buildroot}%{_datadir}/color-schemes/Proper.colors
+install -Dpm 0644 %{_builddir}/proper-semantic/ProperLight.colors %{buildroot}%{_datadir}/color-schemes/ProperLight.colors
+install -Dpm 0644 %{_builddir}/proper-semantic/ProperMidnight.colors %{buildroot}%{_datadir}/color-schemes/ProperMidnight.colors
+install -Dpm 0644 %{_builddir}/proper-semantic/proper-dark.toml %{buildroot}%{_datadir}/vicinae/themes/proper-dark.toml
+install -Dpm 0644 %{_builddir}/proper-semantic/proper-light.toml %{buildroot}%{_datadir}/vicinae/themes/proper-light.toml
 # Keep Dolphin's desktop identity for task grouping while presenting Files with
 # the PM-selected plain folder. These links retain Breeze's independently
 # updated, size-specific upstream artwork rather than copying it into Proper.
@@ -88,7 +102,7 @@ done
 style_root=%{buildroot}%{_datadir}/plasma/desktoptheme/proper
 install -Dpm 0644 %{_sourcedir}/proper/metadata.json "$style_root/metadata.json"
 install -Dpm 0644 %{_sourcedir}/proper/plasmarc "$style_root/plasmarc"
-install -Dpm 0644 %{_sourcedir}/proper/colors "$style_root/colors"
+install -Dpm 0644 %{_builddir}/proper-semantic/Proper.colors "$style_root/colors"
 install -Dpm 0644 %{_builddir}/proper-panel/popup-background.svg "$style_root/dialogs/background.svg"
 install -Dpm 0644 %{_builddir}/proper-panel/panel-background.svg "$style_root/widgets/panel-background.svg"
 install -Dpm 0644 %{_builddir}/proper-panel/solid-panel-background.svg "$style_root/solid/widgets/panel-background.svg"
@@ -121,10 +135,11 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/Lock
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/PasswordSync.qml "$shell_root/contents/lockscreen/PasswordSync.qml"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/ProperGridClock.qml "$shell_root/contents/lockscreen/ProperGridClock.qml"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/ProperPasswordCells.qml "$shell_root/contents/lockscreen/ProperPasswordCells.qml"
+install -Dpm 0644 %{_builddir}/proper-semantic/ProperTokens.qml "$shell_root/contents/lockscreen/ProperTokens.qml"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/qmldir "$shell_root/contents/lockscreen/qmldir"
-install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-ensure-proper-panel.js "$shell_root/contents/updates/00-ensure-proper-panel.js"
-install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/01-refine-proper-panel.js "$shell_root/contents/updates/01-refine-proper-panel.js"
-install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/02-expand-proper-panel.js "$shell_root/contents/updates/02-expand-proper-panel.js"
+install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/00-migrate-proper-panel-v1.js "$shell_root/contents/updates/00-migrate-proper-panel-v1.js"
+install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/01-migrate-status-shade-edge-v1.js "$shell_root/contents/updates/01-migrate-status-shade-edge-v1.js"
+install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/03-migrate-status-shade-to-shelf-v3.js "$shell_root/contents/updates/03-migrate-status-shade-to-shelf-v3.js"
 
 %check
 # Proper overrides only Dolphin and otherwise inherits the complete upstream
@@ -187,21 +202,13 @@ for asset in \
 done
 for asset in \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/panel-background.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/dialogs/background.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/tooltip.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/translucentbackground.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/tooltip.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/translucentbackground.svg; do
-  rim_color="$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill)" "$asset")"
-  test "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$asset")" = 'M0 0H12V1H1V12H0Z'
-  test "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$asset")" = 'M0 0H12V12H11V1H0Z'
-  test "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$asset")" = 'M0 0H1V11H12V12H0Z'
-  test "$(xmllint --xpath "string(//*[@id='rim-bottomright']/@d)" "$asset")" = 'M11 0H12V12H0V11H11Z'
-  test "$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and @fill='$rim_color' and not(@stroke)])" "$asset")" = 4
-done
-for asset in \
-  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg \
-  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/panel-background.svg; do
   test "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$asset")" = 'M16 .5H15C6.99.5.5 6.99.5 15V16'
   test "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$asset")" = 'M0 .5H1c8.01 0 14.5 6.49 14.5 14.5V16'
   test "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$asset")" = 'M16 15.5H15C6.99 15.5.5 9.01.5 1V0'
@@ -232,9 +239,17 @@ test "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" \
 test "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/panel-background.svg)" = 1.00
 test "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" \
-  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg)" = 0.90
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg)" = 0.66
 test "$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/dialogs/background.svg)" = 1.00
+test "$(xmllint --xpath "string(//*[@id = 'center']/@fill)" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg)" = \
+  "$(xmllint --xpath "string(//*[@id = 'center']/@fill)" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg)"
+test "$(xmllint --xpath "string(//*[@id = 'center']/@fill)" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/dialogs/background.svg)" = \
+  "$(xmllint --xpath "string(//*[@id = 'center']/@fill)" \
+  %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/panel-background.svg)"
 heading_asset=%{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/plasmoidheading.svg
 xmllint --noout "$heading_asset"
 for prefix in header footer; do
@@ -259,13 +274,17 @@ grep -qx 'intensity=0.82' %{buildroot}%{_datadir}/plasma/desktoptheme/proper/pla
 grep -qx 'saturation=1.15' %{buildroot}%{_datadir}/plasma/desktoptheme/proper/plasmarc
 panel_radius=$(sed -n "s/^radius: {panel: \([0-9][0-9]*\),.*/\1/p" \
   %{buildroot}%{_datadir}/proper-linux/tokens.yaml)
+popup_radius=$(sed -n "s/^radius: {panel: [0-9][0-9]*, popup: \([0-9][0-9]*\),.*/\1/p" \
+  %{buildroot}%{_datadir}/proper-linux/tokens.yaml)
 asset_radius=$(xmllint --xpath "string(//*[@id='top']/*[1]/@height)" \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg)
 mask_radius=$(xmllint --xpath "string(//*[@id='mask-top']/@height)" \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/panel-background.svg)
 test -n "$panel_radius"
+test -n "$popup_radius"
 test "$panel_radius" = "$asset_radius"
 test "$panel_radius" = "$mask_radius"
+test "$panel_radius" = "$popup_radius"
 
 # Proper task frames must stay empty because the patched task QML owns each
 # exact line or dot. Visible FrameSvg edge art tiles across the button and is
@@ -314,13 +333,34 @@ test "$(xmllint --xpath "count(//*[@id = 'groove-highlight-center'])" \
 
 # The arrival clock and password masks share Proper's exact square-cell visual
 # grammar while the real password TextField remains the authentication owner.
-lock_root=%{buildroot}%{_datadir}/plasma/shells/com.properlinux.desktop/contents/lockscreen
+shell_root=%{buildroot}%{_datadir}/plasma/shells/com.properlinux.desktop/contents
+lock_root=$shell_root/lockscreen
 test -f "$lock_root/ProperGridClock.qml"
 test -f "$lock_root/ProperPasswordCells.qml"
+test -f "$lock_root/ProperTokens.qml"
 grep -Fq 'Accessible.role: Accessible.StaticText' "$lock_root/ProperGridClock.qml"
 grep -Fq 'readonly property int rowCount: 7' "$lock_root/ProperGridClock.qml"
+grep -Fq 'readonly property int digitColumnCount: 5' "$lock_root/ProperGridClock.qml"
+grep -Fq 'readonly property string uiFontFamily: properTokens.uiFont' "$lock_root/LockScreenUi.qml"
 grep -Fq 'passwordCharacter: "▪"' "$lock_root/LockScreenUi.qml"
 grep -Fq 'passwordLength: passwordBox.text.length' "$lock_root/LockScreenUi.qml"
+for theme in com.properlinux.dark.desktop com.properlinux.light.desktop com.properlinux.midnight.desktop; do
+  theme_root=%{buildroot}%{_datadir}/plasma/look-and-feel/$theme/contents
+  test -f "$theme_root/layouts/org.kde.plasma.desktop-layout.js"
+  test -f "$theme_root/layouts/com.properlinux.desktop-layout.js"
+  cmp "$theme_root/layouts/org.kde.plasma.desktop-layout.js" \
+    "$theme_root/layouts/com.properlinux.desktop-layout.js"
+  test -f "$theme_root/splash/ProperTokens.qml"
+  grep -Fq 'color: properTokens.arrivalBase' "$theme_root/splash/Splash.qml"
+done
+test -f %{buildroot}%{_datadir}/proper-linux/ui/proper-palette.json
+for scheme in Proper ProperLight ProperMidnight; do
+  grep -q '^\[Colors:Window\]$' %{buildroot}%{_datadir}/color-schemes/$scheme.colors
+done
+grep -Fq 'background = "#141a22"' %{buildroot}%{_datadir}/vicinae/themes/proper-dark.toml
+grep -Fq 'border = "#282f38"' %{buildroot}%{_datadir}/vicinae/themes/proper-dark.toml
+grep -A12 '^\[Colors:Header\]$' %{buildroot}%{_datadir}/color-schemes/Proper.colors | \
+  grep -Fq 'BackgroundNormal=20,26,34'
 
 %files
 %{_datadir}/wallpapers/ProperBlueHour/
@@ -344,23 +384,74 @@ grep -Fq 'passwordLength: passwordBox.text.length' "$lock_root/LockScreenUi.qml"
 %{_datadir}/icons/proper/
 %{_datadir}/icons/proper-dark/
 %config(noreplace) %{_sysconfdir}/xdg/plasma-workspace/env/proper-wallpaper.conf
-%{_datadir}/proper-linux/plasmalogin.conf
+%{_prefix}/lib/plasmalogin/plasmalogin.conf.d/50-proper.conf
 %{_datadir}/proper-linux/tokens.yaml
 %{_datadir}/proper-linux/ui/
 %{_datadir}/color-schemes/Proper.colors
 %{_datadir}/color-schemes/ProperLight.colors
 %{_datadir}/color-schemes/ProperMidnight.colors
+%{_datadir}/vicinae/themes/proper-dark.toml
+%{_datadir}/vicinae/themes/proper-light.toml
 %license %{_licensedir}/%{name}/CC-BY-SA-4.0.txt
 %license %{_licensedir}/%{name}/LGPL-3.0-only.txt
 %license %{_licensedir}/%{name}/GPL-2.0-or-later.txt
 %license %{_licensedir}/%{name}/GPL-3.0-or-later.txt
 
-%posttrans
-# Fedora's kde-settings-plasmalogin owns defaults.conf. Apply the Proper
-# distro default after the transaction without claiming that upstream file.
-install -m 0644 %{_datadir}/proper-linux/plasmalogin.conf %{_prefix}/lib/plasmalogin/defaults.conf || :
-
 %changelog
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-53
+- Generate Vicinae light and dark themes from the shared semantic tokens
+- Match the dark launcher tint to the translucent Proper shelf material
+- Give Breeze window title bars the same dark material tint
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-52
+- Give panel applet popups the shelf's exact translucent and solid material
+- Keep the Command Centre on Plasma's supported dialog-background path
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-51
+- Restore the approved chunky 5-by-7 clock on login and lock surfaces
+- Keep its colours and shadows sourced from shared semantic tokens
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-50
+- Match the retired single-applet top panel by ownership after Plasma sizing
+- Move Command Centre to the shelf without touching user-created top panels
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-49
+- Use denser 7-by-11 square-cell clocks on login and lock surfaces
+- Move Command Centre into the existing shelf and migrate the former top handle
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-48
+- Match popup corner geometry to the rounded Proper shelf material
+- Keep Plasma as the single owner of popup tint, blur, contrast, and masking
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-47
+- Keep a fixed centred Status Shade handle for reliable one-click activation
+- Migrate only the exact former auto-hide default through a Plasma shell update
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-46
+- Name the first-profile Global Theme layout for Proper's active ShellPackage
+- Keep the upstream-shell compatibility hook sourced from the same layout
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-45
+- Install the canonical panel layout as the active ShellPackage first-login hook
+- Reuse that same source for user-applied Global Theme layout changes
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-44
+- Create the visible shelf before the optional top-edge status surface
+- Bind the Status Shade shortcut only after KGlobalAccel is available
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-43
+- Create the shelf and Status Shade together through the Global Theme layout
+- Prevent first-profile services from pre-empting Plasma's supported defaults
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-42
+- Generate KDE schemes, installer CSS, and login/lock tokens from one semantic palette
+- Seed the shelf through the supported Global Theme layout and consolidate its migration
+- Keep desktop settings layered while preserving later user choices
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-41
+- Ship login defaults through PLM's supported system drop-in directory
+- Preserve Fedora package ownership and administrator wallpaper overrides
+
 * Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-39
 - Remove shortcut containers from the live welcome and strengthen its hierarchy
 - Enlarge the primary choice row while keeping key hints quiet and legible

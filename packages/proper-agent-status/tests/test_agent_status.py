@@ -18,6 +18,8 @@ from unittest import mock
 
 HELPER = Path(__file__).parents[1] / "proper-agent-status"
 FAKE_CODEX = Path(__file__).with_name("fake_codex")
+STATUS_SHADE = Path(__file__).parents[1] / "status-shade/contents/ui/main.qml"
+STATUS_SHADE_FULL = Path(__file__).parents[1] / "status-shade/contents/ui/FullRepresentation.qml"
 SPEC = importlib.util.spec_from_loader("proper_agent_status", SourceFileLoader("proper_agent_status", str(HELPER)))
 assert SPEC and SPEC.loader
 agent_status = importlib.util.module_from_spec(SPEC)
@@ -25,6 +27,25 @@ SPEC.loader.exec_module(agent_status)
 
 
 class AgentStatusTest(unittest.TestCase):
+    def test_status_shade_is_a_normal_shelf_applet(self) -> None:
+        qml = STATUS_SHADE.read_text()
+        self.assertNotIn("Plasmoid.constraintHints", qml)
+        self.assertIn('Plasmoid.title: "Command Centre"', qml)
+
+    def test_status_shade_uses_one_bounded_shell_surface(self) -> None:
+        qml = STATUS_SHADE_FULL.read_text()
+        self.assertIn(
+            "implicitWidth: Math.min(720, Math.max(640, Screen.width - 96))",
+            qml,
+        )
+        self.assertNotIn("FrameSvgItem", qml)
+        self.assertNotIn("widgets/panel-background", qml)
+        self.assertIn('text: "COMMAND CENTRE"', qml)
+        self.assertNotIn("B A N D W I D T H", qml)
+        self.assertNotIn("60 seconds ago", qml)
+        self.assertNotIn("closeArea", qml)
+        self.assertNotIn("not installed", qml.lower())
+
     def test_codex_adapter_speaks_the_supported_app_server_protocol(self) -> None:
         result = agent_status.read_codex_rate_limits(str(FAKE_CODEX), timeout=2)
         limits = result["rateLimitsByLimitId"]["codex"]
@@ -144,9 +165,13 @@ class AgentStatusTest(unittest.TestCase):
                 self.assertEqual(agent_status.ensure_shade(), 0)
             self.assertEqual(run.call_count, 1)
             script = run.call_args.args[0]
-            self.assertIn('panel.location = "top"', script)
-            self.assertIn('panel.hiding = "autohide"', script)
-            self.assertIn('panel.addWidget("com.properlinux.statusshade")', script)
+            self.assertIn('panel.widgets("org.kde.plasma.icontasks")', script)
+            self.assertIn('panel.widgets("org.kde.plasma.systemtray")', script)
+            self.assertIn('panel.widgets("org.kde.plasma.digitalclock")', script)
+            self.assertIn('if (!found && shelf === null)', script)
+            self.assertIn('print("proper-desktop-layout-pending")', script)
+            self.assertNotIn('new Panel("org.kde.panel")', script)
+            self.assertIn('shelf.addWidget("com.properlinux.statusshade")', script)
             self.assertIn('shade.globalShortcut = "Meta+S"', script)
 
     def test_system_snapshot_reduces_live_counters(self) -> None:

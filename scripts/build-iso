@@ -14,6 +14,22 @@ else
 fi
 build_source_dir="$iso_dir/source"
 
+require_manifest_package_from_spec() {
+  local manifest="$1" package="$2" source_file="$3" description="$4"
+  local version release
+  version="$(awk '$1 == "Version:" || $1 == "+Version:" { print $2; exit }' "$source_file")"
+  release="$(awk '$1 == "Release:" || $1 == "+Release:" { print $2; exit }' "$source_file")"
+  release="$(sed 's/%{?dist}/.fc44/g' <<<"$release")"
+  [[ -n "$version" && -n "$release" ]] || {
+    printf 'Cannot derive the expected package version from %s.\n' "$source_file" >&2
+    exit 1
+  }
+  grep -Fq "${package}|(none)|${version}|${release}|" "$manifest" || {
+    printf 'Built image does not contain %s (%s-%s).\n' "$description" "$version" "$release" >&2
+    exit 1
+  }
+}
+
 for binary in fc-scan git lsinitrd patch sha256sum stat strings xmllint xorriso; do
   command -v "$binary" >/dev/null 2>&1 || { printf 'Required command missing: %s\n' "$binary" >&2; exit 1; }
 done
@@ -139,10 +155,9 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       exit 1
     }
   done
-  grep -Eq '^proper-look-and-feel\|\(none\)\|0[.]1\|39[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the refined welcome style release.\n' >&2
-    exit 1
-  }
+  require_manifest_package_from_spec "${package_manifests[0]}" proper-look-and-feel \
+    "$project_root/packages/proper-look-and-feel/proper-look-and-feel.spec" \
+    'the current Proper Plasma Style'
   for upstream_applet in plasma-nm bluedevil plasma-pa kscreen; do
     upstream_epoch='\(none\)'
     [[ "$upstream_applet" == kscreen ]] && upstream_epoch='1'
@@ -155,46 +170,18 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image does not retain the reviewed Fedora powerdevil Qt 6 rebuild unchanged.\n' >&2
     exit 1
   }
-  grep -Eq '^proper-agent-status\|\(none\)\|0[.]2\|1[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Proper agent-status package differs from the reviewed integration.\n' >&2
-    exit 1
-  }
-  grep -Eq '^proper-defaults\|\(none\)\|0[.]1\|32[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the native balanced-halves arrangement default.\n' >&2
-    exit 1
-  }
-  grep -Eq '^plasma-desktop\|\(none\)\|6[.]7[.]4\|1[.]fc44[.]proper2\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the pinned exact task-state and preview patch.\n' >&2
-    exit 1
-  }
-  grep -Eq '^plasma-login-manager\|\(none\)\|6[.]7[.]4\|1[.]proper5[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the Inter-based Proper login composition.\n' >&2
-    exit 1
-  }
-  grep -Eq '^proper-branding\|\(none\)\|0[.]1\|3[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the Inter-based Proper boot branding release.\n' >&2
-    exit 1
-  }
-  grep -Eq '^proper-terminal\|\(none\)\|1[.]3[.]1\|6[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the edge-to-edge Ghostty release.\n' >&2
-    exit 1
-  }
-  grep -Eq '^proper-welcome\|\(none\)\|0[.]1\|11[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the current shortcut references.\n' >&2
-    exit 1
-  }
-  grep -Eq '^proper-apps\|\(none\)\|0[.]1\|11[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the reconciled Proper Apps transaction release.\n' >&2
-    exit 1
-  }
-  grep -Eq '^proper-appearance\|\(none\)\|0[.]1\|9[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the thirteen-wallpaper Appearance release.\n' >&2
-    exit 1
-  }
-  grep -Eq '^proper-launchers\|\(none\)\|0[.]1\|16[.]fc44\|' "${package_manifests[0]}" || {
-    printf 'Built image does not contain the Meta+W arrangement shortcut release.\n' >&2
-    exit 1
-  }
+  require_manifest_package_from_spec "${package_manifests[0]}" proper-agent-status \
+    "$project_root/packages/proper-agent-status/proper-agent-status.spec" 'the current status integration'
+  require_manifest_package_from_spec "${package_manifests[0]}" proper-defaults \
+    "$project_root/packages/proper-defaults/proper-defaults.spec" 'the current desktop defaults'
+  require_manifest_package_from_spec "${package_manifests[0]}" plasma-desktop \
+    "$project_root/packages/plasma-desktop/plasma-desktop.spec.patch" 'the pinned task-state patch'
+  require_manifest_package_from_spec "${package_manifests[0]}" plasma-login-manager \
+    "$project_root/packages/plasma-login-manager/plasma-login-manager.spec.patch" 'the pinned login composition'
+  for proper_package in proper-release proper-branding proper-terminal proper-welcome proper-apps proper-appearance proper-launchers; do
+    require_manifest_package_from_spec "${package_manifests[0]}" "$proper_package" \
+      "$project_root/packages/$proper_package/$proper_package.spec" "the current $proper_package release"
+  done
   grep -Eq '^rsms-inter-fonts\|\(none\)\|4[.]1\|3[.]fc44\|' "${package_manifests[0]}" || {
     printf 'Fedora Inter 4.1 package is missing or changed without review.\n' >&2
     exit 1
@@ -207,6 +194,15 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'JetBrains Mono terminal font package is missing from the Proper image.\n' >&2
     exit 1
   }
+  for integration_package in \
+    breeze-gtk-gtk3 breeze-gtk-gtk4 flatpak flatpak-kcm \
+    xdg-desktop-portal xdg-desktop-portal-gtk xdg-desktop-portal-kde; do
+    grep -Eq "^${integration_package}\\|" "${package_manifests[0]}" || {
+      printf 'Cross-toolkit or sandbox integration is missing from the image: %s\n' \
+        "$integration_package" >&2
+      exit 1
+    }
+  done
   if grep -Eq '^fedora-release-identity-kde-desktop\|' "${package_manifests[0]}"; then
     printf 'Fedora KDE edition identity remained installed beside proper-release.\n' >&2
     exit 1
@@ -232,6 +228,20 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
   image_dark_scheme="$iso_dir/image-build/build/image-root/usr/share/color-schemes/Proper.colors"
   image_kdeglobals="$iso_dir/image-build/build/image-root/etc/xdg/kdeglobals"
   image_root="$iso_dir/image-build/build/image-root"
+  image_vicinae_settings="$image_root/etc/skel/.config/vicinae/settings.json"
+  image_vicinae_theme="$image_root/usr/share/vicinae/themes/proper-dark.toml"
+  [[ -f "$image_vicinae_settings" && -f "$image_vicinae_theme" ]] &&
+    grep -Fq '"dark": { "name": "proper-dark"' "$image_vicinae_settings" &&
+    grep -Fq '"opacity": 0.66' "$image_vicinae_settings" &&
+    grep -Fq '"rounding": 16' "$image_vicinae_settings" &&
+    grep -Fq 'background = "#141a22"' "$image_vicinae_theme" || {
+      printf 'Built image does not give Vicinae the Proper shelf material.\n' >&2
+      exit 1
+    }
+  grep -A12 '^\[Colors:Header\]$' "$image_dark_scheme" | grep -Fq 'BackgroundNormal=20,26,34' || {
+    printf 'Built image window title bars do not use the Proper shelf tint.\n' >&2
+    exit 1
+  }
   light_files_icon="$image_root/usr/share/icons/proper/apps/64/org.kde.dolphin.svg"
   dark_files_icon="$image_root/usr/share/icons/proper-dark/apps/64/org.kde.dolphin.svg"
   [[ -f "$image_root/usr/share/icons/proper/index.theme" &&
@@ -258,10 +268,10 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image is missing the status shade, agent helper, or Plasma widgets.\n' >&2
     exit 1
   }
-  if grep -qx 'plugin=com.properlinux.agentstatus' "$image_root/etc/xdg/plasma-org.kde.plasma.desktop-appletsrc"; then
-    printf 'Built image still seeds the obsolete tall desktop agent card.\n' >&2
+  [[ ! -e "$image_root/etc/xdg/plasma-org.kde.plasma.desktop-appletsrc" ]] || {
+    printf 'Built image still carries a duplicate static Plasma panel configuration.\n' >&2
     exit 1
-  fi
+  }
   [[ "$(readlink "$image_root/etc/localtime")" == "../usr/share/zoneinfo/Europe/London" ]] || {
     printf 'Built image does not use the reviewed Europe/London v0.1 time-zone default.\n' >&2
     exit 1
@@ -277,11 +287,20 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       printf 'Proper Dark image palette is not dark: %s\n' "${dark_window_rgb:-missing}" >&2
       exit 1
     }
-  grep -q '^\[Colors:View\]$' "$image_kdeglobals" &&
-    grep -qx 'BackgroundNormal=21,26,34' "$image_kdeglobals" || {
-      printf 'Built image does not seed the complete dark Proper application palette.\n' >&2
+  ! grep -q '^\[Colors:' "$image_kdeglobals" || {
+    printf 'Built image duplicates colour groups instead of selecting the generated scheme.\n' >&2
+    exit 1
+  }
+  for scheme in Proper ProperLight ProperMidnight; do
+    [[ -f "$image_root/usr/share/color-schemes/$scheme.colors" ]] || {
+      printf 'Built image is missing generated KDE colour scheme: %s\n' "$scheme" >&2
       exit 1
     }
+  done
+  [[ -f "$image_root/usr/share/proper-linux/ui/proper-palette.json" ]] || {
+    printf 'Built image is missing the cross-surface semantic palette.\n' >&2
+    exit 1
+  }
   for font_default in \
     'desktopFont=Inter,10,-1,5,50,0,0,0,0,0' \
     'font=Inter,10,-1,5,50,0,0,0,0,0' \
@@ -339,18 +358,22 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
   image_lock_qml="$image_root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml"
   image_lock_grid="$image_root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/ProperGridClock.qml"
   image_lock_password="$image_root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/ProperPasswordCells.qml"
-  grep -Fq 'readonly property string uiFontFamily: "Inter"' "$image_lock_qml" || {
-    printf 'Built lock screen does not select Inter explicitly.\n' >&2
+  image_lock_tokens="$image_root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/ProperTokens.qml"
+  [[ -f "$image_lock_tokens" ]] &&
+    grep -Fq 'readonly property string uiFontFamily: properTokens.uiFont' "$image_lock_qml" || {
+    printf 'Built lock screen does not consume the generated semantic tokens.\n' >&2
     exit 1
   }
   image_login_strings="$(strings -el "$image_root/usr/libexec/plasma-login-greeter")"
   grep -Fxq 'uiFontFamily' <<<"$image_login_strings" &&
+    grep -Fxq 'uiFont' <<<"$image_login_strings" &&
     grep -Fxq 'Inter' <<<"$image_login_strings" || {
-      printf 'Built login greeter does not embed the explicit Inter family.\n' >&2
+      printf 'Built login greeter does not embed the generated semantic token component.\n' >&2
       exit 1
     }
   [[ -f "$image_lock_grid" && -f "$image_lock_password" ]] &&
     grep -Fq 'readonly property int rowCount: 7' "$image_lock_grid" &&
+    grep -Fq 'readonly property int digitColumnCount: 5' "$image_lock_grid" &&
     grep -Fq 'passwordCharacter: "▪"' "$image_lock_qml" || {
       printf 'Built lock screen lacks the Proper square-cell clock or password masks.\n' >&2
       exit 1
@@ -371,7 +394,11 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       printf 'Built task manager plugin lacks the bounded line and window-count dot states.\n' >&2
       exit 1
     }
-  image_ghostty_config="$iso_dir/image-build/build/image-root/etc/xdg/ghostty/config"
+  image_ghostty_config="$iso_dir/image-build/build/image-root/etc/skel/.config/ghostty/config"
+  [[ ! -e "$image_root/etc/xdg/ghostty/config" ]] || {
+    printf 'Built image still carries the unused duplicate Ghostty XDG config.\n' >&2
+    exit 1
+  }
   grep -Fqx 'font-family = JetBrains Mono' "$image_ghostty_config" || {
     printf 'Built Ghostty configuration no longer selects JetBrains Mono.\n' >&2
     exit 1
@@ -459,10 +486,20 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image shelf does not contain the reviewed translucent and dense optical states.\n' >&2
     exit 1
   }
+  image_popup_asset="$image_root/usr/share/plasma/desktoptheme/proper/dialogs/background.svg"
+  image_popup_fill="$(xmllint --xpath "string(//*[@id = 'center']/@fill)" "$image_popup_asset")"
+  image_popup_opacity="$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" "$image_popup_asset")"
+  image_panel_fill="$(xmllint --xpath "string(//*[@id = 'center']/@fill)" "$image_panel_asset")"
+  image_panel_opacity="$(xmllint --xpath "string(//*[@id = 'center']/@fill-opacity)" "$image_panel_asset")"
+  [[ "$image_popup_fill" == "$image_panel_fill" &&
+     "$image_popup_opacity" == "$image_panel_opacity" ]] || {
+    printf 'Built image panel popups do not use the shelf material.\n' >&2
+    exit 1
+  }
   grep -qx 'contrast=0.72' "$image_theme_material" &&
     grep -qx 'intensity=0.82' "$image_theme_material" &&
     grep -qx 'saturation=1.15' "$image_theme_material" &&
-    grep -qx 'panelOpacity=0' "$image_root/etc/xdg/plasmashellrc" &&
+    grep -qx 'ShellPackage=com.properlinux.desktop' "$image_root/etc/xdg/plasmashellrc" &&
     grep -qx 'BlurStrength=15' "$image_root/etc/xdg/kwinrc" &&
     grep -qx 'NoiseStrength=5' "$image_root/etc/xdg/kwinrc" &&
     grep -qx 'Saturation=150' "$image_root/etc/xdg/kwinrc" || {
@@ -510,18 +547,13 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     }
   done
   image_plasmarc="$image_root/etc/xdg/plasmarc"
-  grep -qx 'Delay=900' "$image_plasmarc" &&
-    grep -qx 'TooltipPolicyVersion=2' "$image_plasmarc" || {
+  grep -qx 'Delay=900' "$image_plasmarc" || {
       printf 'Built image does not restore delayed task previews and status tooltips.\n' >&2
       exit 1
     }
-  grep -qx 'showToolTips=true' "$image_root/etc/xdg/plasma-org.kde.plasma.desktop-appletsrc" || {
-    printf 'Built image does not enable native task-window previews.\n' >&2
-    exit 1
-  }
-  [[ -x "$image_root/usr/bin/proper-tooltip-default-repair" &&
-     -f "$image_root/etc/xdg/autostart/proper-tooltip-default-repair.desktop" ]] || {
-    printf 'Built image cannot repair the former Delay=0 default for existing users.\n' >&2
+  [[ -x "$image_root/usr/share/kconf_update/proper-tooltip-default-repair" &&
+     -f "$image_root/usr/share/kconf_update/proper-defaults.upd" ]] || {
+    printf 'Built image cannot migrate the former Delay=0 default once through kconf_update.\n' >&2
     exit 1
   }
   image_splash="$iso_dir/image-build/build/image-root/usr/share/plasma/look-and-feel/com.properlinux.dark.desktop/contents/splash/Splash.qml"
@@ -531,22 +563,39 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
       printf 'Built image does not select the Proper session splash.\n' >&2
       exit 1
     }
-  image_panel_defaults="$image_root/etc/xdg/plasma-org.kde.plasma.desktop-appletsrc"
-  [[ "$(kreadconfig6 --file "$image_panel_defaults" \
-       --group Containments --group 2 --group Applets --group 7 \
-       --group Configuration --group Appearance --key dateFormat --default missing)" == custom &&
-     "$(kreadconfig6 --file "$image_panel_defaults" \
-       --group Containments --group 2 --group Applets --group 7 \
-       --group Configuration --group Appearance --key customDateFormat --default missing)" == "MMMM d" &&
-     -x "$image_root/usr/bin/proper-clock-date-default-repair" &&
-     -f "$image_root/etc/xdg/autostart/proper-clock-date-default-repair.desktop" ]] || {
-      printf 'Built image does not seed and narrowly repair the written clock date format.\n' >&2
+  image_desktop_layout="$image_root/usr/share/plasma/look-and-feel/com.properlinux.dark.desktop/contents/layouts/com.properlinux.desktop-layout.js"
+  image_upstream_shell_layout="$image_root/usr/share/plasma/look-and-feel/com.properlinux.dark.desktop/contents/layouts/org.kde.plasma.desktop-layout.js"
+  image_panel_migration="$image_root/usr/share/plasma/shells/com.properlinux.desktop/contents/updates/00-migrate-proper-panel-v1.js"
+  image_status_migration="$image_root/usr/share/plasma/shells/com.properlinux.desktop/contents/updates/03-migrate-status-shade-to-shelf-v3.js"
+  [[ -f "$image_desktop_layout" && -f "$image_upstream_shell_layout" && -f "$image_panel_migration" && -f "$image_status_migration" ]] &&
+    cmp "$image_desktop_layout" "$image_upstream_shell_layout" &&
+    grep -Fq 'tasks.writeConfig("showToolTips", true)' "$image_desktop_layout" &&
+    grep -Fq 'clock.currentConfigGroup = ["Appearance"]' "$image_desktop_layout" &&
+    grep -Fq 'clock.writeConfig("customDateFormat", "MMMM d")' "$image_desktop_layout" &&
+    grep -Fq 'panel.addWidget("com.properlinux.statusshade")' "$image_desktop_layout" &&
+    grep -Fq 'commandCentre.globalShortcut = "Meta+S"' "$image_desktop_layout" &&
+    ! grep -Fq 'statusPanel' "$image_desktop_layout" &&
+    grep -Fq 'panel.minimumLength === 320' "$image_panel_migration" &&
+    grep -Fq 'panel.widgets().length === 1' "$image_status_migration" &&
+    grep -Fq 'shelf.addWidget("com.properlinux.statusshade")' "$image_status_migration" &&
+    grep -Fq 'panel.remove()' "$image_status_migration" || {
+      printf 'Built image lacks the canonical Shell/Global Theme layout or bounded panel migration.\n' >&2
       exit 1
     }
-  ! grep -q '^Appearance[.]dateFormat=' "$image_panel_defaults" || {
-    printf 'Built image retains the malformed literal clock Appearance.dateFormat key.\n' >&2
-    exit 1
-  }
+  for theme in dark light midnight; do
+    [[ -f "$image_root/usr/share/plasma/look-and-feel/com.properlinux.$theme.desktop/contents/layouts/com.properlinux.desktop-layout.js" ]] || {
+      printf 'Built image is missing the shared Global Theme layout for %s.\n' "$theme" >&2
+      exit 1
+    }
+  done
+  for legacy in \
+    kdeglobals kglobalshortcutsrc kwinrc plasmarc plasmashellrc \
+    plasma-org.kde.plasma.desktop-appletsrc; do
+    [[ ! -e "$image_root/etc/skel/.config/$legacy" ]] || {
+      printf 'Built image still copies a layered KDE default into /etc/skel: %s\n' "$legacy" >&2
+      exit 1
+    }
+  done
   grep -q 'function revealAuthentication()' \
     "$iso_dir/image-build/build/image-root/usr/share/plasma/shells/com.properlinux.desktop/contents/lockscreen/LockScreenUi.qml" || {
       printf 'Built image lock screen lacks the pointer authentication reveal path.\n' >&2

@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 Proper Linux contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+Version=6
+
+# kconf_update records this ID per user. The helper changes only Proper's old
+# Delay=0 value and never revisits a later user choice.
+Id=proper-tooltip-delay-v2
+Script=proper-tooltip-default-repair,sh

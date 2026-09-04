@@ -34,7 +34,7 @@ KDE continue to deliver their mature infrastructure and security updates.
 | Area | Responsibility |
 | --- | --- |
 | `image/` | Pinned Fedora KIWI input, Proper image overlay, live-session integration, and VM firmware used for controlled review |
-| `packages/proper-release/` | Product identity, release metadata, repository configuration, and Fedora derivative boundary |
+| `packages/proper-release/` | Product identity, release metadata, and Fedora derivative boundary |
 | `packages/proper-branding/` | Boot, installer, system-logo, and platform artwork |
 | `packages/proper-look-and-feel/` | Design tokens, global themes, Plasma Style, wallpapers, lock screen, colours, and generated shared UI assets |
 | `packages/proper-appearance/` | Preview-first style, text-size, and wallpaper control plus the bounded login-wallpaper helper |
@@ -62,6 +62,24 @@ ShellPackage support, KWin shortcuts, and scripts. The floating shelf, common
 shell controls, notifications, tray, OSDs, overview, network, Bluetooth, audio,
 power, and authentication keep their upstream behaviour. Missing Proper theme
 assets fall back to Breeze.
+
+One canonical script owns the complete default panel layout: the centred shelf
+and its Command Centre applet. It is installed as the active
+ShellPackage-named layout in each Global Theme, which is Plasma's supported
+first-profile and user-application hook. The same source is also installed
+under the upstream shell ID for compatibility. Ordinary KDE defaults live in
+`/etc/xdg`, where KConfig layers user values above them, and one-time repairs
+use Plasma shell updates or `kconf_update` with exact legacy signatures. Proper
+does not copy KDE configuration into home directories.
+`/etc/skel` is reserved for Vicinae and Ghostty because those upstream tools
+consume user-local configuration rather than KDE's system-default layer.
+
+`tokens.yaml` is the visual source of truth. Build generators derive the KDE
+light, dark, and midnight schemes, Plasma controls and materials, first-party
+Qt and web styles, the Anaconda stylesheet, the installed semantic palette,
+and the QML token component shared by splash, login, and lock. Proper apps load
+that installed palette or the active Qt palette instead of maintaining another
+set of colours.
 
 The shelf material is generated from the shared design tokens as matched
 translucent and solid Plasma SVG frames. Plasma supplies the supported adaptive
@@ -122,19 +140,23 @@ the update mechanism of its chosen provider.
 
 ### Status surfaces and agent usage
 
-The global Status Shade is a Proper-owned Plasma applet opened from a slim
-auto-hidden top-edge panel. Plasma owns the edge reveal, popup placement,
-keyboard activation, focus dismissal, and shell material. The applet samples
+Command Centre is a Proper-owned Plasma applet opened from the existing shelf.
+Plasma owns the panel, popup placement, keyboard activation, focus dismissal,
+and shell material. The applet samples
 ordinary Linux CPU, thermal, memory, filesystem, and network counters only
 while it is visible. Its 60-second throughput trace lives only in QML memory;
 no performance or network history is persisted. NetworkManager supplies the
 active connection's display name while continuing to own connectivity and all
 network controls.
 
-The top-edge panel and `Meta+S` shortcut are seeded once for every profile. A
-separate seed marker preserves later removal or movement as a user choice. The
-shade consumes the same reduced agent JSON as the compact meter but does not
-depend on an agent being installed.
+The applet uses the ordinary compact-representation contract, so its icon is a
+normal pointer target in the same shelf as KDE's maintained status controls.
+The first-profile Global Theme layout creates it and binds `Meta+S`. A guarded
+upgrade helper adds it only when the canonical shelf exists, and a Plasma shell
+update moves only the exact former Proper top-panel signatures. Later removal,
+movement, or shortcut edits remain user choices. Command Centre consumes the
+same reduced agent JSON as the compact meter but does not depend on an agent
+being installed.
 
 The bottom-right Agent Usage meter is a Proper-owned Plasma applet inside a
 native fit-content panel rather than a port of a macOS menu-bar application or
@@ -160,17 +182,31 @@ current Proper RPM set, creates a local repository, composes the image through
 KIWI, validates its package manifest, and writes a SHA-256 checksum. Generated
 ISOs, RPMs, VM disks, caches, logs, and downloaded archives stay outside Git.
 
-The ISO is a tested installation snapshot, not the update mechanism. Installed
-systems receive Fedora packages from Fedora and Proper-owned RPMs from the
-configured hosted repository through ordinary DNF, PackageKit, and Discover
-flows. Optional applications update through their selected provider. A new ISO
-is needed for a release snapshot, Fedora rebase, installer or live-image change,
-package-set change, or early-boot repair—not for every theme or application
-update.
+The Git repository is the canonical Proper distribution source. Preview
+releases are signed tags rather than hosted ISO artifacts. A user or their
+agent verifies a release tag, checks it out, and builds the ISO and its
+embedded Proper RPM-MD repository locally; no separate Proper package host is
+required.
+Installed systems keep receiving the base operating system from Fedora through
+ordinary DNF, PackageKit, and Discover flows. Optional applications update
+through their selected provider.
 
-Public artifacts require a source tag, package manifest, release notes,
-checksum, signature, and no embedded credentials. Production publishing
-credentials must never be exposed to untrusted pull-request code.
+Proper-owned package updates are built locally from a verified release tag and
+installed through DNF by `scripts/update-installed`; they are not fetched
+automatically from a Proper service. Its dry-run gate verifies the installed
+Fedora release and the exact Fedora Plasma source release behind both
+documented patches before building. A mismatch stops the update instead of
+pinning or reinstalling stale Plasma code. The normal run creates the local
+RPM-MD repository, installs the selected Proper packages and any rebuilt
+subpackages already present, then reports the installed versions. A new ISO is
+needed for an installation snapshot, Fedora rebase, installer or live-image
+change, package-set change, or early-boot repair—not for every theme or
+application update.
+
+A preview release requires a signed source tag, release notes, a Fedora and
+Proper compatibility statement, and no embedded credentials. Each local image
+build emits its exact package manifest and checksum. Signing credentials must
+never be exposed to untrusted pull-request code.
 
 ## Development and verification
 

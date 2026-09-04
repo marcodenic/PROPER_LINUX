@@ -52,9 +52,9 @@ ping_vicinae() {
     timeout --kill-after=0.1s 0.5s vicinae ping >/dev/null 2>&1
 }
 
-# Pointer launches remain idempotent. The global summon shortcut toggles only
-# after the IPC server is already ready, so a repeated key press can dismiss
-# Vicinae without turning a startup race into a flash-and-close.
+# Taskbar and keyboard summons toggle only after the IPC server is already
+# ready, so a repeated activation can dismiss Vicinae without turning a
+# startup race into a flash-and-close.
 if ping_vicinae; then
     if [[ "$mode" == toggle ]]; then
         toggle_vicinae && exit 0

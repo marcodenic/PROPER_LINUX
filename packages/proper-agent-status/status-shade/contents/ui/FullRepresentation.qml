@@ -5,8 +5,6 @@ import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import QtQuick.Window
 
-import org.kde.ksvg as KSvg
-
 FocusScope {
     id: shade
 
@@ -19,11 +17,11 @@ FocusScope {
     readonly property color downloadColor: "#79eadb"
     readonly property color uploadColor: "#91b4ff"
     readonly property color urgent: "#ff7184"
-    readonly property bool narrow: width < 900
+    readonly property bool narrow: width < 680
 
-    implicitWidth: Math.max(720, Screen.width - 24)
-    implicitHeight: narrow ? 376 : 286
-    Layout.minimumWidth: Math.min(implicitWidth, 720)
+    implicitWidth: Math.min(720, Math.max(640, Screen.width - 96))
+    implicitHeight: narrow ? 302 : 236
+    Layout.minimumWidth: Math.min(implicitWidth, 640)
     Layout.minimumHeight: implicitHeight
     activeFocusOnTab: true
 
@@ -60,9 +58,6 @@ FocusScope {
     }
 
     function agentSummary(provider) {
-        if (!provider.installed) {
-            return "Not installed";
-        }
         const usageWindow = controller.primaryWindow(provider);
         if (usageWindow) {
             return Math.round(usageWindow.remaining_percent) + "% remaining";
@@ -101,8 +96,8 @@ FocusScope {
     function secondaryAgentState() {
         const primary = primaryAgent();
         const secondary = controller.provider(primary.id === "codex" ? "claude" : "codex");
-        if (!primary.installed && !secondary.installed) {
-            return "Codex and Claude not installed";
+        if (!secondary.installed) {
+            return "";
         }
         return secondary.label + " · " + agentSummary(secondary);
     }
@@ -136,12 +131,6 @@ FocusScope {
         }
     }
 
-    KSvg.FrameSvgItem {
-        id: surface
-        anchors.fill: parent
-        imagePath: "solid/widgets/panel-background"
-    }
-
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -157,13 +146,13 @@ FocusScope {
                 spacing: 8
 
                 Text {
-                    text: "C O M M A N D   C E N T R E   ·   M O N I T O R"
+                    text: "COMMAND CENTRE"
                     color: shade.foreground
                     opacity: 0.86
                     font.family: "JetBrains Mono"
                     font.pixelSize: 9
                     font.weight: Font.Medium
-                    font.letterSpacing: 0.8
+                    font.letterSpacing: 0.6
                 }
 
                 Item { Layout.fillWidth: true }
@@ -188,7 +177,7 @@ FocusScope {
                     display: Controls.AbstractButton.IconOnly
                     icon.name: "window-close-symbolic"
                     onClicked: shade.controller.expanded = false
-                    Controls.ToolTip.text: "Close status shade"
+                    Controls.ToolTip.text: "Close Command Centre"
                     Controls.ToolTip.visible: hovered
                 }
             }
@@ -338,8 +327,8 @@ FocusScope {
             Layout.fillHeight: true
             Layout.leftMargin: shade.narrow ? 16 : 20
             Layout.rightMargin: shade.narrow ? 16 : 20
-            Layout.topMargin: 12
-            Layout.bottomMargin: 18
+            Layout.topMargin: 10
+            Layout.bottomMargin: 12
             spacing: 0
 
             RowLayout {
@@ -347,15 +336,14 @@ FocusScope {
                 spacing: 20
 
                 Text {
-                    text: "B A N D W I D T H   M O N I T O R   ·   6 0   S E C O N D S"
-                    color: shade.secondary
-                    font.family: "JetBrains Mono"
-                    font.pixelSize: 9
-                    font.weight: Font.Medium
-                    font.letterSpacing: 0.8
+                    Layout.fillWidth: true
+                    text: shade.controller.network.name || "Offline"
+                    color: shade.foreground
+                    opacity: 0.82
+                    font.family: "Inter"
+                    font.pixelSize: 10
+                    elide: Text.ElideRight
                 }
-
-                Item { Layout.fillWidth: true }
 
                 Text {
                     text: "↓ " + shade.rate(Number(shade.controller.network.download_bytes_per_second))
@@ -372,72 +360,16 @@ FocusScope {
                 }
             }
 
-            Text {
-                Layout.fillWidth: true
-                Layout.topMargin: 4
-                text: shade.controller.network.name || "Offline"
-                color: shade.foreground
-                opacity: 0.82
-                font.family: "Inter"
-                font.pixelSize: 10
-                elide: Text.ElideRight
-            }
-
             ThroughputGraph {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumHeight: 72
-                Layout.topMargin: 4
+                Layout.topMargin: 8
                 downloadHistory: shade.downloadHistory
                 uploadHistory: shade.uploadHistory
                 downloadColor: shade.downloadColor
                 uploadColor: shade.uploadColor
             }
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 0
-
-                Text {
-                    text: "60 seconds ago"
-                    color: shade.tertiary
-                    font.family: "JetBrains Mono"
-                    font.pixelSize: 8
-                }
-
-                Item { Layout.fillWidth: true }
-
-                Text {
-                    text: "Now"
-                    color: shade.tertiary
-                    font.family: "JetBrains Mono"
-                    font.pixelSize: 8
-                }
-            }
         }
-    }
-
-    Rectangle {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 5
-        width: 42
-        height: 3
-        radius: 1.5
-        color: shade.foreground
-        opacity: closeArea.containsMouse ? 0.68 : 0.26
-
-        Behavior on opacity { NumberAnimation { duration: 120 } }
-    }
-
-    MouseArea {
-        id: closeArea
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        width: 92
-        height: 18
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: shade.controller.expanded = false
     }
 }

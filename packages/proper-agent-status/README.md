@@ -1,21 +1,21 @@
 # Proper Agent Status
 
-This package owns two related native Plasma surfaces: the global Proper Status
-Shade and the small Agent Usage meter. Plasma supplies their panel placement,
+This package owns two related native Plasma surfaces: Proper Command Centre
+and the small Agent Usage meter. Plasma supplies their panel placement,
 popup, focus, shortcut, and theme behaviour. The implementation is original
 Proper Linux code; it does not copy a menu bar app, Waybar module, or
 third-party widget.
 
-## Status shade
+## Command Centre
 
-The shade is available whether or not a coding agent is installed. Move the
-pointer to the top edge to reveal its slim handle, then click or pull down; use
-`Meta+S` for the keyboard path. The full-width surface shows:
+Command Centre is available whether or not a coding agent is installed. Click
+its shelf button or use `Meta+S`. The compact 720-pixel, single-layer surface
+shows:
 
 - current CPU load and package temperature;
 - used and total memory and root-storage capacity;
 - the active NetworkManager connection plus live upload/download rates;
-- a rolling, in-memory 60-second network graph; and
+- an unlabelled rolling network graph with current transfer rates; and
 - current Codex and Claude state from the same reduced provider model as the
   compact meter.
 
@@ -23,8 +23,8 @@ The system sampler reads Linux's ordinary `/proc` and `/sys` counters and asks
 NetworkManager only for the active connection's display name. Samples exist in
 the running widget only; no system or network history is written to disk.
 
-The shade's top-edge panel and shortcut are seeded once. Removing or moving it
-later is a user choice and package updates do not recreate it.
+The applet and shortcut are seeded once in the existing shelf. Removing or
+moving it later is a user choice and package updates do not recreate it.
 
 ## Agent Usage meter
 

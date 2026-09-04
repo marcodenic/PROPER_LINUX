@@ -1,10 +1,10 @@
 # ID	Visible expectation
 setup-fullhd	The installed first-run wizard is rendered at 1920x1080 and 100 percent scale, with normally proportioned pages and no 640x480 overflow scrollbars.
 login-fullhd	The installed login screen is rendered at 1920x1080 and 100 percent scale, with the approved capsule occupying a restrained central width.
-status-handle	With no coding agent installed, moving the pointer to the top edge reveals a slim centred handle without permanently reserving desktop space.
-status-shade	Clicking or pulling the top handle opens a dense near-full-width telemetry deck with four readouts for CPU, memory, storage, and agent usage above the full-width bandwidth monitor; Meta+S opens the same surface and Escape closes it.
+command-centre-button	With no coding agent installed, a quiet Command Centre button remains available in the existing bottom shelf and no separate top-edge panel or handle is present.
+status-shade	Clicking the shelf button opens one rounded Plasma shell surface, bounded to 720 pixels at Full HD, with four readouts for CPU, memory, storage, and agent usage above an unlabelled network trace; Meta+S opens the same surface, and Escape closes it.
 status-live	While the shade is open, CPU, temperature, memory, root storage, connection name, transfer rates, and the in-memory 60-second network trace update without writing history to disk.
-status-no-agent	With Codex and Claude absent, the global shade remains available and identifies both agents as not installed while the bottom-right meter remains absent.
+status-no-agent	With Codex and Claude absent, the global shade remains available, leaves the unavailable agent detail empty, and keeps the bottom-right meter absent.
 agent-panel	At 1920x1080 the compact meter is a native right-aligned panel with the main shelf's 56-pixel height, inset, material, and floating state; its content is only a white provider mark and square-dot remaining-usage strip.
 agent-attached	With an ordinary window maximised, the centred shelf and right agent meter attach to the bottom edge together and retain matching height and material.
 agent-details	A pointer click opens a tight ordinary detail panel above the meter with current windows, remaining percentages, reset times, and no history chart.

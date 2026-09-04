@@ -185,18 +185,22 @@ static QIcon catalogueIcon(const QJsonObject &entry, int size = 72) {
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
-    const QColor accent(entry.value("accent").toString("#4c8bf5"));
+    QColor accent(entry.value("accent").toString());
+    if (!accent.isValid())
+        accent = QApplication::palette().color(QPalette::Highlight);
     QLinearGradient gradient(0, 0, size, size);
     gradient.setColorAt(0, accent.lighter(118));
     gradient.setColorAt(1, accent.darker(118));
     painter.setBrush(gradient);
-    painter.setPen(QPen(QColor(255, 255, 255, 35), 1));
+    QColor outline = QApplication::palette().color(QPalette::HighlightedText);
+    outline.setAlpha(35);
+    painter.setPen(QPen(outline, 1));
     painter.drawRoundedRect(QRectF(1, 1, size - 2, size - 2), size * 0.25, size * 0.25);
     QFont font = painter.font();
     font.setBold(true);
     font.setPixelSize(size * 0.31);
     painter.setFont(font);
-    painter.setPen(Qt::white);
+    painter.setPen(QApplication::palette().color(QPalette::HighlightedText));
     painter.drawText(pixmap.rect(), Qt::AlignCenter, initialsFor(entry.value("name").toString()));
     return QIcon(pixmap);
 }
@@ -286,7 +290,7 @@ public:
         const QString iconPath = entry.value("icon_path").toString();
         QIcon webIcon = iconPath.isEmpty() ? QIcon::fromTheme("web-browser") : QIcon(iconPath);
         if (webIcon.isNull()) {
-            QJsonObject fallback{{"name", entry.value("name")}, {"accent", "#3978c5"}};
+            QJsonObject fallback{{"name", entry.value("name")}};
             webIcon = catalogueIcon(fallback);
         }
         icon->setPixmap(webIcon.pixmap(54, 54));

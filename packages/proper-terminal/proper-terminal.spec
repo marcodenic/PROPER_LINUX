@@ -1,6 +1,6 @@
 Name: proper-terminal
 Version: 1.3.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Ghostty terminal and Proper developer essentials
 License: MIT
 URL: https://ghostty.org/
@@ -58,7 +58,6 @@ rm %{buildroot}%{_prefix}/lib/libghostty-vt.so.0
 rm %{buildroot}%{_prefix}/lib/libghostty-vt.so.0.1.0
 rm %{buildroot}%{_datadir}/pkgconfig/libghostty-vt.pc
 install -Dpm 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/skel/.config/ghostty/config
-install -Dpm 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/xdg/ghostty/config
 install -Dpm 0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/proper-terminal.desktop
 install -Dpm 0644 %{SOURCE3} %{buildroot}%{_datadir}/kio/servicemenus/proper-terminal-dolphin.desktop
 install -Dpm 0755 %{SOURCE7} %{buildroot}%{_bindir}/proper-terminal-inset-repair
@@ -70,8 +69,11 @@ install -Dpm 0644 %{SOURCE8} %{buildroot}%{_sysconfdir}/xdg/autostart/proper-ter
 %{_bindir}/proper-terminal-inset-repair
 %{_sysconfdir}/xdg/autostart/proper-terminal-inset-repair.desktop
 %config(noreplace) %{_sysconfdir}/skel/.config/ghostty/config
-%config(noreplace) %{_sysconfdir}/xdg/ghostty/config
 %changelog
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 1.3.1-7
+- Keep Ghostty defaults only in its supported per-user configuration path
+- Remove the duplicate /etc/xdg copy that Ghostty does not consume
+
 * Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 1.3.1-6
 - Remove the terminal grid inset and balanced edge slack completely
 - Repair only profiles carrying the exact former Proper padding defaults

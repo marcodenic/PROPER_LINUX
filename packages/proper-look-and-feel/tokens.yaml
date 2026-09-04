@@ -1,14 +1,16 @@
-version: 1
+version: 2
 name: Proper Horizon
 colour:
-  light: {base: '#f6f7fb', surface: '#ffffff', text: '#18202b', muted: '#687386', accent: '#3b68d9', urgent: '#c33d52'}
-  dark: {base: '#11151d', surface: '#1b222d', text: '#f1f4f8', muted: '#a8b2c2', accent: '#91b4ff', urgent: '#ff7184'}
-material: {panel_tint: '#141a22', panel_dense: '#18202a', panel_edge: '#a6afbd', popup_tint: '#181d25'}
-opacity: {panel: 0.66, panel_dense: 1.00, panel_edge: 0.14, popup: 0.90, popup_edge: 0.18, hover: 0.12, active: 0.18}
-radius: {panel: 16, popup: 0, control: 9}
+  light: {base: '#f6f7fb', surface: '#ffffff', surface_alt: '#f2f4f8', view: '#f6f7fb', view_alt: '#eff2f7', text: '#18202b', muted: '#687386', accent: '#3b68d9', selection: '#3b68d9', on_accent: '#ffffff', positive: '#2c8b57', warning: '#a66920', urgent: '#c33d52', visited: '#744ea0', border: '#687386'}
+  dark: {base: '#11151d', surface: '#181d25', surface_alt: '#232933', view: '#151a22', view_alt: '#1d232c', text: '#f1f4f8', muted: '#a8b2c2', accent: '#91b4ff', selection: '#4f6f99', on_accent: '#11151d', positive: '#57be82', warning: '#dea55c', urgent: '#e86978', visited: '#b489d3', border: '#a8b2c2'}
+  midnight: {base: '#090d14', surface: '#0c1119', surface_alt: '#141b25', view: '#090d14', view_alt: '#10161f', text: '#f5f7fa', muted: '#97a4b7', accent: '#79a8ff', selection: '#4e7bc3', on_accent: '#090d14', positive: '#5bc78b', warning: '#e5a95b', urgent: '#ff677e', visited: '#c291e0', border: '#97a4b7'}
+material: {panel_tint: '#141a22', panel_dense: '#18202a', panel_edge: '#a6afbd', popup_tint: '#141a22'}
+opacity: {panel: 0.66, panel_dense: 1.00, panel_edge: 0.14, popup: 0.66, popup_edge: 0.14, hover: 0.12, active: 0.18}
+radius: {panel: 16, popup: 16, control: 9}
 blur: {kwin_strength: 15, noise: 5, saturation: 150}
-contrast: {panel: 0.72, panel_intensity: 0.82, panel_saturation: 1.15}
+contrast: {panel: 0.72, panel_intensity: 0.82, panel_saturation: 1.15, kde: 4, kde_midnight: 5}
 shadow: {panel_margin: 12, panel_ambient: 0.08, panel_contact: 0.20}
 spacing: {unit: 4, panel: 10, panel_end: 14, item: 8, section: 16}
 animation: {fast: 120, normal: 180, slow: 260}
 typography: {ui: 'Inter', fallback: 'Noto Sans', mono: 'JetBrains Mono', body_size: 10}
+welcome: {base: '#050608', glow: '#1f3d62', glow_mid: '#0f2238', glow_low: '#0e233a', glow_low_mid: '#08121f', wordmark: '#f7f8fa', shadow: '#000000'}

@@ -1,6 +1,6 @@
 Name:           proper-launchers
 Version:        0.1
-Release:        16%{?dist}
+Release:        20%{?dist}
 Summary:        Proper Linux launcher and window workflow defaults
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -11,9 +11,9 @@ Requires:       libnotify
 Requires:       plasma-discover
 Requires:       plasma-systemsettings
 Requires:       plasma-systemmonitor
-Requires:       proper-apps >= 0.1-7
-Requires:       proper-appearance >= 0.1-3
-Requires:       proper-look-and-feel >= 0.1-23
+Requires:       proper-apps >= 0.1-12
+Requires:       proper-appearance >= 0.1-10
+Requires:       proper-look-and-feel >= 0.1-53
 Requires:       qt6-qttools
 Requires:       spectacle
 Requires:       systemd
@@ -34,7 +34,7 @@ used by the prior build.
 %setup -q -n vicinae-01cd7cb4936d9cb14272091623da85e7c880f0dc
 
 %build
-cmake --preset linux-release -B build -DCMAKE_INSTALL_PREFIX=%{_prefix} -DUSE_SYSTEM_CMARK_GFM=OFF -DUSE_SYSTEM_KF6=ON -DUSE_SYSTEM_QT_KEYCHAIN=OFF -DUSE_SYSTEM_LAYER_SHELL=ON -DTYPESCRIPT_EXTENSIONS=OFF -DINSTALL_NODE_MODULES=OFF -DVICINAE_NODE_RUNTIME_DOWNLOAD=OFF
+cmake --preset linux-release -B build -DCMAKE_INSTALL_PREFIX=%{_prefix} -DUSE_SYSTEM_CMARK_GFM=OFF -DUSE_SYSTEM_KF6=ON -DUSE_SYSTEM_QT_KEYCHAIN=OFF -DUSE_SYSTEM_LAYER_SHELL=ON -DTYPESCRIPT_EXTENSIONS=OFF -DINSTALL_NODE_MODULES=OFF -DVICINAE_NODE_RUNTIME_DOWNLOAD=OFF -DVICINAE_GIT_TAG=v0.24.0 -DVICINAE_GIT_COMMIT_HASH=01cd7cb4936d9cb14272091623da85e7c880f0dc
 cmake --build build --parallel
 
 %install
@@ -45,7 +45,7 @@ install -Dpm 0755 %{_sourcedir}/proper-tool %{buildroot}%{_bindir}/proper-tool
 install -Dpm 0644 %{_sourcedir}/vicinae.service %{buildroot}%{_userunitdir}/vicinae.service
 # Upstream's desktop entry starts the server but does not open its window.
 # Replace it after cmake --install so every taskbar/menu activation goes
-# through Proper's readiness-aware opener.
+# through Proper's readiness-aware toggle.
 install -Dpm 0644 %{_sourcedir}/vicinae.desktop %{buildroot}%{_datadir}/applications/vicinae.desktop
 install -Dpm 0644 %{_sourcedir}/proper-vicinae.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/proper-vicinae.svg
 install -Dpm 0644 %{_sourcedir}/proper-vicinae-shortcut.desktop %{buildroot}%{_datadir}/applications/proper-vicinae-shortcut.desktop
@@ -54,7 +54,8 @@ install -Dpm 0644 %{_sourcedir}/proper-shortcut-overview.desktop %{buildroot}%{_
 install -Dpm 0644 %{_sourcedir}/proper-arrange-workspace.desktop %{buildroot}%{_datadir}/applications/proper-arrange-workspace.desktop
 install -Dpm 0644 %{_sourcedir}/proper-shortcuts.desktop %{buildroot}%{_datadir}/applications/proper-shortcuts.desktop
 install -Dpm 0644 %{_sourcedir}/settings.json %{buildroot}%{_sysconfdir}/skel/.config/vicinae/settings.json
-install -Dpm 0644 %{_sourcedir}/kglobalshortcutsrc %{buildroot}%{_sysconfdir}/skel/.config/kglobalshortcutsrc
+install -Dpm 0644 %{_sourcedir}/shortcuts.json %{buildroot}%{_sysconfdir}/skel/.local/share/vicinae/shortcuts/shortcuts.json
+install -Dpm 0644 %{_sourcedir}/kglobalshortcutsrc %{buildroot}%{_sysconfdir}/xdg/kglobalshortcutsrc
 install -Dpm 0644 %{_sourcedir}/proper-shortcuts.md %{buildroot}%{_datadir}/doc/proper-launchers/proper-shortcuts.md
 install -Dpm 0644 %{_sourcedir}/proper-shortcuts.html %{buildroot}%{_datadir}/doc/proper-launchers/proper-shortcuts.html
 for script in %{_sourcedir}/vicinae-scripts/*.sh; do
@@ -80,7 +81,8 @@ done
 %{_datadir}/icons/hicolor/512x512/apps/vicinae.png
 %{_datadir}/icons/hicolor/scalable/apps/proper-vicinae.svg
 %config(noreplace) %{_sysconfdir}/skel/.config/vicinae/settings.json
-%config(noreplace) %{_sysconfdir}/skel/.config/kglobalshortcutsrc
+%config(noreplace) %{_sysconfdir}/skel/.local/share/vicinae/shortcuts/shortcuts.json
+%config(noreplace) %{_sysconfdir}/xdg/kglobalshortcutsrc
 %doc %{_datadir}/doc/proper-launchers/proper-shortcuts.md
 %doc %{_datadir}/doc/proper-launchers/proper-shortcuts.html
 
@@ -89,6 +91,22 @@ done
 systemctl --global enable vicinae.service >/dev/null 2>&1 || :
 
 %changelog
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-20
+- Stamp the pinned Vicinae release and commit into archive builds explicitly
+- Match Vicinae's native blurred surface to the shared shelf material
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-19
+- Seed an Open Website shortcut through Vicinae's supported argument template
+- Offer it as a fallback so bare domains open directly in Chromium
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-18
+- Make the taskbar launcher dismiss Vicinae when it is already visible
+
+* Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-17
+- Layer KDE shortcut defaults through XDG instead of copying them into new homes
+- Preserve per-user shortcut changes above the packaged product defaults
+- Require the matching semantic UI revisions reached by the launcher
+
 * Wed Sep 02 2026 Proper Linux <proper@example.invalid> - 0.1-16
 - Move keyboard Overview to Meta+O so Meta+W can arrange the workspace
 - Update the searchable shortcut references for the new bindings

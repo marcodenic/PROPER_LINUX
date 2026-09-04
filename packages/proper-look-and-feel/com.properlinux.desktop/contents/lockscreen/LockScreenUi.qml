@@ -24,10 +24,14 @@ Item {
     property bool noPasswordConfirmation: false
     property bool authenticationVisible: false
     readonly property bool passwordVisible: authenticationVisible || passwordBox.text.length > 0 || authenticationFailed || root.notification.length > 0
-    readonly property string uiFontFamily: "Inter"
+    readonly property string uiFontFamily: properTokens.uiFont
 
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
+
+    ProperTokens {
+        id: properTokens
+    }
 
     function clearEntry() {
         root.clearPassword()
@@ -153,23 +157,25 @@ Item {
             top: parent.top
             topMargin: parent.height * 0.15
         }
-        spacing: Math.max(8, parent.height * 0.012)
+        spacing: Math.max(properTokens.spacingItem, parent.height * 0.012)
 
         ProperGridClock {
             anchors.horizontalCenter: parent.horizontalCenter
-            cellSize: Math.min(10, Math.max(7, lockScreenUi.height * 0.0093))
+            cellSize: Math.min(9, Math.max(7, lockScreenUi.height * 0.0084))
+            cellColor: properTokens.text
             currentDate: lockScreenUi.currentDate
+            shadowColor: properTokens.alpha(properTokens.base, 0.45)
         }
 
         PlasmaComponents3.Label {
             anchors.horizontalCenter: parent.horizontalCenter
-            color: Qt.rgba(0.93, 0.97, 1, 0.72)
+            color: properTokens.alpha(properTokens.text, 0.72)
             font.family: lockScreenUi.uiFontFamily
             font.pixelSize: Math.min(18, Math.max(13, lockScreenUi.height * 0.016))
             font.weight: Font.Normal
             text: Qt.formatDate(lockScreenUi.currentDate, "dddd, d MMMM")
             style: Text.Raised
-            styleColor: Qt.rgba(0, 0.02, 0.06, 0.42)
+            styleColor: properTokens.alpha(properTokens.base, 0.42)
         }
     }
 
@@ -212,13 +218,13 @@ Item {
 
             background: Rectangle {
                 border.color: lockScreenUi.authenticationFailed
-                    ? Qt.rgba(1, 0.45, 0.42, 0.62)
+                    ? properTokens.alpha(properTokens.urgent, 0.62)
                     : passwordBox.activeFocus
-                        ? Qt.rgba(0.68, 0.82, 0.98, 0.28)
-                        : Qt.rgba(0.85, 0.92, 0.98, 0.12)
+                        ? properTokens.alpha(properTokens.accent, 0.28)
+                        : properTokens.alpha(properTokens.border, 0.12)
                 border.width: 1
-                color: Qt.rgba(0.02, 0.065, 0.12, 0.38)
-                radius: 16
+                color: properTokens.alpha(properTokens.base, 0.38)
+                radius: properTokens.controlRadius + 7
 
                 Rectangle {
                     anchors {
@@ -227,14 +233,14 @@ Item {
                         top: parent.top
                         margins: 1
                     }
-                    color: Qt.rgba(1, 1, 1, 0.035)
+                    color: properTokens.alpha(properTokens.text, 0.035)
                     height: 1
                     radius: 1
                 }
             }
 
             Behavior on opacity {
-                NumberAnimation { duration: 150 }
+                NumberAnimation { duration: properTokens.animationFast }
             }
 
             onAccepted: {
@@ -294,8 +300,8 @@ Item {
                 topMargin: 8
             }
             color: lockScreenUi.authenticationFailed
-                ? Qt.rgba(1, 0.72, 0.7, 0.92)
-                : Qt.rgba(0.93, 0.97, 1, 0.75)
+                ? properTokens.alpha(properTokens.urgent, 0.92)
+                : properTokens.alpha(properTokens.text, 0.75)
             font.family: lockScreenUi.uiFontFamily
             font.pixelSize: 13
             text: capsLockState.locked
@@ -335,21 +341,21 @@ Item {
             }
             width: systemRow.width + 10
             height: 42
-            border.color: Qt.rgba(0.85, 0.92, 0.98, 0.14)
+            border.color: properTokens.alpha(properTokens.border, 0.14)
             border.width: 1
-            color: Qt.rgba(0.02, 0.07, 0.13, 0.42)
+            color: properTokens.alpha(properTokens.base, 0.42)
             opacity: lockScreenUi.systemMenuOpen ? 1 : 0
-            radius: 15
+            radius: properTokens.controlRadius + 6
             visible: opacity > 0
 
             Behavior on opacity {
-                NumberAnimation { duration: 130 }
+                NumberAnimation { duration: properTokens.animationFast }
             }
 
             Row {
                 id: systemRow
                 anchors.centerIn: parent
-                spacing: 3
+                spacing: properTokens.spacingUnit - 1
 
                 SystemAction {
                     actionName: i18ndc("plasma_shell_org.kde.plasma.desktop", "@action:button", "Sleep")
@@ -367,7 +373,7 @@ Item {
 
                 SystemAction {
                     actionName: i18ndc("plasma_shell_org.kde.plasma.desktop", "@action:button", "Power")
-                    callback: () => sessionManagement.requestShutdown()
+                    callback: () => sessionManagement.requestShutdown(SessionManagement.ConfirmationMode.Skip)
                     iconName: "system-shutdown"
                     visible: sessionManagement.canShutdown
                 }
@@ -387,16 +393,16 @@ Item {
             text: "•••"
 
             background: Rectangle {
-                border.color: Qt.rgba(0.85, 0.92, 0.98, 0.14)
+                border.color: properTokens.alpha(properTokens.border, 0.14)
                 border.width: 1
                 color: moreButton.hovered || lockScreenUi.systemMenuOpen
-                    ? Qt.rgba(0.04, 0.11, 0.19, 0.5)
-                    : Qt.rgba(0.02, 0.07, 0.13, 0.28)
-                radius: 12
+                    ? properTokens.alpha(properTokens.surface_alt, 0.5)
+                    : properTokens.alpha(properTokens.base, 0.28)
+                radius: properTokens.controlRadius + 3
             }
 
             contentItem: PlasmaComponents3.Label {
-                color: Qt.rgba(0.94, 0.97, 1, 0.8)
+                color: properTokens.alpha(properTokens.text, 0.8)
                 font.family: lockScreenUi.uiFontFamily
                 horizontalAlignment: Text.AlignHCenter
                 text: moreButton.text
@@ -424,8 +430,8 @@ Item {
         icon.name: iconName
 
         background: Rectangle {
-            color: parent.hovered ? Qt.rgba(0.1, 0.19, 0.29, 0.58) : "transparent"
-            radius: 10
+            color: parent.hovered ? properTokens.alpha(properTokens.surface_alt, 0.58) : "transparent"
+            radius: properTokens.controlRadius + 1
         }
 
         onClicked: {

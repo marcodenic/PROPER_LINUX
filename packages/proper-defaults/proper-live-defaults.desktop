@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Proper live defaults
-Exec=/usr/bin/proper-live-defaults
-OnlyShowIn=KDE;
-X-KDE-autostart-phase=1
-NoDisplay=true

@@ -1,5 +1,5 @@
 [Unit]
-Description=Seed the Proper status shade and optional agent-usage panel
+Description=Seed Proper Command Centre and the optional agent-usage panel
 After=plasma-plasmashell.service
 
 [Service]
