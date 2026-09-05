@@ -306,3 +306,7 @@ derived from the same Proper geometry with the light semantic palette.
 The startup dot now shares Task.qml’s state-indicator container with the
 running dots and active line; the icon-sized BusyIndicator loader is empty.
 All marks share one vertical centre while startup motion is horizontal only.
+
+New Command Centre applets seed their native popup size at 720 by 330 pixels,
+preventing a transient startup display geometry from persisting a narrow panel.
+Only creation paths write this value; existing user sizes remain untouched.

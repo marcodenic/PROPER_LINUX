@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        56%{?dist}
+Release:        57%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -426,6 +426,9 @@ grep -A12 '^\[Colors:Header\]$' %{buildroot}%{_datadir}/color-schemes/Proper.col
 %license %{_licensedir}/%{name}/GPL-3.0-or-later.txt
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-57
+- Seed a readable Command Centre size when creating the applet
+
 * Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-56
 - Derive matching light shell material and controls from the shared geometry
 

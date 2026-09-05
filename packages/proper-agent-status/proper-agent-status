@@ -429,6 +429,9 @@ if (!found && shelf === null) {
 } else {
     if (!found) {
         const shade = shelf.addWidget("com.properlinux.statusshade");
+        shade.currentConfigGroup = [];
+        shade.writeConfig("popupWidth", 720);
+        shade.writeConfig("popupHeight", 330);
         shade.globalShortcut = "Meta+S";
     }
     print("proper-status-shade-ready");

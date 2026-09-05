@@ -30,6 +30,9 @@ spacer.writeConfig("length", 24)
 panel.addWidget("org.kde.plasma.systemtray")
 
 const commandCentre = panel.addWidget("com.properlinux.statusshade")
+commandCentre.currentConfigGroup = []
+commandCentre.writeConfig("popupWidth", 720)
+commandCentre.writeConfig("popupHeight", 330)
 commandCentre.globalShortcut = "Meta+S"
 
 const clock = panel.addWidget("org.kde.plasma.digitalclock")

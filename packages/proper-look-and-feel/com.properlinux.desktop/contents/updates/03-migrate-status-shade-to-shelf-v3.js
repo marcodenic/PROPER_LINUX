@@ -36,6 +36,9 @@ if (shelf !== null) {
         if (isLegacyProperShade) {
             if (!shelfShade) {
                 shelfShade = shelf.addWidget("com.properlinux.statusshade")
+                shelfShade.currentConfigGroup = []
+                shelfShade.writeConfig("popupWidth", 720)
+                shelfShade.writeConfig("popupHeight", 330)
                 shelfShade.globalShortcut = shades[0].globalShortcut || "Meta+S"
             }
             panel.remove()

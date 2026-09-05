@@ -6,7 +6,7 @@
     "Description": "Reveal the shelf as one surface after its widgets settle",
     "Category": "Appearance",
     "License": "GPL-2.0-or-later",
-    "Version": "0.1.56",
+    "Version": "0.1.57",
     "EnabledByDefault": true
   },
   "X-KDE-Ordering": 50,
