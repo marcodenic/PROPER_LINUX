@@ -1,5 +1,6 @@
 #include "proper-action-button.h"
 #include "proper-material-window.h"
+#include "proper-help.h"
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDBusConnection>
@@ -412,7 +413,7 @@ public:
             "system-software-update", [this] { launch("Updates", "/usr/bin/proper-tool", {"updates"}); }));
         page->addWidget(makeCard("Keyboard shortcuts", "Useful shortcuts, with pointer routes for every action.",
             "proper-shortcuts", [this] { launch("Keyboard shortcuts", "/usr/bin/proper-welcome", {"--shortcuts"}); }));
-        page->addWidget(makeCard("Help & feedback", "Read the project guide or report a problem on GitHub.",
+        page->addWidget(makeCard("Help & feedback", "Everyday guidance, available offline.",
             "help-contents", [this] { openHelp(); }));
         page->addStretch();
 
@@ -488,8 +489,8 @@ private:
     }
 
     void openHelp() {
-        if (!QDesktopServices::openUrl(QUrl("https://github.com/marcodenic/PROPER_LINUX")))
-            showFailure("Help could not open in your browser. Try again or open github.com/marcodenic/PROPER_LINUX.");
+        auto *help = new ProperHelp(this);
+        help->show();
     }
 
     void showFailure(const QString &message) {

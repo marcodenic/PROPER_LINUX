@@ -2,16 +2,16 @@
 
 ## Required context
 
-Before changing the repository, read only these project documents:
+Before changing the repository, start with these project documents:
 
 1. `docs/PRODUCT.md`
 2. `docs/ARCHITECTURE.md`
 
 Use `PRODUCT.md` for intent, `ARCHITECTURE.md` for ownership and delivery, and
-the owning spec or lock for exact versions and provenance. Resolve ordinary
-implementation decisions; ask only when product direction or authority must
-change. The user is the product manager, and their visual judgement is
-authoritative.
+the owning spec or lock for exact versions and provenance. Read other project
+material when relevant to the task. Resolve ordinary implementation decisions;
+ask only when product direction or authority must change. The user is the
+product manager, and their visual judgement is authoritative.
 
 ## Product and architecture invariants
 
@@ -24,16 +24,16 @@ authoritative.
 - Remove noise and duplication, keep the image lean, and put optional software
   in Proper Apps.
 - Keep project-owned functions and UI components focused and single-purpose.
-  Refactor mixed responsibilities rather than adding branching or nesting.
-- Do not increase measured complexity in changed code. Necessary exceptions
-  require focused tests and a brief justification; never raise or suppress a
-  configured limit silently.
+  Keep changed code simple and refactor mixed responsibilities when needed.
+- Obey configured complexity limits. Necessary exceptions require focused
+  tests and a brief justification; never raise or suppress a limit silently.
 
 ## Research and upstream documentation
 
-- Before visible UX or platform-integration work, consult current official KDE,
-  Fedora, and Qt guidance for the component and shipped version. Verify
-  newer-only documentation against the pinned source.
+- When platform behaviour or compatibility is uncertain, consult the relevant
+  official KDE, Fedora, or Qt guidance for the component and shipped version.
+  Reuse verified guidance while it remains applicable; check newer-only
+  documentation against the pinned source.
 - Prefer primary documentation and source to tutorials. Record material
   compatibility or UX constraints in the handoff.
 - Guidance informs implementation; `PRODUCT.md` and product-manager approval
@@ -43,14 +43,20 @@ authoritative.
 
 | Scope | Required validation |
 | --- | --- |
+| Documentation only | Review the diff for accuracy, consistency, and whitespace errors. |
 | Source or UI | Focused static checks and the cheapest representative disposable preview. |
 | Package | Build only the owning RPM or smallest required set; reuse safe matching outputs. |
-| Image integration | Finish source and package work, then perform one ISO build and one graphical pass. |
+| Image integration | Finish source and package work, then build the ISO and validate the graphical installed journey. |
 
 Image integration means image composition, boot, installer, first boot, or live
 behaviour; an explicit release, installation, or VM review; or behaviour no
 cheaper loop can validate. Merely shipping a UI package on the ISO does not
 qualify. State why a full ISO build is needed before starting it.
+
+Avoid redundant builds; rebuild and repeat affected checks after fixes when
+necessary. For every visible UX change, define named observable states and
+capture the resulting screens in the representative preview. The ISO-bound
+`scripts/verify-ux` gate is required for image integration.
 
 ## Safety and release rules
 

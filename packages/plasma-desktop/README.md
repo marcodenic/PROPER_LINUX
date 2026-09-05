@@ -17,9 +17,13 @@ navigation-only home page. Do not hide Apply buttons on editable KCMs.
 
 When rebasing, regenerate the patch from the original Fedora source, verify the
 readable QML matches its patched file, build the owning RPM, and exercise cards,
-search, sidebar and light/dark palettes. During repeated same-upstream-version
-VM previews, Qt's old disk QML cache may survive a package replacement; stop the
-preview app and remove only its disposable cache before assessing the new UI.
+search, sidebar and light/dark palettes. Advance the Proper RPM changelog date
+when changing embedded QML: Qt rcc uses SOURCE_DATE_EPOCH for resource timestamps,
+and Fedora derives that epoch from the changelog. Merely changing Release can
+leave an old QML disk cache valid. Verify an ordinary application restart after
+the package upgrade with its existing cache intact. Settings home suppresses
+only its own global toolbar through Kirigami Page.globalToolBarStyle; editable
+KCMs retain their upstream headings and actions.
 
 Official guidance: https://develop.kde.org/docs/features/configuration/kcm/
 Upstream: https://invent.kde.org/plasma/plasma-desktop/-/tree/v6.7.4/kcms/landingpage

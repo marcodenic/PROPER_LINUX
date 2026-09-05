@@ -1,12 +1,13 @@
 Name:           proper-appearance
 Version:        0.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Proper Linux appearance, text sizing, and arrival sync
 License:        GPL-3.0-or-later
 BuildRequires:  qt6-qtbase-devel
+BuildRequires:  kf6-kwindowsystem-devel
 Requires:       plasma-workspace
 Requires:       polkit
-Requires:       proper-look-and-feel >= 0.1-42
+Requires:       proper-look-and-feel >= 0.1-62
 Requires:       /usr/bin/kwriteconfig6
 
 %description
@@ -16,6 +17,8 @@ can explicitly synchronise Plasma Login Manager after authentication.
 
 %prep
 cp %{_sourcedir}/proper-appearance.cpp %{_sourcedir}/proper-appearance.pro .
+
+cp %{_sourcedir}/../proper-look-and-feel/proper-material-window.h .
 
 %build
 qmake6 CONFIG+=release proper-appearance.pro
@@ -32,6 +35,9 @@ install -Dpm 0755 %{_sourcedir}/proper-set-login-wallpaper %{buildroot}%{_libexe
 %{_datadir}/applications/proper-appearance.desktop
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-12
+- Separate appearance tasks and keep Apply actions visible beside the gallery
+
 * Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-11
 - Describe Alpine Light’s matching frosted shell accurately
 

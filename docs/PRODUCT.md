@@ -46,7 +46,7 @@ text and JetBrains Mono where fixed-width text belongs, enables natural
 scrolling for new pointer profiles, and keeps normal application content
 opaque. The shelf, shell popups, authentication, and terminal use translucent
 materials where they add a sense of place without making work harder to read.
-Proper Apps and Start Here extend denser frost into their navigation or welcome
+Proper Apps, Appearance and Start Here extend denser frost into their navigation or welcome
 rail while retaining a solid work canvas. A visible material control selects
 solid navigation; unavailable compositor blur also falls back to solid paint.
 Files and upstream settings modules retain their native opaque content.
@@ -62,8 +62,9 @@ Login and lock screens are quiet, clock-first surfaces whose authentication
 controls appear when needed; account and power functions remain reachable
 without permanently covering the artwork.
 
-Proper Appearance offers a small preview-first set of coherent styles, three
-coordinated text-size presets, and the curated wallpaper gallery. It changes
+Proper Appearance separates desktop styles, text size and wallpapers into
+three pages with a shared navigation rail. Compact previews, a text-size sample
+and persistent per-page Apply actions keep selection distinct from application. It changes
 the normal KDE, GTK, terminal, desktop, and lock settings rather than creating a
 second theme system. The result is personalisation with clear choices instead
 of another settings maze.
@@ -113,7 +114,8 @@ and supported extensions. KRunner remains available as a quiet fallback.
 
 Start Here is a passive hub for applications, appearance, updates, shortcuts,
 System Settings, and support. Start Here never autostarts and does not turn first
-boot into onboarding. System Settings opens on a concise set of everyday
+boot into onboarding. Its included help guide works offline; online feedback is
+a separate optional link. System Settings opens on a concise set of everyday
 settings cards, with coordinated symbolic category icons; the complete sidebar
 and search remain available.
 

@@ -1,6 +1,6 @@
 Name:           proper-welcome
 Version:        0.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        Proper Linux live-session welcome
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -17,7 +17,7 @@ desktop and launching Fedora's maintained Anaconda installer, plus a passive
 Start Here hub for the installed desktop.
 
 %prep
-cp %{_sourcedir}/main.cpp %{_sourcedir}/proper-welcome.pro .
+cp %{_sourcedir}/main.cpp %{_sourcedir}/proper-welcome.pro %{_sourcedir}/proper-help.h %{_sourcedir}/help.md %{_sourcedir}/help.qrc .
 
 cp %{_sourcedir}/../proper-look-and-feel/proper-action-button.h %{_sourcedir}/../proper-look-and-feel/proper-material-window.h .
 
@@ -40,6 +40,9 @@ install -Dpm 0644 %{_sourcedir}/proper-start.desktop %{buildroot}%{_datadir}/app
 %{_datadir}/applications/proper-start.desktop
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-16
+- Include a readable offline help guide with optional online feedback
+
 * Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-15
 - Introduce native frosted navigation with solid content and a solid fallback
 

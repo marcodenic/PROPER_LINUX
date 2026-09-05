@@ -132,3 +132,51 @@ An experiment to suppress the Settings home heading through the KCM toolbar
 style did not remove the visible host strip. That ineffective code was removed;
 the final chrome cleanup preserves the heading. Intermediate captures are not
 accepted as evidence of heading removal.
+
+## Follow-up after material approval
+
+The approved material/chrome pass is committed locally as 357e67e. Subsequent
+work remains uncommitted for review. The taskbar corner artwork, mask, rim and
+shadow are unchanged: the product manager requested assessment only. The small
+crop looks soft, but native-resolution comparison is needed to separate edge
+antialiasing/rim contrast from VM or screenshot resampling before tuning it.
+
+Appearance now separates style, text size and wallpaper tasks, keeps Apply
+controls outside scrolling galleries, previews text size locally, and shares
+the native frosted navigation helper. Settings home uses shorter, quieter cards.
+Start Here opens an embedded offline help document; the formerly blocking
+GitHub destination is an optional online link with an access caveat.
+
+A disposable per-app Dolphin 26.08.0 / Fedora Kvantum 1.1.6 experiment confirmed
+frosted Places with opaque file content. The default and KvArcDark trials changed
+other controls; the latter also left text behind the sidebar visible when KWin
+blur was unloaded. This is a feasibility result, not a shipped style. Kvantum
+and its data package were removed after the test; no global style preference or
+Dolphin configuration was changed. The candidate needs a solid fallback,
+coherent controls, and scale/interaction validation before adoption. Original
+upstream assets and temporary variants stay outside Git in review evidence.
+
+Compatibility guidance consulted:
+- https://doc.qt.io/qt-6/qtextbrowser.html
+- https://doc.qt.io/qt-6/qwidget-styling.html
+- https://develop.kde.org/hig/layout_and_nav/
+- https://packages.fedoraproject.org/pkgs/kvantum/kvantum/fedora-44.html
+- https://raw.githubusercontent.com/tsujan/Kvantum/V1.1.6/Kvantum/doc/Theme-Config
+
+Discover’s catalogue-heavy update view, broader native picker/permission
+consistency and complete failure/recovery journeys remain separate work. This
+pass does not replace the Fedora updater or add another upstream source fork.
+
+The earlier heading-strip experiment was inconclusive because Qt reused cached
+QML after the RPM replacement. Qt 6.11.2 rcc stamps resources from
+SOURCE_DATE_EPOCH, which the Fedora build derives from the RPM changelog. The
+Proper changelog now advances that timestamp alongside the QML update; normal
+upgrade testing must retain the existing cache to verify invalidation.
+Source: https://github.com/qt/qtbase/blob/v6.11.2/src/tools/rcc/rcc.cpp
+
+The normal-launch upgrade check passed with plasma-desktop 6.7.4-1.fc44.proper11:
+Settings home now omits the duplicate heading strip. Keyboard still has its
+native heading, Back navigation and Apply action. No QML cache was deleted.
+After product-manager feedback, Appearance caps preview card widths and adds
+wallpaper columns as the window grows (six at full HD), rather than stretching
+three image containers across a maximized window.

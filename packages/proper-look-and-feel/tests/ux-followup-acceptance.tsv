@@ -1,0 +1,5 @@
+help-offline	Start Here opens a local readable guide without a browser or network dependency; Close returns to the hub.
+appearance-style	Appearance has a frosted navigation rail, readable compact style previews and visible Apply action.
+appearance-wallpapers	Wallpapers has a scrollable gallery and always-visible apply controls; selecting a preview does not change the desktop.
+appearance-text	Text size has three reachable presets and its own Apply action.
+settings-compact	Quick Settings cards have compact balanced spacing, readable descriptions and working pointer navigation.

@@ -8,6 +8,7 @@ import org.kde.kcmutils as KCMUtils
 
 KCMUtils.SimpleKCM {
     id: root
+    globalToolBarStyle: Kirigami.ApplicationHeaderStyle.None
     Component.onCompleted: kcm.buttons = 0 // Navigation page: no settings to apply.
     topPadding: 24
     leftPadding: 24
@@ -22,24 +23,24 @@ KCMUtils.SimpleKCM {
         required property string description
         required property string symbol
         required property string module
-        implicitHeight: Math.max(108, contentItem.implicitHeight + topPadding + bottomPadding)
+        implicitHeight: Math.max(76, contentItem.implicitHeight + topPadding + bottomPadding)
         hoverEnabled: true
-        padding: 18
+        padding: 14
         Accessible.name: title
         Accessible.description: description
         onClicked: kcm.openKCM(module)
         background: Rectangle {
-            radius: 12
+            radius: 9
             color: card.hovered ? Qt.tint(Kirigami.Theme.backgroundColor, Qt.alpha(Kirigami.Theme.highlightColor, 0.08)) : Kirigami.Theme.alternateBackgroundColor
-            border.width: card.visualFocus ? 2 : 1
+            border.width: card.visualFocus ? 2 : 0
             border.color: card.visualFocus ? Kirigami.Theme.highlightColor : Qt.alpha(Kirigami.Theme.textColor, 0.08)
         }
         contentItem: RowLayout {
             spacing: 16
             Kirigami.Icon {
                 source: card.symbol
-                Layout.preferredWidth: 28
-                Layout.preferredHeight: 28
+                Layout.preferredWidth: 24
+                Layout.preferredHeight: 24
                 color: Kirigami.Theme.textColor
             }
             ColumnLayout {
@@ -53,12 +54,12 @@ KCMUtils.SimpleKCM {
     }
 
     ColumnLayout {
-        spacing: 24
-        Layout.maximumWidth: 900
+        spacing: 20
+        Layout.maximumWidth: 820
         ColumnLayout {
             spacing: 8
             Layout.topMargin: 12
-            Kirigami.Heading { text: i18n("Make it yours"); level: 1; font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.8; font.weight: Font.DemiBold }
+            Kirigami.Heading { text: i18n("Make it yours"); level: 1; font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.6; font.weight: Font.DemiBold }
             QQC2.Label {
                 text: i18n("Your desktop, devices and everyday preferences.")
                 color: Qt.alpha(Kirigami.Theme.textColor, 0.72)

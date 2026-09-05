@@ -43,7 +43,7 @@ KDE continue to deliver their mature infrastructure and security updates.
 | `packages/proper-launchers/` | Pinned Vicinae build, reliable opener, desktop actions, arrangement, OCR, and shortcut reference |
 | `packages/proper-terminal/` | Pinned Ghostty build, terminal defaults, `btop`, and Files integration |
 | `packages/proper-apps/` | Curated catalogue UI, provider execution, state reconciliation, web apps, and agent selection |
-| `packages/proper-welcome/` | Passive Start Here hub and live install entry point |
+| `packages/proper-welcome/` | Passive Start Here hub, embedded offline help and live install entry point |
 | `packages/plasma-login-manager/` | Fedora source-package pin and the narrow Proper login composition patch |
 | `packages/plasma-desktop/` | Fedora source-package pin, exact task states, window previews, and Settings home presentation |
 | `packages/plasma-workspace/` | Fedora source-package pin and native tray tooltip composition |
@@ -230,16 +230,22 @@ Use the cheapest loop that can answer the question:
    session.
 2. Promote the intentional settings or code into the owning RPM and test both
    a new user and a user with custom settings.
-3. Rebuild the ISO when image composition, boot, login, live behaviour,
-   installer behaviour, or the complete installed journey is in scope.
+3. Rebuild the ISO for image integration as defined in `AGENTS.md`: image
+   composition, boot, installer, first boot, live behaviour, an explicit
+   release, installation, or VM review, or behaviour no cheaper loop can
+   validate. A login presentation change alone can use a representative
+   disposable preview.
 
-Every visible UX change also defines named observable states before graphical
-review. `scripts/verify-ux` binds those checks to the exact ISO, installed disk,
-single QEMU PID, and VM sockets; captures a distinct 1920×1080 framebuffer for
-each state; and refuses to finalize until every capture has an explicit visual
-observation. The evidence stays in the generated build area, while the
-acceptance criteria and implementation remain versioned. This is a required
-gate, not a substitute for product-manager visual judgement.
+Every visible UX change defines named observable states before graphical
+review and captures the resulting screens in the cheapest representative
+disposable preview, with an explicit visual observation for each state.
+Image integration additionally requires `scripts/verify-ux`, which binds those
+checks to the exact ISO, installed disk, single QEMU PID, and VM sockets;
+captures a distinct 1920×1080 framebuffer for each state; and refuses to
+finalize until every capture has an explicit visual observation. The evidence
+stays in the generated build area, while the acceptance criteria and
+implementation remain versioned. These checks do not replace product-manager
+visual judgement.
 
 The QEMU review path corrects the firmware's inherited 640×480 mode from inside
 the Plasma Setup and Plasma Login Manager sessions before visual capture. The
@@ -324,3 +330,10 @@ preventing a transient startup display geometry from persisting a narrow panel.
 Only creation paths write this value; existing user sizes remain untouched.
 
 The system-surfaces pass uses the existing landing-page KCM for practical settings cards and native module navigation. Appearance opens Proper Appearance. Original symbolic category icons use the existing icon-theme inheritance layer; selected-text contrast has its own semantic token.
+
+The first-party Apps, Appearance and Start Here navigation surfaces share
+`proper-material-window.h` from Look and Feel. It confines native KWin blur to
+the translucent rail, retains opaque content and honours a shared solid-material
+preference. The Help document is embedded in Welcome’s Qt resource bundle; no
+network request is required to read it. Appearance’s page navigation and local
+text preview leave the existing apply operations unchanged.

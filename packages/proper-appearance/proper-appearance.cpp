@@ -1,4 +1,6 @@
+#include "proper-material-window.h"
 #include <QApplication>
+#include <QStackedWidget>
 #include <QButtonGroup>
 #include <QDir>
 #include <QFile>
@@ -133,13 +135,13 @@ static QPixmap variantPreview(const AppearanceVariant &variant) {
     return preview;
 }
 
-class ProperAppearance final : public QWidget {
+class ProperAppearance final : public ProperMaterialWindow {
 public:
     ProperAppearance() {
         setObjectName("properRoot");
         setWindowTitle("Appearance");
         setWindowIcon(properIcon("proper-appearance"));
-        resize(1160, 820);
+        resize(1120, 640);
         setMinimumSize(760, 520);
 
         const QJsonObject palette = properPalette();
@@ -184,43 +186,27 @@ public:
             {"large", "Large", "Easier to read", 12, 10, 14},
         };
 
-        auto *outer = new QVBoxLayout(this);
-        outer->setContentsMargins(28, 24, 28, 22);
-        outer->setSpacing(14);
+        buildNavigation();
 
-        auto *title = new QLabel("Appearance");
-        QFont titleFont = title->font();
-        titleFont.setPixelSize(28);
-        titleFont.setBold(true);
-        title->setFont(titleFont);
-        outer->addWidget(title);
-        auto *intro = new QLabel("A small set of coherent looks. Preview first; nothing changes until you apply it.");
-        intro->setObjectName("subtitle");
-        outer->addWidget(intro);
-
-        auto *scroll = new QScrollArea;
-        scroll->setWidgetResizable(true);
-        scroll->setFrameShape(QFrame::NoFrame);
-        auto *content = new QWidget;
-        auto *root = new QVBoxLayout(content);
-        root->setContentsMargins(0, 4, 0, 4);
-        root->setSpacing(12);
-
-        addSectionHeading(root, "Desktop style", "Colour, wallpaper, icons, and the Proper shell move together.");
+        auto stylePage = makePage("Desktop style", "Preview a coordinated look, then apply it when you are ready.");
+        auto *root = stylePage.body;
         variantGroup = new QButtonGroup(this);
         variantGroup->setExclusive(true);
         variantGrid = new QGridLayout;
         variantGrid->setSpacing(16);
+        variantGrid->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         for (int index = 0; index < variants.size(); ++index) {
             const auto &variant = variants[index];
             auto *card = new QToolButton;
             card->setText(variant.name + "\n" + variant.description);
             card->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
             card->setCheckable(true);
-            card->setMinimumSize(300, 242);
+            card->setFocusPolicy(Qt::StrongFocus);
+            card->setMinimumSize(220, 192);
+            card->setMaximumWidth(260);
             card->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
             card->setIcon(QIcon(variantPreview(variant)));
-            card->setIconSize(QSize(320, 165));
+            card->setIconSize(QSize(240, 124));
             card->setAccessibleName(variant.name + ". " + variant.description);
             variantGroup->addButton(card, index);
             variantCards.append(card);
@@ -235,9 +221,11 @@ public:
         auto *applyVariantButton = new QPushButton("Use desktop style");
         applyVariantButton->setObjectName("primary");
         variantActions->addWidget(applyVariantButton);
-        root->addLayout(variantActions);
+        stylePage.footer->addLayout(variantActions);
+        root->addStretch();
 
-        addSectionHeading(root, "Text size", "One choice coordinates Plasma, GTK apps, and new Ghostty windows.");
+        auto textPage = makePage("Text size", "Choose the size that feels comfortable across your desktop and apps.");
+        root = textPage.body;
         textGroup = new QButtonGroup(this);
         textGroup->setExclusive(true);
         auto *textRow = new QHBoxLayout;
@@ -248,18 +236,26 @@ public:
             button->setObjectName("textPreset");
             button->setText(preset.name + "\n" + preset.description);
             button->setCheckable(true);
+            button->setFocusPolicy(Qt::StrongFocus);
             button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
             textGroup->addButton(button, index);
             textRow->addWidget(button);
         }
         auto *applyTextButton = new QPushButton("Use text size");
-        textRow->addWidget(applyTextButton);
         root->addLayout(textRow);
+        textPreview = new QLabel("Make yourself at home.\n\nYour files, favourite apps and everyday work, at a size that is comfortable to read.");
+        textPreview->setWordWrap(true);
+        textPreview->setMargin(24);
+        root->addWidget(textPreview);
+        root->addStretch();
+        textPage.footer->addWidget(applyTextButton, 0, Qt::AlignRight);
 
-        addSectionHeading(root, "Wallpapers", "Change only the desktop and lock-screen background, or sync the login screen too.");
+        auto wallpaperPage = makePage("Wallpapers", "Choose a background for your desktop and lock screen.");
+        root = wallpaperPage.body;
         wallpaperGroup = new QButtonGroup(this);
         wallpaperGroup->setExclusive(true);
         wallpaperGrid = new QGridLayout;
+        wallpaperGrid->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         wallpaperGrid->setHorizontalSpacing(18);
         wallpaperGrid->setVerticalSpacing(18);
         for (int index = 0; index < wallpapers.size(); ++index) {
@@ -268,9 +264,11 @@ public:
             card->setText(wallpaper.name);
             card->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
             card->setCheckable(true);
-            card->setMinimumSize(260, 176);
+            card->setFocusPolicy(Qt::StrongFocus);
+            card->setMinimumSize(210, 156);
+            card->setMaximumWidth(244);
             card->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-            card->setIconSize(QSize(280, 138));
+            card->setIconSize(QSize(224, 126));
             if (QFileInfo::exists(wallpaper.path)) card->setIcon(QIcon(wallpaper.path));
             wallpaperGroup->addButton(card, index);
             wallpaperCards.append(card);
@@ -288,11 +286,9 @@ public:
         everywhereButton->setIcon(QIcon::fromTheme("security-high"));
         wallpaperActions->addWidget(applyWallpaperButton);
         wallpaperActions->addWidget(everywhereButton);
-        root->addLayout(wallpaperActions);
+        wallpaperPage.footer->addLayout(wallpaperActions);
         root->addStretch();
 
-        scroll->setWidget(content);
-        outer->addWidget(scroll, 1);
 
         QSettings preferences(configRoot() + "/proper-linux/appearance.ini", QSettings::IniFormat);
         const QString selectedVariant = preferences.value("Appearance/variant", variants.first().id).toString();
@@ -306,6 +302,8 @@ public:
         for (int index = 0; index < textPresets.size(); ++index)
             if (textPresets[index].id == selectedText) textIndex = index;
         textGroup->button(textIndex)->setChecked(true);
+        updateTextPreview(textIndex);
+        connect(textGroup, &QButtonGroup::idClicked, this, [this](int index) { updateTextPreview(index); });
         rebuildVariantGrid(width());
         rebuildWallpaperGrid(width());
 
@@ -321,25 +319,90 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event) override {
-        QWidget::resizeEvent(event);
+        ProperMaterialWindow::resizeEvent(event);
         rebuildVariantGrid(event->size().width());
         rebuildWallpaperGrid(event->size().width());
     }
 
 private:
-    static void addSectionHeading(QVBoxLayout *layout, const QString &title, const QString &copy) {
+    void buildNavigation() {
+        auto *outer = new QHBoxLayout(this);
+        outer->setContentsMargins(0, 0, 0, 0);
+        outer->setSpacing(0);
+        auto *navigation = new QWidget;
+        navigation->setFixedWidth(210);
+        auto *nav = new QVBoxLayout(navigation);
+        nav->setContentsMargins(18, 24, 18, 20);
+        auto *brand = new QLabel("Appearance");
+        QFont brandFont = brand->font();
+        brandFont.setBold(true);
+        brand->setFont(brandFont);
+        nav->addWidget(brand);
+        nav->addSpacing(14);
+        pages = new QStackedWidget;
+        auto *sections = new QButtonGroup(this);
+        const QStringList names = {"Desktop style", "Text size", "Wallpapers"};
+        for (int index = 0; index < names.size(); ++index) {
+            auto *button = new QToolButton;
+            button->setText(names[index]);
+            button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+            button->setCheckable(true);
+            button->setFocusPolicy(Qt::StrongFocus);
+            button->setObjectName("navButton");
+            button->setMinimumHeight(36);
+            sections->addButton(button, index);
+            nav->addWidget(button);
+        }
+        sections->button(0)->setChecked(true);
+        connect(sections, &QButtonGroup::idClicked, pages, &QStackedWidget::setCurrentIndex);
+        nav->addStretch();
+        nav->addWidget(materialControl(navigation));
+        setNavigation(navigation);
+        outer->addWidget(navigation);
+        outer->addWidget(pages, 1);
+
+    }
+
+    void updateTextPreview(int index) {
+        QFont font = textPreview->font();
+        font.setPointSize(textPresets[index].uiSize);
+        textPreview->setFont(font);
+    }
+
+    struct AppearancePage { QVBoxLayout *body; QVBoxLayout *footer; };
+
+    AppearancePage makePage(const QString &title, const QString &description) {
+        auto *page = new QWidget;
+        auto *layout = new QVBoxLayout(page);
+        layout->setContentsMargins(26, 24, 26, 20);
+        layout->setSpacing(16);
         auto *heading = new QLabel(title);
-        heading->setObjectName("sectionTitle");
-        layout->addSpacing(8);
+        QFont font = heading->font();
+        font.setPointSizeF(font.pointSizeF() * 1.8);
+        font.setBold(true);
+        heading->setFont(font);
         layout->addWidget(heading);
-        auto *description = new QLabel(copy);
-        description->setObjectName("sectionCopy");
-        description->setWordWrap(true);
-        layout->addWidget(description);
+        auto *copy = new QLabel(description);
+        copy->setObjectName("subtitle");
+        copy->setWordWrap(true);
+        layout->addWidget(copy);
+        auto *scroll = new QScrollArea;
+        scroll->setWidgetResizable(true);
+        scroll->setFrameShape(QFrame::NoFrame);
+        auto *content = new QWidget;
+        auto *body = new QVBoxLayout(content);
+        body->setContentsMargins(0, 0, 0, 0);
+        body->setSpacing(12);
+        scroll->setWidget(content);
+        layout->addWidget(scroll, 1);
+        auto *footer = new QVBoxLayout;
+        layout->addLayout(footer);
+        pages->addWidget(page);
+        return {body, footer};
     }
 
     void rebuildWallpaperGrid(int width) {
-        const int wanted = width >= 1020 ? 3 : width >= 700 ? 2 : 1;
+        const int wanted = qMax(1, (width - 244) / 254);
         if (wanted == wallpaperColumns && wallpaperGrid->count() == wallpaperCards.size()) return;
         wallpaperColumns = wanted;
         while (auto *item = wallpaperGrid->takeAt(0)) delete item;
@@ -348,7 +411,7 @@ private:
     }
 
     void rebuildVariantGrid(int width) {
-        const int wanted = width >= 1040 ? 3 : width >= 700 ? 2 : 1;
+        const int wanted = width >= 1040 ? 3 : width >= 760 ? 2 : 1;
         if (wanted == variantColumns && variantGrid->count() == variantCards.size()) return;
         variantColumns = wanted;
         while (auto *item = variantGrid->takeAt(0)) delete item;
@@ -495,6 +558,8 @@ private:
     QVector<TextPreset> textPresets;
     QVector<QToolButton *> variantCards;
     QVector<QToolButton *> wallpaperCards;
+    QLabel *textPreview = nullptr;
+    QStackedWidget *pages = nullptr;
     QGridLayout *variantGrid = nullptr;
     QButtonGroup *variantGroup = nullptr;
     QButtonGroup *textGroup = nullptr;
