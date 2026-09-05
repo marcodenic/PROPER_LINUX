@@ -17,8 +17,8 @@ Image=summer_1am
 cursorTheme=breeze_cursors
 
 [kwinrc][org.kde.kdecoration2]
-library=org.kde.breeze
-theme=Breeze
+library=org.kde.kwin.aurorae.v2
+theme=__aurorae__svg__proper-midnight
 
 [ksplashrc][KSplash]
 Theme=com.properlinux.midnight.desktop

@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        55%{?dist}
+Release:        56%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -10,6 +10,7 @@ BuildRequires:  python3-pyside6
 Provides:       system-backgrounds-kde
 Requires:       plasma-workspace >= 6.7
 Requires:       proper-branding >= 0.1-4
+Requires:       aurorae >= 6.7.4
 Requires:       breeze-icon-theme
 Requires:       google-noto-sans-fonts
 Requires:       rsms-inter-fonts = 4.1-3%{?dist}
@@ -27,6 +28,7 @@ python3 %{_sourcedir}/generate-panel-material.py %{_sourcedir}/tokens.yaml %{_bu
 python3 %{_sourcedir}/generate-semantic-assets.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-semantic
 
 %install
+python3 %{_sourcedir}/generate-window-decoration.py %{_sourcedir}/tokens.yaml %{buildroot}%{_datadir}/aurorae/themes
 install -Dpm 0644 %{_sourcedir}/proper-blue-hour.png %{buildroot}%{_datadir}/wallpapers/ProperBlueHour/contents/images/1920x1080.png
 install -Dpm 0644 %{_sourcedir}/ProperBlueHour/metadata.json %{buildroot}%{_datadir}/wallpapers/ProperBlueHour/metadata.json
 install -Dpm 0644 %{_sourcedir}/proper-horizon-dark.png %{buildroot}%{_datadir}/wallpapers/ProperHorizon/contents/images/1920x1080.png
@@ -95,6 +97,8 @@ install -Dpm 0644 %{_sourcedir}/proper.index.theme "$icon_root/proper/index.them
 install -Dpm 0644 %{_sourcedir}/proper-dark.index.theme "$icon_root/proper-dark/index.theme"
 for size in 16 22 24 32 48 64 96; do
   install -d "$icon_root/proper/apps/$size" "$icon_root/proper-dark/apps/$size"
+  sed 's/#f8fbff/#18202b/g' %{_sourcedir}/../proper-launchers/proper-vicinae.svg > "$icon_root/proper/apps/$size/proper-vicinae.svg"
+  install -m 0644 %{_sourcedir}/../proper-launchers/proper-vicinae.svg "$icon_root/proper-dark/apps/$size/proper-vicinae.svg"
   ln -s "../../../breeze/places/$size/folder-blue.svg" \
     "$icon_root/proper/apps/$size/org.kde.dolphin.svg"
   ln -s "../../../breeze-dark/places/$size/folder-blue.svg" \
@@ -132,6 +136,7 @@ install -Dpm 0644 %{_builddir}/proper-panel/popup-background.svg "$style_root/wi
 install -Dpm 0644 %{_builddir}/proper-panel/popup-background.svg "$style_root/widgets/translucentbackground.svg"
 install -Dpm 0644 %{_builddir}/proper-panel/solid-popup-background.svg "$style_root/solid/widgets/tooltip.svg"
 install -Dpm 0644 %{_builddir}/proper-panel/solid-popup-background.svg "$style_root/solid/widgets/translucentbackground.svg"
+python3 %{_sourcedir}/generate-light-style.py %{_sourcedir}/tokens.yaml "$style_root" %{_builddir}/proper-semantic/ProperLight.colors %{buildroot}%{_datadir}/plasma/desktoptheme/proper-light
 install -Dpm 0644 %{_sourcedir}/LICENSES/CC-BY-SA-4.0.txt %{buildroot}%{_licensedir}/%{name}/CC-BY-SA-4.0.txt
 install -Dpm 0644 %{_sourcedir}/LICENSES/LGPL-3.0-only.txt %{buildroot}%{_licensedir}/%{name}/LGPL-3.0-only.txt
 install -Dpm 0644 %{_sourcedir}/LICENSES/GPL-2.0-or-later.txt %{buildroot}%{_licensedir}/%{name}/GPL-2.0-or-later.txt
@@ -158,6 +163,7 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/01-migr
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/03-migrate-status-shade-to-shelf-v3.js "$shell_root/contents/updates/03-migrate-status-shade-to-shelf-v3.js"
 
 %check
+python3 %{_sourcedir}/tests/test_window_decoration.py %{buildroot}%{_datadir}/aurorae/themes
 QT_QPA_PLATFORM=offscreen python3 %{_sourcedir}/tests/test_panel_material.py %{_builddir}/proper-panel
 # Proper overrides Files and selected status glyphs, inheriting the upstream
 # Breeze themes. Preserve every size-specific source link.
@@ -398,6 +404,10 @@ grep -A12 '^\[Colors:Header\]$' %{buildroot}%{_datadir}/color-schemes/Proper.col
 %{_datadir}/plasma/look-and-feel/com.properlinux.light.desktop/
 %{_datadir}/plasma/look-and-feel/com.properlinux.midnight.desktop/
 %{_datadir}/plasma/desktoptheme/proper/
+%{_datadir}/plasma/desktoptheme/proper-light/
+%{_datadir}/aurorae/themes/proper-dark/
+%{_datadir}/aurorae/themes/proper-light/
+%{_datadir}/aurorae/themes/proper-midnight/
 %{_datadir}/plasma/shells/com.properlinux.desktop/
 %{_datadir}/icons/proper/
 %{_datadir}/icons/proper-dark/
@@ -416,6 +426,9 @@ grep -A12 '^\[Colors:Header\]$' %{buildroot}%{_datadir}/color-schemes/Proper.col
 %license %{_licensedir}/%{name}/GPL-3.0-or-later.txt
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-56
+- Derive matching light shell material and controls from the shared geometry
+
 * Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-55
 - Keep shelf material consistent in floating and attached states
 

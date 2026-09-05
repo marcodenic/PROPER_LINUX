@@ -1,6 +1,6 @@
 Name:           proper-agent-status
 Version:        0.2
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Proper Linux Command Centre and coding-agent usage widget
 License:        GPL-3.0-or-later
 BuildArch:      noarch
@@ -51,6 +51,9 @@ ln -s ../proper-agent-panel.timer %{buildroot}%{_userunitdir}/timers.target.want
 %{_userunitdir}/timers.target.wants/proper-agent-panel.timer
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.2-10
+- Use semantic chart colours in both light and dark shell palettes
+
 * Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.2-9
 - Keep all Command Centre corners and leave clearance above the shelf
 

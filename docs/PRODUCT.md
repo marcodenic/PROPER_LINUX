@@ -114,6 +114,8 @@ into onboarding.
 ### Windows that work both ways
 
 Windows float, overlap, drag, resize, minimise, maximise, and close normally.
+Title bars use frosted material matched to the selected light or dark style,
+without a painted frame around application content.
 Edge snapping and quick tiling make halves and quadrants easy with either mouse
 or keyboard. Arrange Workspace can temporarily place eligible windows into a
 chosen native KWin layout and restore their previous floating geometry; new

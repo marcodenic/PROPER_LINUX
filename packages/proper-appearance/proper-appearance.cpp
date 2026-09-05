@@ -150,7 +150,7 @@ public:
              semanticColour(palette, "dark", "surface", "#181d25"),
              semanticColour(palette, "dark", "text", "#f1f4f8"),
              semanticColour(palette, "dark", "accent", "#91b4ff")},
-            {"com.properlinux.light.desktop", "ProperLight", "Alpine Light", "Airy light surfaces · dark shell", "ProperHorizon",
+            {"com.properlinux.light.desktop", "ProperLight", "Alpine Light", "Light surfaces · frosted shelf", "ProperHorizon",
              "/usr/share/wallpapers/ProperHorizon/contents/images/1920x1080.png",
              semanticColour(palette, "light", "base", "#f6f7fb"),
              semanticColour(palette, "light", "surface", "#ffffff"),

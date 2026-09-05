@@ -7,5 +7,7 @@ apps	Proper Apps uses consistent sans-serif text in headings, cards and buttons;
 preview	Hovering a running task displays its native window preview without obscuring shelf controls.
 attached	A maximised window retains translucent shelf material; Command Centre has four complete rounded corners and an 8-pixel gap.
 notification	A real desktop notification has a coherent frame, legible text and a working dismiss control.
-windows	Floating windows have no grey inset rim and retain pointer resizing and titlebar controls.
+windows	Ghostty has no painted side/bottom border; its translucent titlebar blurs content behind it. Native resizing, titlebar buttons and menu work in light and dark styles.
 start	Start Here presents concise guidance and usable pointer actions.
+light	Applying Alpine Light gives the shelf and Command Centre pale material and readable dark glyphs without resetting layout.
+startup	Opening dot, inactive dots and active line share one vertical centre with no jump when the app opens.

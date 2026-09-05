@@ -1,6 +1,6 @@
 Name:           proper-appearance
 Version:        0.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        Proper Linux appearance, text sizing, and arrival sync
 License:        GPL-3.0-or-later
 BuildRequires:  qt6-qtbase-devel
@@ -32,6 +32,9 @@ install -Dpm 0755 %{_sourcedir}/proper-set-login-wallpaper %{buildroot}%{_libexe
 %{_datadir}/applications/proper-appearance.desktop
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-11
+- Describe Alpine Light’s matching frosted shell accurately
+
 * Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-10
 - Render every desktop-style preview from the installed semantic palette
 

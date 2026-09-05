@@ -295,6 +295,14 @@ The Plasma 6.7.4 scripting opacity setter calls QWindow::setOpacity rather
 than PanelView::setOpacityMode. Proper therefore declares stable material in
 the style’s AdaptiveTransparency setting. Command Centre uses
 PopupPlasmaWindow’s Never border-removal strategy and an 8-pixel margin.
-Breeze’s outline and physical side/bottom borders are disabled through layered
-KConfig defaults; pointer resizing retains upstream invisible resize borders.
-Stock Breeze has no supported blurred-titlebar setting.
+Proper supplies original SVG title-bar themes to Fedora’s Aurorae 6.7.4 v2
+decoration engine. Native KDecoration3 owns buttons, dragging, resizing, and
+menus. The title material has 66% opacity and a native blur mask; there are no
+painted side/bottom borders or overlapping shadow. Aurorae does not round the
+client’s bottom corners. This avoids Breeze’s opaque title bar and the shadow
+underlap visible through translucent terminal content. Light shell artwork is
+derived from the same Proper geometry with the light semantic palette.
+
+The startup dot now shares Task.qml’s state-indicator container with the
+running dots and active line; the icon-sized BusyIndicator loader is empty.
+All marks share one vertical centre while startup motion is horizontal only.

@@ -15,9 +15,9 @@ FocusScope {
     readonly property color foreground: Kirigami.Theme.textColor
     readonly property color secondary: Kirigami.Theme.disabledTextColor
     readonly property color tertiary: Kirigami.Theme.disabledTextColor
-    readonly property color downloadColor: "#79eadb"
-    readonly property color uploadColor: "#91b4ff"
-    readonly property color urgent: "#ff7184"
+    readonly property color downloadColor: Kirigami.Theme.positiveTextColor
+    readonly property color uploadColor: Kirigami.Theme.highlightColor
+    readonly property color urgent: Kirigami.Theme.negativeTextColor
     readonly property bool narrow: width < 680
 
     implicitWidth: Math.min(720, Math.max(640, Screen.width - 96))

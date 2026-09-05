@@ -455,7 +455,7 @@ done
 }
 
 grep -q 'id: launchIndicator' "$task_loading_patch"
-grep -q 'id: launchPath' "$task_loading_patch"
+grep -q 'anchors.verticalCenter: parent.verticalCenter' "$task_loading_patch"
 grep -q 'id: launchMotion' "$task_loading_patch"
 grep -q 'duration: 700' "$task_loading_patch"
 grep -q 'id: properStateIndicator' "$task_loading_patch"

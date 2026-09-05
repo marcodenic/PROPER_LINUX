@@ -8,7 +8,7 @@ ColorScheme=ProperLight
 Theme=proper
 
 [plasmarc][Theme]
-name=proper
+name=proper-light
 
 [Wallpaper]
 Image=ProperHorizon
@@ -17,8 +17,8 @@ Image=ProperHorizon
 cursorTheme=breeze_cursors
 
 [kwinrc][org.kde.kdecoration2]
-library=org.kde.breeze
-theme=Breeze
+library=org.kde.kwin.aurorae.v2
+theme=__aurorae__svg__proper-light
 
 [ksplashrc][KSplash]
 Theme=com.properlinux.light.desktop
