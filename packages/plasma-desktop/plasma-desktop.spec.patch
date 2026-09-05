@@ -5,11 +5,11 @@
  Summary: Plasma Desktop shell
  Version: 6.7.4
 -Release: 1%{?dist}
-+Release: 1%{?dist}.proper5
++Release: 1%{?dist}.proper8
  
  License: BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND (GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only)
  URL:     https://invent.kde.org/plasma/%{name}
-@@ -27,6 +27,10 @@
+@@ -27,6 +27,11 @@
  # Hide virtual keyboard indicator on sddm.
  # Do not remove this as it breaks Fedora's QA policy
  Patch101:       hide-virtual-keyboard-indicator-on-sddm.patch
@@ -17,6 +17,7 @@
 +# dots, native window previews, and a travelling-dot launch state. Keep this
 +# narrow downstream patch until task-specific state hooks are exposed.
 +Patch102:       proper-task-loading-indicator.patch
++Patch103:       proper-settings-home.patch
  
  ## upstreamable patches
  

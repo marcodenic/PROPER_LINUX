@@ -1,0 +1,1 @@
+Original Proper Linux artwork (2026), GPL-3.0-or-later. Consistent 24px canvas, 1.6px rounded strokes. KDE semantic icon names preserve upstream identity and icon-theme inheritance. No third-party artwork copied.

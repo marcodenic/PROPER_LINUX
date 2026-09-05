@@ -343,6 +343,15 @@ def main() -> int:
         popup_svg(tint=material["panel_dense"], opacity=float(opacity["panel_dense"]), dense=True, **popup_shared),
         encoding="utf-8",
     )
+    tooltip_shared = dict(popup_shared, rim_opacity=float(opacity["tooltip_edge"]))
+    (arguments.output / "tooltip-background.svg").write_text(
+        popup_svg(tint=material["popup_tint"], opacity=float(opacity["tooltip"]), dense=False, **tooltip_shared),
+        encoding="utf-8",
+    )
+    (arguments.output / "solid-tooltip-background.svg").write_text(
+        popup_svg(tint=material["panel_dense"], opacity=1.0, dense=True, **tooltip_shared),
+        encoding="utf-8",
+    )
     return 0
 
 

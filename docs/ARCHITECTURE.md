@@ -45,7 +45,8 @@ KDE continue to deliver their mature infrastructure and security updates.
 | `packages/proper-apps/` | Curated catalogue UI, provider execution, state reconciliation, web apps, and agent selection |
 | `packages/proper-welcome/` | Passive Start Here hub and live install entry point |
 | `packages/plasma-login-manager/` | Fedora source-package pin and the narrow Proper login composition patch |
-| `packages/plasma-desktop/` | Fedora source-package pin and the narrow exact task-state and preview-filter patch |
+| `packages/plasma-desktop/` | Fedora source-package pin, exact task states, window previews, and Settings home presentation |
+| `packages/plasma-workspace/` | Fedora source-package pin and native tray tooltip composition |
 | `apps/` | Catalogue schema and data plus the application-icon provenance ledger |
 | `artwork/` | Shipped identity, wallpaper, and preview assets |
 | `scripts/` | Build, validation, VM, and source-pinning tools |
@@ -102,18 +103,24 @@ floating geometry needed by Restore.
 
 ### Deliberate source-package exceptions
 
-Two small patches exist because the required presentation is not exposed by a
-supported theme hook:
+Three source-package exceptions exist because the required presentation is not
+exposed by a supported theme hook:
 
 - Plasma Login Manager 6.7.4 embeds its greeter composition in the executable.
   Proper rebuilds Fedora's exact source RPM with one entry-point QML patch while
   retaining upstream authentication, session, accessibility, power, service,
   and package behaviour.
 - Plasma Desktop 6.7.4 does not expose task-specific hooks for exact bounded
-  state marks. Proper carries one QML patch for the shelf's active line,
+  state marks or a themed settings-home layout. Proper carries narrow
+  presentation patches for the shelf's active line,
   inactive window-count dots, travelling startup dot, and running-window
   preview filter without changing the system-wide busy indicator or preview
-  implementation.
+  implementation. Its home-page patch provides navigation cards, retaining
+  native modules, search and sidebar, and links Appearance to Proper Appearance.
+- Plasma Workspace 6.7.4 compiles the tray tooltip delegates into its applet.
+  Proper forwards the existing icon and supplies one bounded icon/title/detail
+  component, preserving upstream custom tooltips, text formats, status and
+  interaction. libplasma stays unpatched.
 
 Each exception is version-pinned, checksum-verified, built as a normal RPM, and
 must be rebased and retested when Fedora updates its source. It should be
@@ -310,3 +317,5 @@ All marks share one vertical centre while startup motion is horizontal only.
 New Command Centre applets seed their native popup size at 720 by 330 pixels,
 preventing a transient startup display geometry from persisting a narrow panel.
 Only creation paths write this value; existing user sizes remain untouched.
+
+The system-surfaces pass uses the existing landing-page KCM for practical settings cards and native module navigation. Appearance opens Proper Appearance. Original symbolic category icons use the existing icon-theme inheritance layer; selected-text contrast has its own semantic token.

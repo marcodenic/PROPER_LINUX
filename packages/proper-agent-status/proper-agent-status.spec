@@ -1,8 +1,8 @@
 Name:           proper-agent-status
 Version:        0.2
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Proper Linux Command Centre and coding-agent usage widget
-License:        GPL-3.0-or-later
+License:        GPL-3.0-or-later AND LGPL-2.0-or-later
 BuildArch:      noarch
 BuildRequires:  python3
 Requires:       python3
@@ -20,6 +20,8 @@ local app-server and Claude through its supported status-line feed.
 python3 -m unittest discover -s %{_sourcedir}/tests -v
 
 %install
+# Share the same original tooltip composition as the compiled native tray.
+install -Dpm 0644 %{_sourcedir}/../plasma-workspace/ProperToolTip.qml %{buildroot}%{_datadir}/plasma/plasmoids/com.properlinux.statusshade/contents/ui/ProperToolTip.qml
 install -Dpm 0755 %{_sourcedir}/proper-agent-status %{buildroot}%{_bindir}/proper-agent-status
 install -Dpm 0644 %{_sourcedir}/plasmoid/metadata.json %{buildroot}%{_datadir}/plasma/plasmoids/com.properlinux.agentstatus/metadata.json
 install -Dpm 0644 %{_sourcedir}/plasmoid/contents/ui/main.qml %{buildroot}%{_datadir}/plasma/plasmoids/com.properlinux.agentstatus/contents/ui/main.qml

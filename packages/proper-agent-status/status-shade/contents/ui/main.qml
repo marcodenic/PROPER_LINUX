@@ -69,6 +69,14 @@ PlasmoidItem {
     Plasmoid.title: "Command Centre"
     toolTipMainText: "Command Centre"
     toolTipSubText: "System and agent status · Meta+S"
+    toolTipItem: ProperToolTip {
+        sourceArea: QtObject {
+            readonly property string mainText: root.toolTipMainText
+            readonly property string subText: root.toolTipSubText
+            readonly property string icon: "dashboard-show"
+            readonly property int textFormat: Text.PlainText
+        }
+    }
 
     compactRepresentation: CompactRepresentation {
         controller: root

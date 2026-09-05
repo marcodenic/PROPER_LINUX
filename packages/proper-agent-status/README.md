@@ -67,3 +67,7 @@ language of the Proper mark.
 `tests/fake_codex` implements only the documented handshake and read method. It
 is test data, is never installed by the RPM, and supplies deterministic visual
 values for an installed-VM review without copying a real account into a guest.
+
+The Command Centre uses Plasma's native tooltip ownership and the same original
+`packages/plasma-workspace/ProperToolTip.qml` as tray items (copied at RPM build
+time). Its compact view must not create a competing Qt Controls tooltip.

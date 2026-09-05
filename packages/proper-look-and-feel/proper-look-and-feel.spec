@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        57%{?dist}
+Release:        60%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -28,6 +28,9 @@ python3 %{_sourcedir}/generate-panel-material.py %{_sourcedir}/tokens.yaml %{_bu
 python3 %{_sourcedir}/generate-semantic-assets.py %{_sourcedir}/tokens.yaml %{_builddir}/proper-semantic
 
 %install
+install -Dpm 0644 %{_sourcedir}/proper-selection.upd %{buildroot}%{_datadir}/kconf_update/proper-selection.upd
+install -Dpm 0755 %{_sourcedir}/proper-selection-default-repair %{buildroot}%{_datadir}/kconf_update/proper-selection-default-repair
+install -Dpm 0644 %{_sourcedir}/selection-migration.json %{buildroot}%{_datadir}/proper-linux/ui/selection-migration.json
 python3 %{_sourcedir}/generate-window-decoration.py %{_sourcedir}/tokens.yaml %{buildroot}%{_datadir}/aurorae/themes
 install -Dpm 0644 %{_sourcedir}/proper-blue-hour.png %{buildroot}%{_datadir}/wallpapers/ProperBlueHour/contents/images/1920x1080.png
 install -Dpm 0644 %{_sourcedir}/ProperBlueHour/metadata.json %{buildroot}%{_datadir}/wallpapers/ProperBlueHour/metadata.json
@@ -115,6 +118,11 @@ for variant in proper proper-dark; do
   done
 done
 sed -i 's/#232629/#eff0f1/g' "$icon_root/proper-dark/status/22/"*.svg
+for variant in proper proper-dark; do
+  install -d "$icon_root/$variant/categories/24"
+  install -m 0644 %{_sourcedir}/settings-icons/*.svg "$icon_root/$variant/categories/24/"
+done
+sed -i 's/#232629/#eff0f1/g' "$icon_root/proper-dark/categories/24/"*.svg
 style_root=%{buildroot}%{_datadir}/plasma/desktoptheme/proper
 install -Dpm 0644 %{_sourcedir}/proper/metadata.json "$style_root/metadata.json"
 install -Dpm 0644 %{_sourcedir}/proper/plasmarc "$style_root/plasmarc"
@@ -132,9 +140,9 @@ for asset in button line lineedit listitem slider switch tabbar viewitem; do
 done
 # Notifications, tooltips, and workspace OSDs use the same approved surface
 # recipe. Everything else remains an explicit Breeze fallback.
-install -Dpm 0644 %{_builddir}/proper-panel/popup-background.svg "$style_root/widgets/tooltip.svg"
+install -Dpm 0644 %{_builddir}/proper-panel/tooltip-background.svg "$style_root/widgets/tooltip.svg"
 install -Dpm 0644 %{_builddir}/proper-panel/popup-background.svg "$style_root/widgets/translucentbackground.svg"
-install -Dpm 0644 %{_builddir}/proper-panel/solid-popup-background.svg "$style_root/solid/widgets/tooltip.svg"
+install -Dpm 0644 %{_builddir}/proper-panel/solid-tooltip-background.svg "$style_root/solid/widgets/tooltip.svg"
 install -Dpm 0644 %{_builddir}/proper-panel/solid-popup-background.svg "$style_root/solid/widgets/translucentbackground.svg"
 python3 %{_sourcedir}/generate-light-style.py %{_sourcedir}/tokens.yaml "$style_root" %{_builddir}/proper-semantic/ProperLight.colors %{buildroot}%{_datadir}/plasma/desktoptheme/proper-light
 install -Dpm 0644 %{_sourcedir}/LICENSES/CC-BY-SA-4.0.txt %{buildroot}%{_licensedir}/%{name}/CC-BY-SA-4.0.txt
@@ -163,6 +171,8 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/01-migr
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/03-migrate-status-shade-to-shelf-v3.js "$shell_root/contents/updates/03-migrate-status-shade-to-shelf-v3.js"
 
 %check
+python3 %{_sourcedir}/tests/test_selection_migration.py
+python3 %{_sourcedir}/tests/test_selection_contrast.py %{buildroot}%{_datadir}/color-schemes
 python3 %{_sourcedir}/tests/test_window_decoration.py %{buildroot}%{_datadir}/aurorae/themes
 QT_QPA_PLATFORM=offscreen python3 %{_sourcedir}/tests/test_panel_material.py %{_builddir}/proper-panel
 # Proper overrides Files and selected status glyphs, inheriting the upstream
@@ -280,11 +290,8 @@ for prefix in header footer; do
     test "$(xmllint --xpath "count(//*[@id='$prefix-$side'])" "$heading_asset")" = 1
   done
 done
-test "$(xmllint --xpath "count(//*[@id='header-top' or @id='header-left' or @id='header-right']/*[2][@fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" = 3
-test "$(xmllint --xpath "count(//*[@id='header-topleft' or @id='header-topright']/*[2][local-name()='path' and @fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" = 2
-test "$(xmllint --xpath "count(//*[@id='header-bottomleft' or @id='header-bottomright']/*[@fill='#a6afbd'])" "$heading_asset")" = 4
-test "$(xmllint --xpath "count(//*[@id='footer-bottom' or @id='footer-left' or @id='footer-right']/*[2][@fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" = 3
-test "$(xmllint --xpath "count(//*[@id='footer-bottomleft' or @id='footer-bottomright']/*[2][local-name()='path' and @fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" = 2
+# Heading slices must not paint square corners over the rounded dialog frame.
+test "$(xmllint --xpath "count(//*[@fill-opacity and number(@fill-opacity) != 0])" "$heading_asset")" = 0
 for asset in button lineedit listitem tabbar viewitem; do
   control_asset=%{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/$asset.svg
   test "$(xmllint --xpath "count(//*[contains(@id, 'hint-compose-over-border')])" "$control_asset")" = 0
@@ -386,6 +393,8 @@ grep -A12 '^\[Colors:Header\]$' %{buildroot}%{_datadir}/color-schemes/Proper.col
   grep -Fq 'BackgroundNormal=20,26,34'
 
 %files
+%{_datadir}/kconf_update/proper-selection.upd
+%{_datadir}/kconf_update/proper-selection-default-repair
 %{_datadir}/kwin/effects/proper-shelf-reveal/
 %{_datadir}/wallpapers/ProperBlueHour/
 %{_datadir}/wallpapers/ProperHorizon/

@@ -10,7 +10,7 @@
     "Id": "proper",
     "License": "GPL-3.0-or-later",
     "Name": "Proper",
-        "Version": "0.1.57",
+        "Version": "0.1.60",
     "Website": "https://github.com/proper-linux/proper-linux"
   },
   "X-Plasma-API": "5.0"

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import QtQuick
-import QtQuick.Controls as Controls
 import QtQuick.Layouts
 
 import org.kde.kirigami as Kirigami
@@ -52,9 +51,4 @@ FocusScope {
     Keys.onSpacePressed: controller.expanded = !controller.expanded
     Keys.onReturnPressed: controller.expanded = !controller.expanded
 
-    Controls.ToolTip {
-        visible: pointer.containsMouse && !controller.expanded
-        delay: Kirigami.Units.toolTipDelay
-        text: "Command Centre · Meta+S"
-    }
 }

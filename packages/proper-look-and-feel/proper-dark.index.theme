@@ -2,7 +2,7 @@
 Name=Proper Dark
 Comment=Proper application icon curation over Breeze Dark
 Inherits=breeze-dark
-Directories=apps/16,apps/22,apps/24,apps/32,apps/48,apps/64,apps/96,status/22
+Directories=apps/16,apps/22,apps/24,apps/32,apps/48,apps/64,apps/96,status/22,categories/24
 
 [apps/16]
 Size=16
@@ -45,3 +45,10 @@ Context=Status
 Type=Scalable
 MinSize=16
 MaxSize=32
+
+[categories/24]
+Size=24
+Context=Categories
+Type=Scalable
+MinSize=16
+MaxSize=64

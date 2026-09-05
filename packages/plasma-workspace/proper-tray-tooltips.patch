@@ -1,0 +1,113 @@
+--- a/applets/systemtray/CMakeLists.txt
++++ b/applets/systemtray/CMakeLists.txt
+@@ -58,6 +58,7 @@
+     CPP_SOURCES
+         systemtray.cpp
+     QML_SOURCES
++        qml/ProperToolTip.qml
+         qml/AbstractItem.qml
+         qml/BackgroundAppItem.qml
+         qml/ConfigGeneral.qml
+--- a/applets/systemtray/qml/CompactApplet.qml
++++ b/applets/systemtray/qml/CompactApplet.qml
+@@ -25,7 +25,9 @@
+     }
+     active: plasmoidItem ? !plasmoidItem.expanded : false
+     textFormat: plasmoidItem?.toolTipTextFormat ?? Text.AutoText
+-    mainItem: plasmoidItem?.toolTipItem ?? null
++    icon: plasmoidItem?.Plasmoid.icon ?? ""
++    mainItem: plasmoidItem?.toolTipItem ?? properToolTip
++    ProperToolTip { id: properToolTip; sourceArea: appletRoot }
+ 
+     property Item fullRepresentation
+     property Item compactRepresentation
+--- a/applets/systemtray/qml/PlasmoidItem.qml
++++ b/applets/systemtray/qml/PlasmoidItem.qml
+@@ -23,7 +23,9 @@
+     itemId: applet?.Plasmoid.pluginName ?? ""
+     mainText: applet && (inVisibleLayout || (applet.toolTipMainText && applet.toolTipMainText != text)) ? applet.toolTipMainText : ""
+     subText: applet?.toolTipSubText ?? ""
+-    mainItem: applet?.toolTipItem ?? null
++    icon: applet?.Plasmoid.icon ?? ""
++    mainItem: applet?.toolTipItem ?? properToolTip
++    ProperToolTip { id: properToolTip; sourceArea: plasmoidContainer }
+     textFormat: applet?.toolTipTextFormat ?? 0 /* Text.AutoText, the default value */
+     active: inVisibleLayout || (systemTrayState.activeApplet !== applet && (text != mainText || subText.length > 0))
+ 
+--- a/applets/systemtray/qml/StatusNotifierItem.qml
++++ b/applets/systemtray/qml/StatusNotifierItem.qml
+@@ -19,6 +19,8 @@
+     text: model?.Title || model?.ToolTipTitle || ""
+     mainText: inVisibleLayout || (model?.ToolTipTitle !== "" && model?.ToolTipTitle !== text) ? model?.ToolTipTitle ?? "" : ""
+     subText: model?.ToolTipSubTitle ?? ""
++    icon: iconItem.source
++    mainItem: ProperToolTip { sourceArea: taskIcon }
+     textFormat: Text.AutoText
+     active: inVisibleLayout || text != mainText || subText.length > 0
+ 
+--- /dev/null
++++ b/applets/systemtray/qml/ProperToolTip.qml
+@@ -0,0 +1,63 @@
++// SPDX-License-Identifier: LGPL-2.0-or-later
++pragma ComponentBehavior: Bound
++import QtQuick
++import QtQuick.Layouts
++import org.kde.kirigami as Kirigami
++import org.kde.plasma.components as PlasmaComponents
++
++Item {
++    id: root
++    // ToolTipArea makes the item visible when it reparents it into its popup.
++    visible: false
++    required property var sourceArea
++    implicitWidth: Math.min(420, content.implicitWidth) + 24
++    implicitHeight: content.implicitHeight + 24
++    LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
++    LayoutMirroring.childrenInherit: true
++
++    RowLayout {
++        id: content
++        anchors.fill: parent
++        anchors.margins: 12
++        spacing: 14
++        Rectangle {
++            Layout.alignment: Qt.AlignTop
++            Layout.preferredWidth: 40
++            Layout.preferredHeight: 40
++            radius: 12
++            color: Qt.alpha(Kirigami.Theme.highlightColor, 0.10)
++            visible: symbol.valid
++            Kirigami.Icon {
++                id: symbol
++                anchors.centerIn: parent
++                width: 24
++                height: 24
++                animated: false
++                source: root.sourceArea.icon
++            }
++        }
++        ColumnLayout {
++            Layout.maximumWidth: 342
++            Layout.fillWidth: true
++            spacing: 4
++            PlasmaComponents.Label {
++                Layout.fillWidth: true
++                text: root.sourceArea.mainText
++                textFormat: Text.PlainText
++                font.weight: Font.DemiBold
++                wrapMode: Text.Wrap
++                visible: text.length > 0
++            }
++            PlasmaComponents.Label {
++                Layout.fillWidth: true
++                text: root.sourceArea.subText
++                textFormat: root.sourceArea.textFormat
++                color: Qt.alpha(Kirigami.Theme.textColor, 0.72)
++                wrapMode: Text.Wrap
++                maximumLineCount: 8
++                elide: Text.ElideRight
++                visible: text.length > 0
++            }
++        }
++    }
++}

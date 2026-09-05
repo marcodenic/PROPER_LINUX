@@ -58,12 +58,12 @@ def colour_scheme(identifier: str, name: str, palette: dict[str, str], contrast:
         }
         return f"[{title}]\n" + "\n".join(f"{key}={value}" for key, value in entries.items())
 
-    selection_foreground = rgb(palette["on_accent"])
+    selection_foreground = rgb(palette["on_selection"])
     selection = {
         "BackgroundAlternate": rgb(mix(palette["selection"], palette["text"], 0.08)),
         "BackgroundNormal": rgb(palette["selection"]),
         "ForegroundActive": selection_foreground,
-        "ForegroundInactive": rgb(mix(palette["on_accent"], palette["selection"], 0.18)),
+        "ForegroundInactive": rgb(mix(palette["on_selection"], palette["selection"], 0.18)),
         "ForegroundLink": selection_foreground,
         "ForegroundNegative": selection_foreground,
         "ForegroundNeutral": selection_foreground,
@@ -225,7 +225,7 @@ visited = "{palette["visited"]}"
 
 [colors.text.selection]
 background = "{palette["selection"]}"
-foreground = "{palette["on_accent"]}"
+foreground = "{palette["on_selection"]}"
 
 [colors.input]
 background = "{palette["view_alt"]}"
@@ -277,7 +277,7 @@ def main() -> int:
     material = inline_map(source, "material")
     opacity = inline_map(source, "opacity")
 
-    required = {"base", "surface", "surface_alt", "view", "view_alt", "text", "muted", "accent", "selection", "on_accent", "positive", "warning", "urgent", "visited", "border"}
+    required = {"base", "surface", "surface_alt", "view", "view_alt", "text", "muted", "accent", "selection", "on_accent", "on_selection", "positive", "warning", "urgent", "visited", "border"}
     for name, palette in palettes.items():
         missing = required - palette.keys()
         if missing:

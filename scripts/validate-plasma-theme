@@ -328,15 +328,9 @@ for prefix in header footer; do
     }
   done
 done
-[[ "$(xmllint --xpath "count(//*[@id='header-top' or @id='header-left' or @id='header-right']/*[2][@fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" == 3 &&
-   "$(xmllint --xpath "count(//*[@id='header-topleft' or @id='header-topright']/*[2][local-name()='path' and @fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" == 2 &&
-   "$(xmllint --xpath "count(//*[@id='header-bottomleft' or @id='header-bottomright']/*[@fill='#a6afbd'])" "$heading_asset")" == 4 ]] || {
-  printf '%s header must preserve the popup rim and join its bottom separator at both sides.\n' "$heading_asset" >&2
-  exit 1
-}
-[[ "$(xmllint --xpath "count(//*[@id='footer-bottom' or @id='footer-left' or @id='footer-right']/*[2][@fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" == 3 &&
-   "$(xmllint --xpath "count(//*[@id='footer-bottomleft' or @id='footer-bottomright']/*[2][local-name()='path' and @fill='#a6afbd' and @fill-opacity='0.18'])" "$heading_asset")" == 2 ]] || {
-  printf '%s footer must preserve the popup rim across its lower corners.\n' "$heading_asset" >&2
+# PlasmoidHeading extends to the outer popup edge. Only the dialog frame paints it.
+[[ "$(xmllint --xpath "count(//*[@fill-opacity and number(@fill-opacity) != 0])" "$heading_asset")" == 0 ]] || {
+  printf '%s must leave the rounded dialog material unobscured.\n' "$heading_asset" >&2
   exit 1
 }
 
@@ -476,14 +470,15 @@ mapfile -t plasma_spec_patches < <(
 expected_plasma_spec_patches=(
   "$project_root/packages/plasma-desktop/plasma-desktop.spec.patch"
   "$project_root/packages/plasma-login-manager/plasma-login-manager.spec.patch"
+  "$project_root/packages/plasma-workspace/plasma-workspace.spec.patch"
 )
 [[ "${plasma_spec_patches[*]}" == "${expected_plasma_spec_patches[*]}" ]] || {
-  printf 'Proper must carry exactly the two documented Plasma source-package exceptions.\n' >&2
+  printf 'Proper must carry exactly the three documented Plasma source-package exceptions.\n' >&2
   printf 'Found: %s\n' "${plasma_spec_patches[*]:-none}" >&2
   exit 1
 }
-! grep -Eq 'libplasma|plasma-workspace' "$project_root/scripts/build-rpms" || {
-  printf 'Unpatched libplasma and plasma-workspace must remain on Fedora\x27s update path.\n' >&2
+! grep -Eq 'libplasma' "$project_root/scripts/build-rpms" || {
+  printf 'Unpatched libplasma must remain on Fedora\x27s update path.\n' >&2
   exit 1
 }
 

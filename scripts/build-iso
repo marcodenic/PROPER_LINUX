@@ -176,6 +176,8 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     "$project_root/packages/proper-defaults/proper-defaults.spec" 'the current desktop defaults'
   require_manifest_package_from_spec "${package_manifests[0]}" plasma-desktop \
     "$project_root/packages/plasma-desktop/plasma-desktop.spec.patch" 'the pinned task-state patch'
+  require_manifest_package_from_spec "${package_manifests[0]}" plasma-workspace \
+    "$project_root/packages/plasma-workspace/plasma-workspace.spec.patch" 'the pinned tray-tooltip presentation patch'
   require_manifest_package_from_spec "${package_manifests[0]}" plasma-login-manager \
     "$project_root/packages/plasma-login-manager/plasma-login-manager.spec.patch" 'the pinned login composition'
   for proper_package in proper-release proper-branding proper-terminal proper-welcome proper-apps proper-appearance proper-launchers; do

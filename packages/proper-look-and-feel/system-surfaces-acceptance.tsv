@@ -1,0 +1,9 @@
+settings-dark	System Settings home has legible cards, consistent category icons and calm high-contrast selection in dark mode.
+settings-navigation	A settings card opens its native KDE module; search and sidebar remain usable.
+appearance-route	Appearance card opens Proper Appearance without applying settings.
+tray-network	Network hover shows a recognisable icon, clear title and readable status without clipping.
+tray-audio	Audio hover uses the same hierarchy; clicking still opens native audio controls.
+notification	Notification text, actions and dismissal remain clear with the shared palette.
+settings-light	Light Settings home and selection are legible; tray tooltip icon and status retain contrast.
+command-tooltip	Command Centre hover has one icon/title/status popup and clicking opens its existing controls.
+tray-sni	A disposable StatusNotifierItem retains its icon, readable tooltip and context menu.

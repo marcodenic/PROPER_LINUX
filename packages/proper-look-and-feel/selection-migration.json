@@ -1,0 +1,80 @@
+{
+  "Proper": {
+    "old": {
+      "BackgroundAlternate": "92,122,161",
+      "BackgroundNormal": "79,111,153",
+      "ForegroundActive": "17,21,29",
+      "ForegroundInactive": "28,37,51",
+      "ForegroundLink": "17,21,29",
+      "ForegroundNegative": "17,21,29",
+      "ForegroundNeutral": "17,21,29",
+      "ForegroundNormal": "17,21,29",
+      "ForegroundPositive": "17,21,29",
+      "ForegroundVisited": "17,21,29"
+    },
+    "new": {
+      "BackgroundAlternate": "57,72,93",
+      "BackgroundNormal": "41,57,79",
+      "ForegroundActive": "241,244,248",
+      "ForegroundInactive": "205,210,218",
+      "ForegroundLink": "241,244,248",
+      "ForegroundNegative": "241,244,248",
+      "ForegroundNeutral": "241,244,248",
+      "ForegroundNormal": "241,244,248",
+      "ForegroundPositive": "241,244,248",
+      "ForegroundVisited": "241,244,248"
+    }
+  },
+  "ProperLight": {
+    "old": {
+      "BackgroundAlternate": "56,98,203",
+      "BackgroundNormal": "59,104,217",
+      "ForegroundActive": "255,255,255",
+      "ForegroundInactive": "220,228,248",
+      "ForegroundLink": "255,255,255",
+      "ForegroundNegative": "255,255,255",
+      "ForegroundNeutral": "255,255,255",
+      "ForegroundNormal": "255,255,255",
+      "ForegroundPositive": "255,255,255",
+      "ForegroundVisited": "255,255,255"
+    },
+    "new": {
+      "BackgroundAlternate": "208,216,233",
+      "BackgroundNormal": "224,232,250",
+      "ForegroundActive": "24,32,43",
+      "ForegroundInactive": "60,68,80",
+      "ForegroundLink": "24,32,43",
+      "ForegroundNegative": "24,32,43",
+      "ForegroundNeutral": "24,32,43",
+      "ForegroundNormal": "24,32,43",
+      "ForegroundPositive": "24,32,43",
+      "ForegroundVisited": "24,32,43"
+    }
+  },
+  "ProperMidnight": {
+    "old": {
+      "BackgroundAlternate": "91,133,199",
+      "BackgroundNormal": "78,123,195",
+      "ForegroundActive": "9,13,20",
+      "ForegroundInactive": "21,33,52",
+      "ForegroundLink": "9,13,20",
+      "ForegroundNegative": "9,13,20",
+      "ForegroundNeutral": "9,13,20",
+      "ForegroundNormal": "9,13,20",
+      "ForegroundPositive": "9,13,20",
+      "ForegroundVisited": "9,13,20"
+    },
+    "new": {
+      "BackgroundAlternate": "52,69,93",
+      "BackgroundNormal": "35,54,79",
+      "ForegroundActive": "245,247,250",
+      "ForegroundInactive": "207,212,219",
+      "ForegroundLink": "245,247,250",
+      "ForegroundNegative": "245,247,250",
+      "ForegroundNeutral": "245,247,250",
+      "ForegroundNormal": "245,247,250",
+      "ForegroundPositive": "245,247,250",
+      "ForegroundVisited": "245,247,250"
+    }
+  }
+}

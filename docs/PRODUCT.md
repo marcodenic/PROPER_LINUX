@@ -77,8 +77,9 @@ status. Selected status glyphs share consistent rounded strokes; the calendar
 remains one click away. The active application has one short line. An inactive
 application has one small dot per window, capped before the count becomes
 visual noise, and an opening application has one oscillating dot. Running
-applications expose their native window previews on hover; status icons retain
-their useful labels after a restrained delay. The shelf grows when needed but
+applications expose their native window previews on hover; status tooltips pair
+a recognisable icon with a clear title and secondary status after a restrained
+delay. The shelf grows when needed but
 keeps visual separation between application tasks and status controls. Where
 compositor animations are available, its first appearance uses one eased reveal that lets its contents settle. App icons retain clear space above
 their running marks.
@@ -108,8 +109,10 @@ Search extends to applications, files, clipboard history, commands, settings,
 and supported extensions. KRunner remains available as a quiet fallback.
 
 Start Here is a passive hub for applications, appearance, updates, shortcuts,
-System Settings, and support. It never autostarts and does not turn first boot
-into onboarding.
+System Settings, and support. Start Here never autostarts and does not turn first
+boot into onboarding. System Settings opens on a concise set of everyday
+settings cards, with coordinated symbolic category icons; the complete sidebar
+and search remain available.
 
 ### Windows that work both ways
 
