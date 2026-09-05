@@ -70,13 +70,17 @@ of another settings maze.
 The desktop uses one centred, floating bottom shelf. Its quiet resting material
 keeps the wallpaper present through native compositor blur, a restrained tint,
 and a directional rim and shadow; it becomes denser when a window meets it.
-It contains the Proper launcher, pinned and running applications, a terminal
-shortcut, system status, and the clock. The active application has one short line. An inactive
+It contains the Proper launcher, browser, Files, terminal, running applications,
+system status, and a readable clock and date. A compact gap separates tasks from
+status. Selected status glyphs share consistent rounded strokes; the calendar
+remains one click away. The active application has one short line. An inactive
 application has one small dot per window, capped before the count becomes
 visual noise, and an opening application has one oscillating dot. Running
 applications expose their native window previews on hover; status icons retain
 their useful labels after a restrained delay. The shelf grows when needed but
-keeps visual separation between application tasks and status controls.
+keeps visual separation between application tasks and status controls. Where
+compositor animations are available, its first appearance uses one eased reveal that lets its contents settle. App icons retain clear space above
+their running marks.
 
 Network, Bluetooth, audio, power, notifications, authentication, overview, and
 workspace controls remain KDE's maintained components. Proper gives their
@@ -88,7 +92,8 @@ security- and hardware-sensitive code.
 A quiet Command Centre button in the shelf opens its bounded surface by pointer
 or `Meta+S`. It gives a current view of CPU temperature and load, memory, root
 storage, the active network and its last minute of in-memory throughput, and
-installed-agent usage. The surface is always available; the absence of Codex
+installed-agent usage, with readable desktop typography and an explicit
+unconnected-agent state. The surface is always available; the absence of Codex
 or Claude is shown as a neutral state instead of hiding the system view. It
 complements rather than replaces KDE's maintained network, audio, power, and
 notification controls in the shelf.

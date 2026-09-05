@@ -12,67 +12,51 @@
 
   <g id="top" transform="translate(16 0)">
     <rect width="32" height="16" fill="#18202a" fill-opacity="1.00"/>
-    <rect width="32" height="1" fill="#a6afbd" fill-opacity="0.140"/>
+    <rect width="32" height="1" fill="#a6afbd" fill-opacity="0.100"/>
   </g>
   <g id="bottom" transform="translate(16 48)">
     <rect width="32" height="16" fill="#18202a" fill-opacity="1.00"/>
-    <rect y="15" width="32" height="1" fill="#a6afbd" fill-opacity="0.140"/>
+    <rect y="15" width="32" height="1" fill="#a6afbd" fill-opacity="0.100"/>
   </g>
   <g id="left" transform="translate(0 16)">
     <rect width="16" height="32" fill="#18202a" fill-opacity="1.00"/>
-    <rect width="1" height="32" fill="#a6afbd" fill-opacity="0.140"/>
+    <rect width="1" height="32" fill="#a6afbd" fill-opacity="0.100"/>
   </g>
   <g id="right" transform="translate(48 16)">
     <rect width="16" height="32" fill="#18202a" fill-opacity="1.00"/>
-    <rect x="15" width="1" height="32" fill="#a6afbd" fill-opacity="0.140"/>
+    <rect x="15" width="1" height="32" fill="#a6afbd" fill-opacity="0.100"/>
   </g>
   <rect id="center" x="16" y="16" width="32" height="32" fill="#18202a" fill-opacity="1.00"/>
   <g id="topleft">
     <g opacity="1.00">
       <path d="M16 0v16H0v-1C0 6.72 6.72 0 15 0h1z" fill="#18202a"/>
-      <rect x="15" width="1" height="16" fill="#18202a"/>
-      <rect y="15" width="16" height="1" fill="#18202a"/>
     </g>
-    <g opacity="0.140">
-      <path id="rim-topleft" d="M16 .5H15C6.99.5.5 6.99.5 15V16" fill="none" stroke="#a6afbd"/>
-      <rect x="15" width="1" height="1" fill="#a6afbd"/>
-      <rect y="15" width="1" height="1" fill="#a6afbd"/>
+    <g opacity="0.100">
+      <path id="rim-topleft" d="M16 0H15C6.72 0 0 6.72 0 15V16H1V15C1 7.27 7.27 1 15 1H16Z" fill="#a6afbd"/>
     </g>
   </g>
   <g id="topright" transform="translate(48 0)">
     <g opacity="1.00">
       <path d="M0 0v16h16v-1C16 6.72 9.28 0 1 0H0z" fill="#18202a"/>
-      <rect width="1" height="16" fill="#18202a"/>
-      <rect y="15" width="16" height="1" fill="#18202a"/>
     </g>
-    <g opacity="0.140">
-      <path id="rim-topright" d="M0 .5H1c8.01 0 14.5 6.49 14.5 14.5V16" fill="none" stroke="#a6afbd"/>
-      <rect width="1" height="1" fill="#a6afbd"/>
-      <rect x="15" y="15" width="1" height="1" fill="#a6afbd"/>
+    <g opacity="0.100">
+      <path id="rim-topright" d="M0 0H1C9.28 0 16 6.72 16 15V16H15V15C15 7.27 8.73 1 1 1H0Z" fill="#a6afbd"/>
     </g>
   </g>
   <g id="bottomleft" transform="translate(0 48)">
     <g opacity="1.00">
       <path d="M16 16V0H0v1c0 8.28 6.72 15 15 15h1z" fill="#18202a"/>
-      <rect x="15" width="1" height="16" fill="#18202a"/>
-      <rect width="16" height="1" fill="#18202a"/>
     </g>
-    <g opacity="0.140">
-      <path id="rim-bottomleft" d="M16 15.5H15C6.99 15.5.5 9.01.5 1V0" fill="none" stroke="#a6afbd"/>
-      <rect x="15" y="15" width="1" height="1" fill="#a6afbd"/>
-      <rect width="1" height="1" fill="#a6afbd"/>
+    <g opacity="0.100">
+      <path id="rim-bottomleft" d="M16 16H15C6.72 16 0 9.28 0 1V0H1V1C1 8.73 7.27 15 15 15H16Z" fill="#a6afbd"/>
     </g>
   </g>
   <g id="bottomright" transform="translate(48 48)">
     <g opacity="1.00">
       <path d="M0 16V0h16v1c0 8.28-6.72 15-15 15H0z" fill="#18202a"/>
-      <rect width="1" height="16" fill="#18202a"/>
-      <rect width="16" height="1" fill="#18202a"/>
     </g>
-    <g opacity="0.140">
-      <path id="rim-bottomright" d="M0 15.5H1c8.01 0 14.5-6.49 14.5-14.5V0" fill="none" stroke="#a6afbd"/>
-      <rect y="15" width="1" height="1" fill="#a6afbd"/>
-      <rect x="15" width="1" height="1" fill="#a6afbd"/>
+    <g opacity="0.100">
+      <path id="rim-bottomright" d="M0 16H1C9.28 16 16 9.28 16 1V0H15V1C15 8.73 8.73 15 1 15H0Z" fill="#a6afbd"/>
     </g>
   </g>
 

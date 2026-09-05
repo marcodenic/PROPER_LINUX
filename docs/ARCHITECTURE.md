@@ -87,10 +87,13 @@ panel transition, while KWin owns the masked blur, saturation, noise, and
 background-contrast pass. Proper does not copy the panel shell or sample the
 desktop through an application-level shader.
 
-A narrow Proper icon-theme layer inherits Breeze and remaps only Dolphin's
+A narrow Proper icon-theme layer inherits Breeze and remaps Dolphin's
 existing application identity to Breeze's plain blue folder. The link retains
-upstream size-specific artwork and task grouping; every other icon continues
-to resolve through the independently updateable Breeze themes.
+upstream size-specific artwork and task grouping; a focused set of original status glyphs supplies volume, wired connection,
+brightness, Bluetooth, notifications, and Command Centre artwork. Remaining
+icons and unmodified warning states resolve through the independently
+updateable Breeze themes. New shelf layout defaults apply on first profile
+creation or explicit theme application; package updates preserve existing layouts.
 
 Windows remain in KWin's normal floating model. Snapping and native tiling are
 configured defaults; Arrange Workspace is a reversible KWin script that moves
@@ -271,3 +274,20 @@ changes. Update this file when ownership, packaging, build, update, security, or
 verification architecture changes. Record exact versions, checksums, licences,
 and implementation notes next to their code and data, where they can be checked
 and updated without growing another historical document.
+
+### Shelf refinement compatibility
+
+The Proper shelf reveal is a small KWin JavaScript effect, installed by
+`proper-look-and-feel`. It targets Plasma docks, uses KWin's window-added
+signal and animation-time scaling, and leaves window management
+and panel geometry upstream. KWin can disable scripted effects on software
+renderers; the ordinary panel remains available in that case. The effect can
+be disabled in Desktop Effects. Plasma's normal adaptive material and
+attachment behaviour remain intact.
+
+Rounded material slices use filled rims with exactly 16-pixel bounds. Qt's
+stroke bounds previously extended the corners to 16.5 pixels while masks
+remained 16 pixels, producing visible seams. The owning RPM renders the SVGs
+with Qt and checks corner bounds and adjoining pixels. Command Centre manual
+refresh remains clickable during periodic sampling; existing controller guards
+prevent duplicate work.

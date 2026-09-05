@@ -1,11 +1,12 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        53%{?dist}
+Release:        54%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
 BuildRequires:  libxml2
 BuildRequires:  python3
+BuildRequires:  python3-pyside6
 Provides:       system-backgrounds-kde
 Requires:       plasma-workspace >= 6.7
 Requires:       proper-branding >= 0.1-4
@@ -99,6 +100,17 @@ for size in 16 22 24 32 48 64 96; do
   ln -s "../../../breeze-dark/places/$size/folder-blue.svg" \
     "$icon_root/proper-dark/apps/$size/org.kde.dolphin.svg"
 done
+# Original small status artwork inherits KDE state handling and palette colours.
+for variant in proper proper-dark; do
+  install -d "$icon_root/$variant/status/22"
+  for asset in %{_sourcedir}/status-icons/*.svg; do
+    install -m 0644 "$asset" "$icon_root/$variant/status/22/"
+  done
+  for name in dashboard-show brightness-high audio-volume-muted audio-volume-low audio-volume-medium audio-volume-high network-wired-activated network-wired-disconnected; do
+    ln -s "$name.svg" "$icon_root/$variant/status/22/$name-symbolic.svg"
+  done
+done
+sed -i 's/#232629/#eff0f1/g' "$icon_root/proper-dark/status/22/"*.svg
 style_root=%{buildroot}%{_datadir}/plasma/desktoptheme/proper
 install -Dpm 0644 %{_sourcedir}/proper/metadata.json "$style_root/metadata.json"
 install -Dpm 0644 %{_sourcedir}/proper/plasmarc "$style_root/plasmarc"
@@ -128,6 +140,10 @@ install -Dpm 0644 %{_sourcedir}/LICENSES/GPL-3.0-or-later.txt %{buildroot}%{_lic
 # Plasma exposes the lock screen through its supported ShellPackage extension
 # point. The package metadata names Fedora's active desktop shell as its
 # fallback, so Proper owns only lockscreen QML and upstream fixes keep landing.
+effect_root=%{buildroot}%{_datadir}/kwin/effects/proper-shelf-reveal
+install -Dpm 0644 %{_sourcedir}/proper-shelf-reveal/metadata.json "$effect_root/metadata.json"
+install -Dpm 0644 %{_sourcedir}/proper-shelf-reveal/contents/code/main.js "$effect_root/contents/code/main.js"
+
 shell_root=%{buildroot}%{_datadir}/plasma/shells/com.properlinux.desktop
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/metadata.json "$shell_root/metadata.json"
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/lockscreen/LockScreen.qml "$shell_root/contents/lockscreen/LockScreen.qml"
@@ -142,7 +158,8 @@ install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/01-migr
 install -Dpm 0644 %{_sourcedir}/com.properlinux.desktop/contents/updates/03-migrate-status-shade-to-shelf-v3.js "$shell_root/contents/updates/03-migrate-status-shade-to-shelf-v3.js"
 
 %check
-# Proper overrides only Dolphin and otherwise inherits the complete upstream
+QT_QPA_PLATFORM=offscreen python3 %{_sourcedir}/tests/test_panel_material.py %{_builddir}/proper-panel
+# Proper overrides Files and selected status glyphs, inheriting the upstream
 # Breeze themes. Preserve every size-specific source link.
 grep -qx 'Inherits=breeze' %{buildroot}%{_datadir}/icons/proper/index.theme
 grep -qx 'Inherits=breeze-dark' %{buildroot}%{_datadir}/icons/proper-dark/index.theme
@@ -190,12 +207,12 @@ for asset in \
   centre_opacity=$(xmllint --xpath "string(//*[@id='center']/@fill-opacity)" "$asset")
   test "$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[1][@fill-opacity='$centre_opacity'])" "$asset")" = 4
   test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1][@opacity='$centre_opacity'])" "$asset")" = 4
-  test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$asset")" = 8
+  test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$asset")" = 0
   rim_color=$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill)" "$asset")
   rim_opacity=$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill-opacity)" "$asset")
   test "$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[2][@fill='$rim_color' and @fill-opacity='$rim_opacity'])" "$asset")" = 4
   test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2][@opacity='$rim_opacity'])" "$asset")" = 4
-  test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2]/*[local-name()='rect' and @fill='$rim_color'])" "$asset")" = 8
+  test "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2]/*[local-name()='rect' and @fill='$rim_color'])" "$asset")" = 0
   test "$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and (@stroke='$rim_color' or @fill='$rim_color')])" "$asset")" = 4
   test "$(xmllint --xpath "count(//*[local-name()='linearGradient'])" "$asset")" = 0
   test "$(xmllint --xpath "count(//*[@id='mask-topleft' or @id='mask-topright' or @id='mask-bottomleft' or @id='mask-bottomright']/*[local-name()='rect'])" "$asset")" = 8
@@ -209,10 +226,10 @@ for asset in \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/widgets/translucentbackground.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/tooltip.svg \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/solid/widgets/translucentbackground.svg; do
-  test "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$asset")" = 'M16 .5H15C6.99.5.5 6.99.5 15V16'
-  test "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$asset")" = 'M0 .5H1c8.01 0 14.5 6.49 14.5 14.5V16'
-  test "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$asset")" = 'M16 15.5H15C6.99 15.5.5 9.01.5 1V0'
-  test "$(xmllint --xpath "string(//*[@id='rim-bottomright']/@d)" "$asset")" = 'M0 15.5H1c8.01 0 14.5-6.49 14.5-14.5V0'
+  test "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$asset")" = 'M16 0H15C6.72 0 0 6.72 0 15V16H1V15C1 7.27 7.27 1 15 1H16Z'
+  test "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$asset")" = 'M0 0H1C9.28 0 16 6.72 16 15V16H15V15C15 7.27 8.73 1 1 1H0Z'
+  test "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$asset")" = 'M16 16H15C6.72 16 0 9.28 0 1V0H1V1C1 8.73 7.27 15 15 15H16Z'
+  test "$(xmllint --xpath "string(//*[@id='rim-bottomright']/@d)" "$asset")" = 'M0 16H1C9.28 16 16 9.28 16 1V0H15V1C15 8.73 8.73 15 1 15H0Z'
 done
 for asset in \
   %{buildroot}%{_datadir}/plasma/desktoptheme/proper/dialogs/background.svg \
@@ -358,11 +375,12 @@ for scheme in Proper ProperLight ProperMidnight; do
   grep -q '^\[Colors:Window\]$' %{buildroot}%{_datadir}/color-schemes/$scheme.colors
 done
 grep -Fq 'background = "#141a22"' %{buildroot}%{_datadir}/vicinae/themes/proper-dark.toml
-grep -Fq 'border = "#282f38"' %{buildroot}%{_datadir}/vicinae/themes/proper-dark.toml
+grep -Fq 'border = "#232932"' %{buildroot}%{_datadir}/vicinae/themes/proper-dark.toml
 grep -A12 '^\[Colors:Header\]$' %{buildroot}%{_datadir}/color-schemes/Proper.colors | \
   grep -Fq 'BackgroundNormal=20,26,34'
 
 %files
+%{_datadir}/kwin/effects/proper-shelf-reveal/
 %{_datadir}/wallpapers/ProperBlueHour/
 %{_datadir}/wallpapers/ProperHorizon/
 %{_datadir}/wallpapers/Path/
@@ -398,6 +416,11 @@ grep -A12 '^\[Colors:Header\]$' %{buildroot}%{_datadir}/color-schemes/Proper.col
 %license %{_licensedir}/%{name}/GPL-3.0-or-later.txt
 
 %changelog
+* Sat Sep 05 2026 Proper Linux contributors - 0.1-54
+- Refine shelf spacing, status artwork and shared surface edges
+- Match rounded slice bounds and reserve icon-to-indicator clearance
+- Reveal the first shelf surface with a focused KWin effect
+
 * Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-53
 - Generate Vicinae light and dark themes from the shared semantic tokens
 - Match the dark launcher tint to the translucent Proper shelf material

@@ -1,6 +1,6 @@
 Name:           proper-agent-status
 Version:        0.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Proper Linux Command Centre and coding-agent usage widget
 License:        GPL-3.0-or-later
 BuildArch:      noarch
@@ -51,6 +51,9 @@ ln -s ../proper-agent-panel.timer %{buildroot}%{_userunitdir}/timers.target.want
 %{_userunitdir}/timers.target.wants/proper-agent-panel.timer
 
 %changelog
+* Sat Sep 05 2026 Proper Linux contributors - 0.2-8
+- Use readable desktop typography and a clear disconnected agent state
+
 * Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.2-7
 - Put Command Centre in the existing shelf and remove the unwanted top handle
 - Keep Meta+S and a normal pointer-opened Plasma applet path

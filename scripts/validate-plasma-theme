@@ -58,7 +58,7 @@ cmp "$generated_semantic/proper-anaconda.css" \
 cmp "$generated_semantic/ProperTokens.qml" \
   "$project_root/packages/plasma-login-manager/ProperTokens.qml"
 grep -Fq 'background = "#141a22"' "$generated_semantic/proper-dark.toml"
-grep -Fq 'border = "#282f38"' "$generated_semantic/proper-dark.toml"
+grep -Fq 'border = "#232932"' "$generated_semantic/proper-dark.toml"
 grep -A12 '^\[Colors:Header\]$' "$generated_semantic/Proper.colors" | \
   grep -Fq 'BackgroundNormal=20,26,34'
 
@@ -280,8 +280,8 @@ for asset in "${surface_assets[@]}"; do
     printf '%s must use centre opacity %s on all eight border fills.\n' "$asset" "$centre_opacity" >&2
     exit 1
   }
-  [[ "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$asset")" == 8 ]] || {
-    printf '%s must bleed each corner fill into both adjoining slice edges.\n' "$asset" >&2
+  [[ "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$asset")" == 0 ]] || {
+    printf '%s must not overlap translucent corner fills.\n' "$asset" >&2
     exit 1
   }
   rim_color="$(xmllint --xpath "string(//*[@id='top']/*[2]/@fill)" "$asset")"
@@ -291,7 +291,7 @@ for asset in "${surface_assets[@]}"; do
   matched_corner_rim_bleeds="$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2]/*[local-name()='rect' and @fill='$rim_color'])" "$asset")"
   matched_corner_rim_paths="$(xmllint --xpath "count(//*[starts-with(@id, 'rim-') and (@stroke='$rim_color' or @fill='$rim_color')])" "$asset")"
   [[ "$matched_edge_rims" == 4 && "$matched_corner_rim_groups" == 4 &&
-     "$matched_corner_rim_bleeds" == 8 && "$matched_corner_rim_paths" == 4 ]] || {
+     "$matched_corner_rim_bleeds" == 0 && "$matched_corner_rim_paths" == 4 ]] || {
     printf '%s must post-composite one identical seam-safe rim around every slice.\n' "$asset" >&2
     exit 1
   }
@@ -341,10 +341,10 @@ done
 }
 
 for asset in "${surface_assets[@]}"; do
-  [[ "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$asset")" == 'M16 .5H15C6.99.5.5 6.99.5 15V16' &&
-     "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$asset")" == 'M0 .5H1c8.01 0 14.5 6.49 14.5 14.5V16' &&
-     "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$asset")" == 'M16 15.5H15C6.99 15.5.5 9.01.5 1V0' &&
-     "$(xmllint --xpath "string(//*[@id='rim-bottomright']/@d)" "$asset")" == 'M0 15.5H1c8.01 0 14.5-6.49 14.5-14.5V0' ]] || {
+  [[ "$(xmllint --xpath "string(//*[@id='rim-topleft']/@d)" "$asset")" == 'M16 0H15C6.72 0 0 6.72 0 15V16H1V15C1 7.27 7.27 1 15 1H16Z' &&
+     "$(xmllint --xpath "string(//*[@id='rim-topright']/@d)" "$asset")" == 'M0 0H1C9.28 0 16 6.72 16 15V16H15V15C15 7.27 8.73 1 1 1H0Z' &&
+     "$(xmllint --xpath "string(//*[@id='rim-bottomleft']/@d)" "$asset")" == 'M16 16H15C6.72 16 0 9.28 0 1V0H1V1C1 8.73 7.27 15 15 15H16Z' &&
+     "$(xmllint --xpath "string(//*[@id='rim-bottomright']/@d)" "$asset")" == 'M0 16H1C9.28 16 16 9.28 16 1V0H15V1C15 8.73 8.73 15 1 15H0Z' ]] || {
     printf '%s must carry every corner rim exactly to its adjoining slice boundary.\n' "$asset" >&2
     exit 1
   }

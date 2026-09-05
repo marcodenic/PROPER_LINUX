@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+<!-- SPDX-FileCopyrightText: 2026 Proper Linux contributors -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<style id="current-color-scheme">.ColorScheme-Text { color: #232629; }</style>
+<g class="ColorScheme-Text" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="15" height="15" rx="4"/><path d="M7.5 14.5v-4m3.5 4v-7m3.5 7v-5"/></g>
+</svg>

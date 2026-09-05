@@ -1,0 +1,9 @@
+reveal	The first visible shelf appears cohesively with animations enabled; later show/hide does not repeat the startup reveal.
+arrival	Installed boot reaches the Proper clock and wallpaper at 1920x1080.
+shelf	Fresh layout offers launcher, browser, Files and terminal with a compact gap, clear status glyphs and clock and date.
+status	Pointer opens Command Centre; headings and live values are readable, the corners are continuous, periodic sampling does not flash the refresh icon, and close works.
+audio	Pointer opens the maintained audio controls with the shared material and clear mute icon.
+apps	Proper Apps uses consistent sans-serif text in headings, cards and buttons; Spotify and Codex remain discoverable.
+preview	Hovering a running task displays its native window preview without obscuring shelf controls.
+attached	A maximised window produces the opaque attached shelf with legible status glyphs.
+notification	A real desktop notification has a coherent frame, legible text and a working dismiss control.

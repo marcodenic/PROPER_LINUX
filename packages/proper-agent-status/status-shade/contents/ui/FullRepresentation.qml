@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import QtQuick.Window
+import org.kde.kirigami as Kirigami
 
 FocusScope {
     id: shade
@@ -11,16 +12,16 @@ FocusScope {
     required property var controller
     property var downloadHistory: []
     property var uploadHistory: []
-    readonly property color foreground: "#f1f4f8"
-    readonly property color secondary: "#a8b2c2"
-    readonly property color tertiary: "#687386"
+    readonly property color foreground: Kirigami.Theme.textColor
+    readonly property color secondary: Kirigami.Theme.disabledTextColor
+    readonly property color tertiary: Kirigami.Theme.disabledTextColor
     readonly property color downloadColor: "#79eadb"
     readonly property color uploadColor: "#91b4ff"
     readonly property color urgent: "#ff7184"
     readonly property bool narrow: width < 680
 
     implicitWidth: Math.min(720, Math.max(640, Screen.width - 96))
-    implicitHeight: narrow ? 302 : 236
+    implicitHeight: narrow ? 330 : 264
     Layout.minimumWidth: Math.min(implicitWidth, 640)
     Layout.minimumHeight: implicitHeight
     activeFocusOnTab: true
@@ -90,7 +91,7 @@ FocusScope {
 
     function primaryAgentName() {
         const provider = primaryAgent();
-        return provider.installed ? provider.label : "";
+        return provider.installed ? provider.label : "Not connected";
     }
 
     function secondaryAgentState() {
@@ -137,7 +138,7 @@ FocusScope {
 
         Item {
             Layout.fillWidth: true
-            Layout.preferredHeight: 43
+            Layout.preferredHeight: 48
 
             RowLayout {
                 anchors.fill: parent
@@ -146,13 +147,13 @@ FocusScope {
                 spacing: 8
 
                 Text {
-                    text: "COMMAND CENTRE"
+                    text: "Command Centre"
                     color: shade.foreground
-                    opacity: 0.86
-                    font.family: "JetBrains Mono"
-                    font.pixelSize: 9
+                    opacity: 1
+                    font.family: Kirigami.Theme.defaultFont.family
+                    font.pixelSize: 15
                     font.weight: Font.Medium
-                    font.letterSpacing: 0.6
+                    font.letterSpacing: 0
                 }
 
                 Item { Layout.fillWidth: true }
@@ -160,7 +161,6 @@ FocusScope {
                 Controls.ToolButton {
                     implicitWidth: 30
                     implicitHeight: 30
-                    enabled: !shade.controller.systemRefreshing && !shade.controller.agentsRefreshing
                     display: Controls.AbstractButton.IconOnly
                     icon.name: "view-refresh-symbolic"
                     onClicked: {
@@ -169,6 +169,7 @@ FocusScope {
                     }
                     Controls.ToolTip.text: "Refresh status"
                     Controls.ToolTip.visible: hovered
+                    Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
                 }
 
                 Controls.ToolButton {
@@ -179,6 +180,7 @@ FocusScope {
                     onClicked: shade.controller.expanded = false
                     Controls.ToolTip.text: "Close Command Centre"
                     Controls.ToolTip.visible: hovered
+                    Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
                 }
             }
 
@@ -194,7 +196,7 @@ FocusScope {
         GridLayout {
             id: telemetryDeck
             Layout.fillWidth: true
-            Layout.preferredHeight: shade.narrow ? 144 : 78
+            Layout.preferredHeight: shade.narrow ? 160 : 90
             columns: shade.narrow ? 2 : 4
             columnSpacing: 0
             rowSpacing: 0
@@ -210,21 +212,21 @@ FocusScope {
                         detail: ""
                     },
                     {
-                        label: "MEMORY",
+                        label: "Memory",
                         value: shade.capacity(Number(shade.controller.system.memory_used_bytes), Number(shade.controller.system.memory_total_bytes)),
                         annotation: "",
                         annotationColor: shade.secondary,
                         detail: ""
                     },
                     {
-                        label: "STORAGE",
+                        label: "Storage",
                         value: shade.capacity(Number(shade.controller.system.storage_used_bytes), Number(shade.controller.system.storage_total_bytes)),
                         annotation: "",
                         annotationColor: shade.secondary,
                         detail: ""
                     },
                     {
-                        label: "AGENT USAGE",
+                        label: "Agent",
                         value: shade.primaryAgentValue(),
                         annotation: shade.primaryAgentName(),
                         annotationColor: shade.secondary,
@@ -252,10 +254,10 @@ FocusScope {
                         Text {
                             text: telemetryCell.modelData.label
                             color: shade.secondary
-                            font.family: "JetBrains Mono"
-                            font.pixelSize: 9
+                            font.family: Kirigami.Theme.defaultFont.family
+                            font.pixelSize: 12
                             font.weight: Font.Medium
-                            font.letterSpacing: 1.1
+                            font.letterSpacing: 0
                         }
 
                         RowLayout {
@@ -266,9 +268,9 @@ FocusScope {
                             Text {
                                 text: telemetryCell.modelData.value
                                 color: shade.foreground
-                                font.family: "JetBrains Mono"
-                                font.pixelSize: telemetryCell.modelData.label === "AGENT USAGE" ? 20 : 18
-                                font.weight: Font.Light
+                                font.family: Kirigami.Theme.defaultFont.family
+                                font.pixelSize: telemetryCell.modelData.label === "Agent" ? 20 : 18
+                                font.weight: Font.Normal
                                 elide: Text.ElideRight
                             }
 
@@ -277,8 +279,8 @@ FocusScope {
                                 text: telemetryCell.modelData.annotation
                                 visible: text.length > 0
                                 color: telemetryCell.modelData.annotationColor
-                                font.family: "JetBrains Mono"
-                                font.pixelSize: 10
+                                font.family: Kirigami.Theme.defaultFont.family
+                                font.pixelSize: 12
                                 elide: Text.ElideRight
                             }
                         }
@@ -289,8 +291,8 @@ FocusScope {
                             text: telemetryCell.modelData.detail
                             visible: text.length > 0
                             color: shade.tertiary
-                            font.family: "Inter"
-                            font.pixelSize: 9
+                            font.family: Kirigami.Theme.defaultFont.family
+                            font.pixelSize: 12
                             elide: Text.ElideRight
                         }
                     }
@@ -340,22 +342,22 @@ FocusScope {
                     text: shade.controller.network.name || "Offline"
                     color: shade.foreground
                     opacity: 0.82
-                    font.family: "Inter"
-                    font.pixelSize: 10
+                    font.family: Kirigami.Theme.defaultFont.family
+                    font.pixelSize: 12
                     elide: Text.ElideRight
                 }
 
                 Text {
                     text: "↓ " + shade.rate(Number(shade.controller.network.download_bytes_per_second))
                     color: shade.downloadColor
-                    font.family: "JetBrains Mono"
+                    font.family: Kirigami.Theme.defaultFont.family
                     font.pixelSize: 12
                 }
 
                 Text {
                     text: "↑ " + shade.rate(Number(shade.controller.network.upload_bytes_per_second))
                     color: shade.uploadColor
-                    font.family: "JetBrains Mono"
+                    font.family: Kirigami.Theme.defaultFont.family
                     font.pixelSize: 12
                 }
             }

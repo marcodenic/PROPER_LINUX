@@ -1,0 +1,14 @@
+{
+  "KPackageStructure": "KWin/Effect",
+  "KPlugin": {
+    "Id": "proper-shelf-reveal",
+    "Name": "Proper shelf reveal",
+    "Description": "Reveal the shelf as one surface after its widgets settle",
+    "Category": "Appearance",
+    "License": "GPL-2.0-or-later",
+    "Version": "0.1.54",
+    "EnabledByDefault": true
+  },
+  "X-KDE-Ordering": 50,
+  "X-Plasma-API": "javascript"
+}

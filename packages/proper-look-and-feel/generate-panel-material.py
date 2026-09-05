@@ -72,49 +72,33 @@ def panel_svg(
   <g id="topleft">
     <g opacity="{opacity:.2f}">
       <path d="M{radius} 0v{radius}H0v-1C0 6.72 6.72 0 {radius - 1} 0h1z" fill="{tint}"/>
-      <rect x="{radius - 1}" width="1" height="{radius}" fill="{tint}"/>
-      <rect y="{radius - 1}" width="{radius}" height="1" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-topleft" d="M{radius} .5H{radius - 1}C6.99.5.5 6.99.5 {radius - 1}V{radius}" fill="none" stroke="{rim}"/>
-      <rect x="{radius - 1}" width="1" height="1" fill="{rim}"/>
-      <rect y="{radius - 1}" width="1" height="1" fill="{rim}"/>
+      <path id="rim-topleft" d="M16 0H15C6.72 0 0 6.72 0 15V16H1V15C1 7.27 7.27 1 15 1H16Z" fill="{rim}"/>
     </g>
   </g>
   <g id="topright" transform="translate({radius + centre} 0)">
     <g opacity="{opacity:.2f}">
       <path d="M0 0v{radius}h{radius}v-1C{radius} 6.72 9.28 0 1 0H0z" fill="{tint}"/>
-      <rect width="1" height="{radius}" fill="{tint}"/>
-      <rect y="{radius - 1}" width="{radius}" height="1" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-topright" d="M0 .5H1c8.01 0 14.5 6.49 14.5 14.5V{radius}" fill="none" stroke="{rim}"/>
-      <rect width="1" height="1" fill="{rim}"/>
-      <rect x="{radius - 1}" y="{radius - 1}" width="1" height="1" fill="{rim}"/>
+      <path id="rim-topright" d="M0 0H1C9.28 0 16 6.72 16 15V16H15V15C15 7.27 8.73 1 1 1H0Z" fill="{rim}"/>
     </g>
   </g>
   <g id="bottomleft" transform="translate(0 {radius + centre})">
     <g opacity="{opacity:.2f}">
       <path d="M{radius} {radius}V0H0v1c0 8.28 6.72 {radius - 1} {radius - 1} {radius - 1}h1z" fill="{tint}"/>
-      <rect x="{radius - 1}" width="1" height="{radius}" fill="{tint}"/>
-      <rect width="{radius}" height="1" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-bottomleft" d="M{radius} {radius - .5}H{radius - 1}C6.99 {radius - .5}.5 9.01.5 1V0" fill="none" stroke="{rim}"/>
-      <rect x="{radius - 1}" y="{radius - 1}" width="1" height="1" fill="{rim}"/>
-      <rect width="1" height="1" fill="{rim}"/>
+      <path id="rim-bottomleft" d="M16 16H15C6.72 16 0 9.28 0 1V0H1V1C1 8.73 7.27 15 15 15H16Z" fill="{rim}"/>
     </g>
   </g>
   <g id="bottomright" transform="translate({radius + centre} {radius + centre})">
     <g opacity="{opacity:.2f}">
       <path d="M0 {radius}V0h{radius}v1c0 8.28-6.72 {radius - 1}-{radius - 1} {radius - 1}H0z" fill="{tint}"/>
-      <rect width="1" height="{radius}" fill="{tint}"/>
-      <rect width="{radius}" height="1" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-bottomright" d="M0 {radius - .5}H1c8.01 0 14.5-6.49 14.5-14.5V0" fill="none" stroke="{rim}"/>
-      <rect y="{radius - 1}" width="1" height="1" fill="{rim}"/>
-      <rect x="{radius - 1}" width="1" height="1" fill="{rim}"/>
+      <path id="rim-bottomright" d="M0 16H1C9.28 16 16 9.28 16 1V0H15V1C15 8.73 8.73 15 1 15H0Z" fill="{rim}"/>
     </g>
   </g>
 
@@ -231,49 +215,33 @@ def popup_svg(
   <g id="topleft">
     <g opacity="{opacity:.2f}">
       <path d="M{edge} 0v{edge}H0v-1C0 6.72 6.72 0 {edge - 1} 0h1z" fill="{tint}"/>
-      <rect x="{edge - 1}" width="1" height="{edge}" fill="{tint}"/>
-      <rect y="{edge - 1}" width="{edge}" height="1" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-topleft" d="M{edge} .5H{edge - 1}C6.99.5.5 6.99.5 {edge - 1}V{edge}" fill="none" stroke="{rim}"/>
-      <rect x="{edge - 1}" width="1" height="1" fill="{rim}"/>
-      <rect y="{edge - 1}" width="1" height="1" fill="{rim}"/>
+      <path id="rim-topleft" d="M16 0H15C6.72 0 0 6.72 0 15V16H1V15C1 7.27 7.27 1 15 1H16Z" fill="{rim}"/>
     </g>
   </g>
   <g id="topright" transform="translate({edge + centre} 0)">
     <g opacity="{opacity:.2f}">
       <path d="M0 0v{edge}h{edge}v-1C{edge} 6.72 9.28 0 1 0H0z" fill="{tint}"/>
-      <rect width="1" height="{edge}" fill="{tint}"/>
-      <rect y="{edge - 1}" width="{edge}" height="1" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-topright" d="M0 .5H1c8.01 0 14.5 6.49 14.5 14.5V{edge}" fill="none" stroke="{rim}"/>
-      <rect width="1" height="1" fill="{rim}"/>
-      <rect x="{edge - 1}" y="{edge - 1}" width="1" height="1" fill="{rim}"/>
+      <path id="rim-topright" d="M0 0H1C9.28 0 16 6.72 16 15V16H15V15C15 7.27 8.73 1 1 1H0Z" fill="{rim}"/>
     </g>
   </g>
   <g id="bottomleft" transform="translate(0 {edge + centre})">
     <g opacity="{opacity:.2f}">
       <path d="M{edge} {edge}V0H0v1c0 8.28 6.72 {edge - 1} {edge - 1} {edge - 1}h1z" fill="{tint}"/>
-      <rect x="{edge - 1}" width="1" height="{edge}" fill="{tint}"/>
-      <rect width="{edge}" height="1" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-bottomleft" d="M{edge} {edge - .5}H{edge - 1}C6.99 {edge - .5}.5 9.01.5 1V0" fill="none" stroke="{rim}"/>
-      <rect x="{edge - 1}" y="{edge - 1}" width="1" height="1" fill="{rim}"/>
-      <rect width="1" height="1" fill="{rim}"/>
+      <path id="rim-bottomleft" d="M16 16H15C6.72 16 0 9.28 0 1V0H1V1C1 8.73 7.27 15 15 15H16Z" fill="{rim}"/>
     </g>
   </g>
   <g id="bottomright" transform="translate({edge + centre} {edge + centre})">
     <g opacity="{opacity:.2f}">
       <path d="M0 {edge}V0h{edge}v1c0 8.28-6.72 {edge - 1}-{edge - 1} {edge - 1}H0z" fill="{tint}"/>
-      <rect width="1" height="{edge}" fill="{tint}"/>
-      <rect width="{edge}" height="1" fill="{tint}"/>
     </g>
     <g opacity="{rim_opacity:.3f}">
-      <path id="rim-bottomright" d="M0 {edge - .5}H1c8.01 0 14.5-6.49 14.5-14.5V0" fill="none" stroke="{rim}"/>
-      <rect y="{edge - 1}" width="1" height="1" fill="{rim}"/>
-      <rect x="{edge - 1}" width="1" height="1" fill="{rim}"/>
+      <path id="rim-bottomright" d="M0 16H1C9.28 16 16 9.28 16 1V0H15V1C15 8.73 8.73 15 1 15H0Z" fill="{rim}"/>
     </g>
   </g>
 

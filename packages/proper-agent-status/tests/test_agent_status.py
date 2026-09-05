@@ -40,7 +40,7 @@ class AgentStatusTest(unittest.TestCase):
         )
         self.assertNotIn("FrameSvgItem", qml)
         self.assertNotIn("widgets/panel-background", qml)
-        self.assertIn('text: "COMMAND CENTRE"', qml)
+        self.assertIn('text: "Command Centre"', qml)
         self.assertNotIn("B A N D W I D T H", qml)
         self.assertNotIn("60 seconds ago", qml)
         self.assertNotIn("closeArea", qml)

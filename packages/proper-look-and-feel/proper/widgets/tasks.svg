@@ -96,12 +96,12 @@
 
   <!-- Symmetric content margins keep every state centred on its task icon. -->
   <g fill="#f0f">
-    <rect id="normal-hint-top-margin" x="2" y="48" width="1" height="2"/>
-    <rect id="normal-hint-bottom-margin" x="4" y="48" width="1" height="2"/>
+    <rect id="normal-hint-top-margin" x="2" y="48" width="1" height="8"/>
+    <rect id="normal-hint-bottom-margin" x="4" y="48" width="1" height="8"/>
     <rect id="normal-hint-left-margin" x="6" y="48" width="2" height="1"/>
     <rect id="normal-hint-right-margin" x="6" y="50" width="2" height="1"/>
-    <rect id="focus-hint-top-margin" x="46" y="48" width="1" height="2"/>
-    <rect id="focus-hint-bottom-margin" x="48" y="48" width="1" height="2"/>
+    <rect id="focus-hint-top-margin" x="46" y="48" width="1" height="8"/>
+    <rect id="focus-hint-bottom-margin" x="48" y="48" width="1" height="8"/>
     <rect id="focus-hint-left-margin" x="50" y="48" width="2" height="1"/>
     <rect id="focus-hint-right-margin" x="50" y="50" width="2" height="1"/>
   </g>
