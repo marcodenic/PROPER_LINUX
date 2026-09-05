@@ -1,13 +1,14 @@
 Name:           proper-welcome
 Version:        0.1
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Proper Linux live-session welcome
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
 BuildRequires:  qt6-qtbase-devel
+BuildRequires:  kf6-kwindowsystem-devel
 Requires:       anaconda-live
 Requires:       proper-branding >= 0.1-4
-Requires:       proper-look-and-feel >= 0.1-61
+Requires:       proper-look-and-feel >= 0.1-62
 Requires:       proper-launchers >= 0.1-17
 
 %description
@@ -18,7 +19,7 @@ Start Here hub for the installed desktop.
 %prep
 cp %{_sourcedir}/main.cpp %{_sourcedir}/proper-welcome.pro .
 
-cp %{_sourcedir}/../proper-look-and-feel/proper-action-button.h .
+cp %{_sourcedir}/../proper-look-and-feel/proper-action-button.h %{_sourcedir}/../proper-look-and-feel/proper-material-window.h .
 
 %build
 qmake6 CONFIG+=release proper-welcome.pro
@@ -39,6 +40,9 @@ install -Dpm 0644 %{_sourcedir}/proper-start.desktop %{buildroot}%{_datadir}/app
 %{_datadir}/applications/proper-start.desktop
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-15
+- Introduce native frosted navigation with solid content and a solid fallback
+
 * Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-14
 - Refine app layout, native keyboard actions and everyday navigation
 

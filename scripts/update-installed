@@ -45,7 +45,7 @@ if [[ "${PROPER_ALLOW_DIRTY:-0}" != 1 ]] &&
 fi
 
 if ((${#packages[@]} == 0)); then
-  read -r -a packages <<<"plasma-login-manager plasma-desktop plasma-workspace proper-release proper-branding proper-welcome proper-look-and-feel proper-agent-status proper-defaults proper-launchers proper-terminal proper-apps proper-appearance"
+  read -r -a packages <<<"plasma-login-manager plasma-desktop plasma-workspace plasma-systemsettings proper-release proper-branding proper-welcome proper-look-and-feel proper-agent-status proper-defaults proper-launchers proper-terminal proper-apps proper-appearance"
 fi
 
 for package in "${packages[@]}"; do
@@ -81,7 +81,7 @@ check_plasma_source() {
 
 for package in "${packages[@]}"; do
   case "$package" in
-    plasma-desktop|plasma-workspace|plasma-login-manager)
+    plasma-desktop|plasma-workspace|plasma-login-manager|plasma-systemsettings)
       check_plasma_source "$package" "$project_root/packages/$package/$package.spec.patch"
       ;;
   esac

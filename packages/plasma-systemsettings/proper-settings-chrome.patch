@@ -1,0 +1,117 @@
+--- a/app/qml/Main.qml
++++ b/app/qml/Main.qml
+@@ -22,19 +22,6 @@
+     LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
+     LayoutMirroring.childrenInherit: true
+ 
+-    // This is the background of the missing part of the sidebar's header
+-    Rectangle {
+-        anchors {
+-            top: parent.top
+-            right: parent.right
+-        }
+-        Kirigami.Theme.inherit: false
+-        Kirigami.Theme.colorSet: Kirigami.Theme.Header
+-        color: Kirigami.Theme.backgroundColor
+-        width: separator.width
+-        height: sideBar.pageStack.currentItem?.header.height
+-    }
+-
+     SideBarItem {
+         id: sideBar
+ 
+@@ -43,28 +30,16 @@
+     }
+ 
+     Kirigami.Separator {
+-        z: 1
+-        anchors {
+-            top: parent.top
+-            topMargin: Kirigami.Units.largeSpacing
+-            right: parent.right
+-        }
+-        height: sideBar.pageStack.currentItem?.header.height - Kirigami.Units.largeSpacing * 2
+-        Kirigami.Theme.inherit: false
+-        Kirigami.Theme.colorSet: Kirigami.Theme.Header
+-    }
+-
+-    Kirigami.Separator {
+         id: separator
+         z: 1
+         anchors {
+             top: parent.top
+-            topMargin: sideBar.pageStack.currentItem?.header.height - Math.round(separator.width * systemsettings.devicePixelRatio) / systemsettings.devicePixelRatio
++            topMargin: 0
+             right: parent.right
+             bottom: parent.bottom
+         }
+ 
+         Kirigami.Theme.inherit: false
+-        Kirigami.Theme.colorSet: Kirigami.Theme.Header
++        Kirigami.Theme.colorSet: Kirigami.Theme.View
+     }
+ }
+--- a/app/qml/CategoriesPage.qml
++++ b/app/qml/CategoriesPage.qml
+@@ -21,6 +21,9 @@
+ 
+     header: Kirigami.AbstractApplicationHeader {
+         id: pageHeader
++        background: Rectangle { color: Kirigami.Theme.backgroundColor }
++        leftPadding: Kirigami.Units.largeSpacing
++        rightPadding: Kirigami.Units.largeSpacing
+ 
+         // TODO Plasma 6.6 align size to grid
+         height: Math.round((sizeHelper.implicitHeight + Kirigami.Units.smallSpacing * 2) * systemsettings.devicePixelRatio) / systemsettings.devicePixelRatio
+@@ -48,7 +51,8 @@
+             Kirigami.SearchField {
+                 id: searchField
+ 
+-                focus: !Kirigami.InputMethod.willShowOnActive
++                focus: false
++                placeholderText: i18n("Search settings")
+                 Layout.fillWidth: true
+                 onTextChanged: {
+                     systemsettings.searchModel.filterRegExp = text;
+@@ -69,18 +73,18 @@
+                 }
+             }
+ 
+-            HamburgerMenuButton {
+-                id: hamburgerMenuButton
+-
+-                KeyNavigation.left: searchField
+-
+-                KeyNavigation.down: categoryView
+-
+-                KeyNavigation.backtab: KeyNavigation.left
+-                KeyNavigation.tab: KeyNavigation.down
+-
+-                Keys.onDownPressed: event => rowLayout.Keys.downPressed(event)
+-            }
++
++        }
++    }
++
++    footer: RowLayout {
++        LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
++        Item { Layout.fillWidth: true }
++        HamburgerMenuButton {
++            id: hamburgerMenuButton
++            Layout.margins: Kirigami.Units.smallSpacing
++            KeyNavigation.backtab: categoryView
++            KeyNavigation.tab: searchField
+         }
+     }
+ 
+--- a/app/qml/HamburgerMenuButton.qml
++++ b/app/qml/HamburgerMenuButton.qml
+@@ -13,7 +13,7 @@
+ import org.kde.systemsettings
+ 
+ QQC2.ToolButton {
+-    icon.name: "application-menu"
++    icon.name: "view-more-symbolic"
+ 
+     checkable: true
+     checked: systemsettings.actionMenuVisible

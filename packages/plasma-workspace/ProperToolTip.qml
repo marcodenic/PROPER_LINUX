@@ -9,6 +9,11 @@ Item {
     id: root
     // ToolTipArea makes the item visible when it reparents it into its popup.
     visible: false
+    // ToolTipArea reparents this item into the native PopupPlasmaWindow.
+    // Its margin is outside the painted card and respects panel orientation.
+    Window.onWindowChanged: {
+        if (Window.window && typeof Window.window.margin !== "undefined") Window.window.margin = 8;
+    }
     required property var sourceArea
     implicitWidth: Math.min(420, content.implicitWidth) + 24
     implicitHeight: content.implicitHeight + 24

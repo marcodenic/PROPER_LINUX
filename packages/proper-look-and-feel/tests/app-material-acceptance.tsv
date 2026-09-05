@@ -1,0 +1,7 @@
+apps-material	Apps has frosted sidebar and opaque readable product area with working search and details.
+apps-solid	Solid navigation is opaque and remains usable.
+apps-light	Light palette retains readable navigation, descriptions and focus.
+guide-material	Start Here has frosted welcome rail and all six destinations visible and internal application routes reachable.
+settings-home	Settings home has full-width sidebar search, no adjacent menu or short header divider, and a reachable footer menu.
+settings-navigation	Search, subcategory Back and the relocated application menu remain reachable.
+tray-gap	Tray tooltip has visible space above the shelf; pointer movement dismisses it normally.

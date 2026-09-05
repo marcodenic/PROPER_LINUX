@@ -470,10 +470,11 @@ mapfile -t plasma_spec_patches < <(
 expected_plasma_spec_patches=(
   "$project_root/packages/plasma-desktop/plasma-desktop.spec.patch"
   "$project_root/packages/plasma-login-manager/plasma-login-manager.spec.patch"
+  "$project_root/packages/plasma-systemsettings/plasma-systemsettings.spec.patch"
   "$project_root/packages/plasma-workspace/plasma-workspace.spec.patch"
 )
 [[ "${plasma_spec_patches[*]}" == "${expected_plasma_spec_patches[*]}" ]] || {
-  printf 'Proper must carry exactly the three documented Plasma source-package exceptions.\n' >&2
+  printf 'Proper must carry exactly the four documented Plasma source-package exceptions.\n' >&2
   printf 'Found: %s\n' "${plasma_spec_patches[*]:-none}" >&2
   exit 1
 }

@@ -38,7 +38,7 @@ if [[ "${PROPER_RPM_RESUME:-0}" != 1 ]]; then
 fi
 mkdir -p "$rpm_root" "$repo_root" "$source_cache"
 
-default_packages="plasma-login-manager plasma-desktop plasma-workspace proper-release proper-branding proper-welcome proper-look-and-feel proper-agent-status proper-defaults proper-launchers proper-terminal proper-apps proper-appearance"
+default_packages="plasma-login-manager plasma-desktop plasma-workspace plasma-systemsettings proper-release proper-branding proper-welcome proper-look-and-feel proper-agent-status proper-defaults proper-launchers proper-terminal proper-apps proper-appearance"
 read -r -a packages_to_build <<<"${PROPER_RPM_PACKAGES:-$default_packages}"
 for package in "${packages_to_build[@]}"; do
   package_root="$project_root/packages/$package"

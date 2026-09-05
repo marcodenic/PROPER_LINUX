@@ -1,4 +1,5 @@
 #include "proper-action-button.h"
+#include "proper-material-window.h"
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDBusConnection>
@@ -325,7 +326,7 @@ public:
     }
 };
 
-class Guide final : public QWidget {
+class Guide final : public ProperMaterialWindow {
 public:
     Guide() {
         setObjectName("properRoot");
@@ -334,7 +335,8 @@ public:
         resize(980, 640);
         setMinimumSize(620, 460);
 
-        auto *root = new QVBoxLayout(this);
+        auto *root = new QHBoxLayout(this);
+        root->setSpacing(0);
         root->setContentsMargins(0, 0, 0, 0);
 
         auto *scroll = new QScrollArea;
@@ -348,8 +350,9 @@ public:
 
         auto *hero = new QFrame;
         hero->setObjectName("guideGreeting");
-        auto *header = new QHBoxLayout(hero);
-        header->setContentsMargins(0, 12, 0, 22);
+        auto *header = new QVBoxLayout(hero);
+        hero->setFixedWidth(280);
+        header->setContentsMargins(26, 36, 26, 24);
         header->setSpacing(16);
         auto *mark = new QLabel;
         mark->setPixmap(properIcon("proper-logo-icon").pixmap(58, 58));
@@ -374,8 +377,11 @@ public:
         intro->setObjectName("guideCopy");
         intro->setWordWrap(true);
         copy->addWidget(intro);
-        header->addLayout(copy, 1);
-        page->addWidget(hero);
+        header->addLayout(copy);
+        header->addStretch();
+        header->addWidget(materialControl(hero));
+        root->addWidget(hero);
+        setNavigation(hero);
 
         status = new QLabel;
         status->setObjectName("errorBanner");
@@ -416,14 +422,14 @@ public:
         footer->setWordWrap(true);
         page->addWidget(footer);
         scroll->setWidget(content);
-        root->addWidget(scroll);
-        rebuildGrid(width());
+        root->addWidget(scroll, 1);
+        rebuildGrid(width() - 280);
     }
 
 protected:
     void resizeEvent(QResizeEvent *event) override {
-        QWidget::resizeEvent(event);
-        rebuildGrid(event->size().width());
+        ProperMaterialWindow::resizeEvent(event);
+        rebuildGrid(event->size().width() - 280);
     }
 
 private:
@@ -464,7 +470,7 @@ private:
     }
 
     void rebuildGrid(int width) {
-        const int wanted = width >= 820 ? 2 : 1;
+        const int wanted = width >= 700 ? 2 : 1;
         if (wanted == actionColumns && actionGrid->count() == actionCards.size())
             return;
         actionColumns = wanted;

@@ -1,4 +1,5 @@
 #include "proper-action-button.h"
+#include "proper-material-window.h"
 #include <QApplication>
 #include <QButtonGroup>
 #include <QComboBox>
@@ -316,7 +317,7 @@ private:
     QString id;
 };
 
-class ProperApps final : public QWidget {
+class ProperApps final : public ProperMaterialWindow {
     Q_OBJECT
 public:
     ProperApps(bool chooseAgent = false, const QString &directory = {}, const QString &missing = {})
@@ -376,12 +377,25 @@ private:
     }
 
     void buildUi() {
-        auto *root = new QVBoxLayout(this);
+        auto *shell = new QHBoxLayout(this);
+        shell->setContentsMargins(0, 0, 0, 0);
+        shell->setSpacing(0);
+        auto *navigation = new QWidget;
+        navigation->setMinimumWidth(200);
+        navigation->setMaximumWidth(260);
+        auto *sidebar = new QVBoxLayout(navigation);
+        sidebar->setContentsMargins(16, 24, 16, 20);
+        sidebar->setSpacing(12);
+        auto *brand = new QLabel("Proper Apps");
+        brand->setObjectName("cardTitle");
+        sidebar->addWidget(brand);
+        auto *content = new QWidget;
+        auto *root = new QVBoxLayout(content);
         root->setContentsMargins(28, 24, 28, 20);
         root->setSpacing(14);
         auto *header = new QHBoxLayout;
         auto *titleBlock = new QVBoxLayout;
-        titleLabel = new QLabel("Proper Apps");
+        titleLabel = new QLabel("Recommended");
         QFont titleFont = titleLabel->font();
         titleFont.setPointSizeF(titleFont.pointSizeF() * 1.8);
         titleFont.setBold(true);
@@ -404,10 +418,11 @@ private:
         search->setClearButtonEnabled(true);
         search->setAccessibleName("Search applications");
         root->addLayout(header);
-        root->addWidget(search);
+        sidebar->addWidget(search);
 
         navBar = new QWidget;
-        auto *navRow = new FlowLayout(navBar, 0, 8, 8);
+        auto *navRow = new QVBoxLayout(navBar);
+        navRow->setSpacing(6);
         navRow->setContentsMargins(0, 0, 0, 0);
         navGroup = new QButtonGroup(this);
         navGroup->setExclusive(true);
@@ -431,7 +446,13 @@ private:
 
         category->hide();
         countLabel->hide();
-        root->addWidget(navBar);
+        sidebar->addWidget(navBar);
+        sidebar->addStretch();
+        sidebar->addWidget(agentButton);
+        sidebar->addWidget(materialControl(navigation));
+        shell->addWidget(navigation);
+        shell->addWidget(content, 1);
+        setNavigation(navigation);
         auto *context = new QHBoxLayout;
         context->addWidget(category);
         context->addWidget(countLabel);
@@ -448,7 +469,6 @@ private:
         root->addWidget(operationProgress);
         stack = new QStackedWidget;
         root->addWidget(stack, 1);
-        root->addWidget(agentButton, 0, Qt::AlignRight);
 
         auto *cataloguePage = new QWidget;
         auto *catalogueLayout = new QVBoxLayout(cataloguePage);
@@ -501,6 +521,7 @@ private:
         connect(category, qOverload<int>(&QComboBox::currentIndexChanged), this, &ProperApps::refresh);
         connect(navGroup, &QButtonGroup::idClicked, this, [this](int id) {
             view = id;
+            titleLabel->setText(navGroup->button(id)->text());
             const bool web = id == 3;
             stack->setCurrentIndex(web ? 1 : 0);
             search->show();
@@ -730,15 +751,20 @@ private:
         if (shown == 0) {
             auto *empty = new QLabel(view == 1 ? "Nothing from the Proper catalogue is installed in this view yet." : "No applications match that search.");
             empty->setObjectName("subtitle");
-            empty->setMinimumSize(420, 120);
+            empty->setMinimumHeight(120);
             empty->setAlignment(Qt::AlignCenter);
             catalogueFlow->addWidget(empty);
         }
         catalogueGrid->updateGeometry();
     }
 
+    void updatePageTitle(const QString &query) {
+        titleLabel->setText(query.isEmpty() ? navGroup->button(view)->text() : "Search results");
+    }
+
     void updateViewDescription(const QString &query) {
         if (agentChooser) return;
+        updatePageTitle(query);
         if (view == 1) {
             subtitleLabel->setText("Installed apps listed in the Proper catalogue.");
             return;
@@ -768,7 +794,7 @@ private:
         if (shown == 0) {
             auto *empty = new QLabel(webApps.isEmpty() ? "No web apps yet. Create one for a site you use often." : "No web apps match that search.");
             empty->setObjectName("subtitle");
-            empty->setMinimumSize(420, 120);
+            empty->setMinimumHeight(120);
             empty->setAlignment(Qt::AlignCenter);
             webFlow->addWidget(empty);
         }

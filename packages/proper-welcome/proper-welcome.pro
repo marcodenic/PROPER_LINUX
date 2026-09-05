@@ -5,3 +5,6 @@ TEMPLATE = app
 SOURCES += main.cpp
 
 INCLUDEPATH += $$PWD/../proper-look-and-feel
+
+CONFIG += link_pkgconfig
+PKGCONFIG += KF6WindowSystem

@@ -304,7 +304,7 @@ def main() -> int:
         vicinae_theme("Proper Horizon Light", "light", palettes["light"], material, opacity), encoding="utf-8"
     )
     (arguments.output / "proper-palette.json").write_text(
-        json.dumps({"version": 2, "colour": palettes, "welcome": welcome}, indent=2) + "\n",
+        json.dumps({"version": 2, "colour": palettes, "welcome": welcome, "opacity": opacity}, indent=2) + "\n",
         encoding="utf-8",
     )
     return 0

@@ -48,6 +48,7 @@ def widget_qss(palette: dict[str, str], radius: dict[str, str], spacing: dict[st
 
     return f"""/* Generated from tokens.yaml; do not edit. */
 QWidget#properRoot {{ background: {base}; color: {text}; font-family: {qss_font}; }}
+QWidget#properRoot[materialWindow="true"] {{ background: transparent; }}
 QWidget#properRoot QWidget {{ font-family: {qss_font}; }}
 QWidget#properRoot QLabel {{ color: {text}; }}
 QWidget#properRoot QLabel#subtitle,

@@ -1,19 +1,20 @@
 Name: proper-apps
 Version: 0.1
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary: Proper Linux curated application catalogue
 License: GPL-3.0-or-later
 BuildRequires: qt6-qtbase-devel
+BuildRequires: kf6-kwindowsystem-devel
 Requires: flatpak
 Requires: kdialog
 Requires: polkit
 Requires: proper-terminal >= 1.3.1-7
-Requires: proper-look-and-feel >= 0.1-61
+Requires: proper-look-and-feel >= 0.1-62
 %description
 Small catalogue front end delegating installs to Fedora, Flatpak, and official vendor paths.
 %prep
 cp %{_sourcedir}/main.cpp %{_sourcedir}/proper-apps.pro .
-cp %{_sourcedir}/../proper-look-and-feel/proper-action-button.h .
+cp %{_sourcedir}/../proper-look-and-feel/proper-action-button.h %{_sourcedir}/../proper-look-and-feel/proper-material-window.h .
 
 %build
 qmake6 CONFIG+=release proper-apps.pro
@@ -37,6 +38,9 @@ install -pm 0644 %{_sourcedir}/icons/* %{buildroot}%{_datadir}/proper-apps/icons
 %{_datadir}/proper-apps/icons/
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-15
+- Introduce native frosted navigation with solid content and a solid fallback
+
 * Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-14
 - Refine app layout, native keyboard actions and everyday navigation
 

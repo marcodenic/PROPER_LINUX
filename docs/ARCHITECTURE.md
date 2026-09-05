@@ -47,6 +47,7 @@ KDE continue to deliver their mature infrastructure and security updates.
 | `packages/plasma-login-manager/` | Fedora source-package pin and the narrow Proper login composition patch |
 | `packages/plasma-desktop/` | Fedora source-package pin, exact task states, window previews, and Settings home presentation |
 | `packages/plasma-workspace/` | Fedora source-package pin and native tray tooltip composition |
+| `packages/plasma-systemsettings/` | Fedora source-package pin and compiled sidebar chrome presentation |
 | `apps/` | Catalogue schema and data plus the application-icon provenance ledger |
 | `artwork/` | Shipped identity, wallpaper, and preview assets |
 | `scripts/` | Build, validation, VM, and source-pinning tools |
@@ -103,7 +104,7 @@ floating geometry needed by Restore.
 
 ### Deliberate source-package exceptions
 
-Three source-package exceptions exist because the required presentation is not
+Four source-package exceptions exist because the required presentation is not
 exposed by a supported theme hook:
 
 - Plasma Login Manager 6.7.4 embeds its greeter composition in the executable.
@@ -117,6 +118,10 @@ exposed by a supported theme hook:
   preview filter without changing the system-wide busy indicator or preview
   implementation. Its home-page patch provides navigation cards, retaining
   native modules, search and sidebar, and links Appearance to Proper Appearance.
+- System Settings 6.7.4 compiles its sidebar chrome into the executable.
+  Proper simplifies its search header, removes the header divider, and moves
+  the application menu to the sidebar footer. Search, category navigation,
+  modules, shortcuts and settings persistence retain upstream behaviour.
 - Plasma Workspace 6.7.4 compiles the tray tooltip delegates into its applet.
   Proper forwards the existing icon and supplies one bounded icon/title/detail
   component, preserving upstream custom tooltips, text formats, status and

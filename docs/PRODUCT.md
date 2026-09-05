@@ -46,9 +46,10 @@ text and JetBrains Mono where fixed-width text belongs, enables natural
 scrolling for new pointer profiles, and keeps normal application content
 opaque. The shelf, shell popups, authentication, and terminal use translucent
 materials where they add a sense of place without making work harder to read.
-The next material direction extends denser frost into selected application
-navigation while retaining a solid work canvas. Native prototypes must prove
-legibility and a reliable solid fallback before that treatment ships.
+Proper Apps and Start Here extend denser frost into their navigation or welcome
+rail while retaining a solid work canvas. A visible material control selects
+solid navigation; unavailable compositor blur also falls back to solid paint.
+Files and upstream settings modules retain their native opaque content.
 
 This is the clearest expression of the product: dozens of small defaults work
 together, and none is allowed to become a permanent override of the user's
@@ -79,7 +80,7 @@ status. Selected status glyphs share consistent rounded strokes; the calendar
 remains one click away. The active application has one short line. An inactive
 application has one small dot per window, capped before the count becomes
 visual noise, and an opening application has one oscillating dot. Running
-applications expose their native window previews on hover; status tooltips pair
+applications expose their native window previews on hover; status tooltips sit clear of the shelf and pair
 a recognisable icon with a clear title and secondary status after a restrained
 delay. The shelf grows when needed but
 keeps visual separation between application tasks and status controls. Where
@@ -156,7 +157,7 @@ evidence of deliberate curation—not as a vanity number—and explains that the
 broader software catalogue remains one click away.
 
 Optional software belongs in Proper Apps. Its flexible rows show recognisable products,
-plain descriptions, and one Install or Open action. Product details open inside the same window, with Back preserving the current
+plain descriptions, and one Install or Open action. Search and browsing live in a left navigation rail. Product details open inside the same window, with Back preserving the current
 search and list. Installed identifies its catalogue scope. Provider, licence, and
 maintenance details remain inspectable without dominating the normal flow.
 Proper Apps delegates installation and updates to Fedora, Flatpak, or a vetted

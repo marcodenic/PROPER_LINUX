@@ -1,0 +1,19 @@
+--- a/plasma-systemsettings.spec
++++ b/plasma-systemsettings.spec
+@@ -3,13 +3,15 @@
+ Name:    plasma-%{base_name}
+ Summary: KDE System Settings application
+ Version: 6.7.4
+-Release: 1%{?dist}
++Release: 1%{?dist}.proper1
+ 
+ License: BSD-2-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-only AND LGPL-2.1-or-later AND (GPL-2.0-only OR GPL-3.0-only)
+ URL:     https://invent.kde.org/plasma/%{base_name}
+ 
+ Source0: https://download.kde.org/%{stable_kf6}/plasma/%{version}/%{base_name}-%{version}.tar.xz
+ Source1: https://download.kde.org/%{stable_kf6}/plasma/%{version}/%{base_name}-%{version}.tar.xz.sig
++
++Patch100: proper-settings-chrome.patch
+ 
+ BuildRequires: desktop-file-utils
+ 

@@ -1,2 +1,2 @@
 FROM quay.io/fedora/fedora:44@sha256:c095fee5833adde3e7fb9bdfc30023d34b884a327e8019d597c708cbe8d8dd13
-RUN dnf -y install rpm-build curl gcc git-core gtk4-devel libadwaita-devel gtk4-layer-shell-devel pkgconf gettext pandoc oniguruma-devel qt6-qtbase-devel xz tar minisign && dnf clean all
+RUN dnf -y install rpm-build curl gcc git-core gtk4-devel libadwaita-devel gtk4-layer-shell-devel pkgconf gettext pandoc oniguruma-devel qt6-qtbase-devel kf6-kwindowsystem-devel xz tar minisign && dnf clean all
