@@ -1,3 +1,4 @@
+#include "proper-action-button.h"
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDBusConnection>
@@ -343,12 +344,12 @@ public:
         auto *content = new QWidget;
         auto *page = new QVBoxLayout(content);
         page->setContentsMargins(34, 30, 34, 26);
-        page->setSpacing(18);
+        page->setSpacing(12);
 
         auto *hero = new QFrame;
-        hero->setObjectName("guideHero");
+        hero->setObjectName("guideGreeting");
         auto *header = new QHBoxLayout(hero);
-        header->setContentsMargins(22, 20, 22, 20);
+        header->setContentsMargins(0, 12, 0, 22);
         header->setSpacing(16);
         auto *mark = new QLabel;
         mark->setPixmap(properIcon("proper-logo-icon").pixmap(58, 58));
@@ -361,7 +362,7 @@ public:
         copy->addWidget(eyebrow);
         auto *title = new QLabel("Make yourself at home.");
         QFont titleFont = title->font();
-        titleFont.setPixelSize(27);
+        titleFont.setPointSizeF(titleFont.pointSizeF() * 2.1);
         titleFont.setBold(true);
         title->setFont(titleFont);
         title->setWordWrap(true);
@@ -382,7 +383,7 @@ public:
         status->hide();
         page->addWidget(status);
 
-        auto *section = new QLabel("A few useful places to start");
+        auto *section = new QLabel("Make it yours");
         section->setObjectName("guideSectionLabel");
         page->addWidget(section);
 
@@ -390,20 +391,23 @@ public:
         actionGrid->setHorizontalSpacing(12);
         actionGrid->setVerticalSpacing(12);
         actionCards = {
-            makeCard("Add your favourite apps", "Codex, Spotify, GitHub Desktop, and more when you need them.",
-                     "proper-apps", {}, [this] { launch("/usr/bin/proper-apps"); }),
-            makeCard("Choose your look", "Desktop styles, comfortable text sizes, and wallpapers.",
-                     "proper-appearance", {}, [this] { launch("/usr/bin/proper-appearance"); }),
-            makeCard("Open your browser", "Chromium is installed and ready to go.",
-                     "chromium-browser", {}, [this] { launch("/usr/bin/chromium-browser"); }),
-            makeCard("Open your terminal", "Ghostty is ready for work.",
-                     "com.mitchellh.ghostty", {"Meta", "Enter"}, [this] { launch("/usr/bin/ghostty"); }),
-            makeCard("System Settings", "Connect devices, adjust displays, and make yourself comfortable.",
-                     "systemsettings", {}, [this] { launch("/usr/bin/systemsettings"); }),
-            makeCard("Check for updates", "Keep your system and applications up to date.",
-                     "system-software-update", {}, [this] { launch("/usr/bin/proper-tool", {"updates"}); })
+            makeCard("Find your apps", "A few favourites, and more when you need them.",
+                     "proper-apps", [this] { launch("Proper Apps", "/usr/bin/proper-apps"); }, true),
+            makeCard("Choose your look", "Desktop styles, text sizes and wallpapers.",
+                     "proper-appearance", [this] { launch("Appearance", "/usr/bin/proper-appearance"); }, true)
         };
         page->addLayout(actionGrid);
+        auto *everyday = new QLabel("Everyday essentials");
+        everyday->setObjectName("guideSectionLabel");
+        page->addWidget(everyday);
+        page->addWidget(makeCard("System Settings", "Displays, sound, network and connected devices.",
+            "systemsettings", [this] { launch("System Settings", "/usr/bin/systemsettings"); }));
+        page->addWidget(makeCard("Check for updates", "Keep Fedora and your applications up to date.",
+            "system-software-update", [this] { launch("Updates", "/usr/bin/proper-tool", {"updates"}); }));
+        page->addWidget(makeCard("Keyboard shortcuts", "Useful shortcuts, with pointer routes for every action.",
+            "proper-shortcuts", [this] { launch("Keyboard shortcuts", "/usr/bin/proper-welcome", {"--shortcuts"}); }));
+        page->addWidget(makeCard("Help & feedback", "Read the project guide or report a problem on GitHub.",
+            "help-contents", [this] { openHelp(); }));
         page->addStretch();
 
         auto *footer = new QLabel("Proper Linux · Built on Fedora and KDE");
@@ -424,22 +428,23 @@ protected:
 
 private:
     QWidget *makeCard(const QString &title, const QString &description, const QString &icon,
-                      const QStringList &keys, std::function<void()> action) {
-        auto *card = new QFrame;
-        card->setObjectName("guideCard");
-        card->setMinimumHeight(104);
+                      std::function<void()> action, bool primary = false) {
+        auto *card = new ProperActionButton;
+        card->setObjectName(primary ? "guideAction" : "guideLink");
+        card->setAccessibleName(title);
+        card->setAccessibleDescription(description);
+        card->setCursor(Qt::PointingHandCursor);
         card->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         auto *row = new QHBoxLayout(card);
-        row->setContentsMargins(16, 14, 14, 14);
-        row->setSpacing(13);
+        const int verticalInset = primary ? 18 : 8;
+        row->setContentsMargins(18, verticalInset, 18, verticalInset);
+        row->setSpacing(16);
         auto *art = new QLabel;
-        art->setObjectName("guideIcon");
-        art->setPixmap(properIcon(icon).pixmap(34, 34));
-        art->setAlignment(Qt::AlignCenter);
-        art->setFixedSize(52, 52);
-        row->addWidget(art, 0, Qt::AlignTop);
+        art->setPixmap(properIcon(icon).pixmap(28, 28));
+        art->setFixedSize(32, 32);
+        row->addWidget(art);
         auto *copy = new QVBoxLayout;
-        copy->setSpacing(4);
+        copy->setSpacing(5);
         auto *heading = new QLabel(title);
         heading->setObjectName("guideCardTitle");
         heading->setWordWrap(true);
@@ -448,31 +453,13 @@ private:
         body->setObjectName("guideCopy");
         body->setWordWrap(true);
         copy->addWidget(body);
-        copy->addStretch();
         row->addLayout(copy, 1);
-        auto *end = new QVBoxLayout;
-        end->setSpacing(8);
-        if (!keys.isEmpty()) {
-            auto *caps = new QHBoxLayout;
-            caps->setSpacing(4);
-            for (int index = 0; index < keys.size(); ++index) {
-                if (index > 0) {
-                    auto *plus = new QLabel("+");
-                    plus->setObjectName("keyJoin");
-                    caps->addWidget(plus);
-                }
-                caps->addWidget(keycap(keys[index]));
-            }
-            end->addLayout(caps);
-        }
-        end->addStretch();
-        auto *button = new QPushButton("Open");
-        button->setObjectName("cardAction");
-        button->setCursor(Qt::PointingHandCursor);
-        button->setAccessibleName(title + ". " + description);
-        connect(button, &QPushButton::clicked, this, [action = std::move(action)] { action(); });
-        end->addWidget(button);
-        row->addLayout(end);
+        auto *arrow = new QLabel;
+        arrow->setPixmap(QIcon::fromTheme("go-next").pixmap(16, 16));
+        row->addWidget(arrow);
+        for (auto *label : card->findChildren<QLabel *>())
+            label->setAttribute(Qt::WA_TransparentForMouseEvents);
+        connect(card, &QPushButton::clicked, this, [action = std::move(action)] { action(); });
         return card;
     }
 
@@ -488,9 +475,15 @@ private:
             actionGrid->setColumnStretch(column, 1);
     }
 
-    void launch(const QString &program, const QStringList &arguments = {}) {
+    void launch(const QString &name, const QString &program, const QStringList &arguments = {}) {
+        status->hide();
         if (!QProcess::startDetached(program, arguments))
-            showFailure("That tool could not be opened. Reinstall the corresponding Proper Linux package and try again.");
+            showFailure(name + " could not start. Try again, or use Help & feedback. Details: " + program);
+    }
+
+    void openHelp() {
+        if (!QDesktopServices::openUrl(QUrl("https://github.com/marcodenic/PROPER_LINUX")))
+            showFailure("Help could not open in your browser. Try again or open github.com/marcodenic/PROPER_LINUX.");
     }
 
     void showFailure(const QString &message) {
@@ -521,11 +514,11 @@ public:
         root->addWidget(eyebrow);
         auto *title = new QLabel("Keyboard shortcuts");
         QFont titleFont = title->font();
-        titleFont.setPixelSize(28);
+        titleFont.setPointSizeF(titleFont.pointSizeF() * 1.8);
         titleFont.setBold(true);
         title->setFont(titleFont);
         root->addWidget(title);
-        auto *intro = new QLabel("Every action here also has an ordinary pointer route. Press Esc to close this pane.");
+        auto *intro = new QLabel("Meta is the Windows or Super key. Use the shelf for apps and Command Centre, and window menus for arrangement. Press Esc to close.");
         intro->setObjectName("guideCopy");
         intro->setWordWrap(true);
         root->addWidget(intro);
@@ -552,6 +545,7 @@ public:
         }), 0, 1);
         grid->addWidget(section("Workspace", {
             {{"Meta", "O"}, "Overview"},
+            {{"Meta", "S"}, "Command Centre"},
             {{"Meta", "G"}, "Desktop grid"},
             {{"Meta", "D"}, "Peek at the desktop"},
             {{"Meta", "T"}, "Edit tiling layout"}

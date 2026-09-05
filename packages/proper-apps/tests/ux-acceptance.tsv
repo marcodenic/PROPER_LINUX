@@ -1,0 +1,11 @@
+# Existing installed Fedora 44 / Plasma 6.7.4 VM; app and style RPMs only.
+apps-home	Recommended shows three real products with readable descriptions and named actions.
+apps-search	Search finds a non-recommended app; empty state is readable and clearing restores results.
+apps-details	Details stay in the main window; Back restores the search and list position.
+apps-filter	Changing category then switching views does not silently filter Recommended or Installed.
+apps-keyboard	Tab focus is visible and Space opens details from a product identity button.
+apps-light	Light palette retains readable text and distinct focus.
+apps-large	Larger text and a narrow window wrap descriptions without losing actions.
+guide-home	Start Here shows two primary choices and settings, updates, shortcuts and help.
+guide-keyboard	A whole guide row works by pointer and keyboard; shortcuts include Meta+S.
+appearance-shared	Appearance remains readable with the revised shared widget style.

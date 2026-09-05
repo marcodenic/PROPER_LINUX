@@ -1,3 +1,4 @@
+#include "proper-action-button.h"
 #include <QApplication>
 #include <QButtonGroup>
 #include <QComboBox>
@@ -20,6 +21,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLabel>
+#include <QKeySequence>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -209,70 +211,56 @@ class AppCard final : public QFrame {
     Q_OBJECT
 public:
     AppCard(const QJsonObject &entry, bool installed, bool agentChoice = false, QWidget *parent = nullptr)
-        : QFrame(parent), id(entry.value("id").toString()) {
-        setObjectName("appCard");
-        setFixedSize(288, 240);
-        setCursor(Qt::PointingHandCursor);
-        auto *root = new QVBoxLayout(this);
-        root->setContentsMargins(18, 16, 18, 15);
-        root->setSpacing(8);
-
-        auto *top = new QHBoxLayout;
+        : QFrame(parent) {
+        setObjectName("appRow");
+        auto *row = new QHBoxLayout(this);
+        row->setContentsMargins(0, 4, 12, 4);
+        row->setSpacing(16);
+        const QString id = entry.value("id").toString();
+        const QString title = entry.value("name").toString();
+        auto *details = new ProperActionButton;
+        details->setObjectName("appIdentity");
+        details->setAccessibleName(title + " details");
+        details->setAccessibleDescription(entry.value("description").toString());
+        details->setCursor(Qt::PointingHandCursor);
+        details->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        auto *identity = new QHBoxLayout(details);
+        identity->setContentsMargins(14, 14, 14, 14);
+        identity->setSpacing(16);
         auto *icon = new QLabel;
-        icon->setPixmap(catalogueIcon(entry).pixmap(54, 54));
-        icon->setFixedSize(56, 56);
-        top->addWidget(icon);
-        top->addStretch();
-        auto *category = new QLabel(entry.value("category").toString().toUpper());
-        category->setObjectName("categoryPill");
-        top->addWidget(category, 0, Qt::AlignTop);
-        root->addLayout(top);
-
-        auto *name = new QLabel(entry.value("name").toString());
+        icon->setPixmap(catalogueIcon(entry).pixmap(48, 48));
+        icon->setFixedSize(48, 48);
+        identity->addWidget(icon, 0, Qt::AlignTop);
+        auto *copy = new QVBoxLayout;
+        copy->setSpacing(5);
+        auto *name = new QLabel(title);
         name->setObjectName("cardTitle");
         name->setWordWrap(true);
-        root->addWidget(name);
+        copy->addWidget(name);
         auto *description = new QLabel(entry.value("description").toString());
         description->setObjectName("cardDescription");
         description->setWordWrap(true);
-        description->setMaximumHeight(50);
-        root->addWidget(description);
-        root->addStretch();
-
-        auto *bottom = new QHBoxLayout;
-        auto *details = new QToolButton;
-        details->setText("Details");
-        details->setObjectName("quietButton");
-        details->setCursor(Qt::PointingHandCursor);
-        bottom->addWidget(details);
-        bottom->addStretch();
+        copy->addWidget(description);
+        identity->addLayout(copy, 1);
+        icon->setAttribute(Qt::WA_TransparentForMouseEvents);
+        name->setAttribute(Qt::WA_TransparentForMouseEvents);
+        description->setAttribute(Qt::WA_TransparentForMouseEvents);
+        row->addWidget(details, 1);
         auto *action = new QPushButton;
-        action->setCursor(Qt::PointingHandCursor);
         const bool launchable = !entry.value("launch_args").toArray().isEmpty();
         action->setText(agentChoice ? (installed ? "Use" : "Install and use")
                                     : (installed ? (launchable ? "Open" : "Installed") : "Install"));
+        action->setAccessibleName(action->text() + " " + title);
         action->setEnabled(!installed || launchable);
         action->setObjectName(installed ? "secondaryButton" : "primaryButton");
-        bottom->addWidget(action);
-        root->addLayout(bottom);
-
-        connect(details, &QToolButton::clicked, this, [this] { emit detailsRequested(id); });
-        connect(action, &QPushButton::clicked, this, [this] { emit primaryRequested(id); });
+        action->setCursor(Qt::PointingHandCursor);
+        row->addWidget(action);
+        connect(details, &QPushButton::clicked, this, [this, id] { emit detailsRequested(id); });
+        connect(action, &QPushButton::clicked, this, [this, id] { emit primaryRequested(id); });
     }
-
 signals:
     void primaryRequested(const QString &id);
     void detailsRequested(const QString &id);
-
-protected:
-    void mouseReleaseEvent(QMouseEvent *event) override {
-        QFrame::mouseReleaseEvent(event);
-        if (rect().contains(event->position().toPoint()))
-            emit detailsRequested(id);
-    }
-
-private:
-    QString id;
 };
 
 class WebCard final : public QFrame {
@@ -280,12 +268,11 @@ class WebCard final : public QFrame {
 public:
     explicit WebCard(const QJsonObject &entry, QWidget *parent = nullptr)
         : QFrame(parent), id(entry.value("id").toString()) {
-        setObjectName("appCard");
-        setFixedSize(252, 196);
-        auto *root = new QVBoxLayout(this);
+        setObjectName("appRow");
+        auto *root = new QHBoxLayout(this);
         root->setContentsMargins(18, 16, 18, 15);
         root->setSpacing(8);
-        auto *top = new QHBoxLayout;
+        auto *copy = new QVBoxLayout;
         auto *icon = new QLabel;
         const QString iconPath = entry.value("icon_path").toString();
         QIcon webIcon = iconPath.isEmpty() ? QIcon::fromTheme("web-browser") : QIcon(iconPath);
@@ -293,29 +280,28 @@ public:
             QJsonObject fallback{{"name", entry.value("name")}};
             webIcon = catalogueIcon(fallback);
         }
-        icon->setPixmap(webIcon.pixmap(54, 54));
-        icon->setFixedSize(56, 56);
-        top->addWidget(icon);
-        top->addStretch();
-        auto *label = new QLabel("WEB APP");
-        label->setObjectName("categoryPill");
-        top->addWidget(label, 0, Qt::AlignTop);
-        root->addLayout(top);
+        icon->setPixmap(webIcon.pixmap(48, 48));
+        icon->setFixedSize(48, 48);
+        root->addWidget(icon);
         auto *name = new QLabel(entry.value("name").toString());
         name->setObjectName("cardTitle");
-        root->addWidget(name);
+        name->setWordWrap(true);
+        copy->addWidget(name);
         auto *host = new QLabel(QUrl(entry.value("url").toString()).host());
         host->setObjectName("cardDescription");
-        root->addWidget(host);
-        root->addStretch();
+        host->setWordWrap(true);
+        copy->addWidget(host);
+        root->addLayout(copy, 1);
         auto *actions = new QHBoxLayout;
         auto *remove = new QToolButton;
         remove->setText("Remove");
         remove->setObjectName("quietButton");
+        remove->setAccessibleName("Remove " + entry.value("name").toString());
         auto *open = new QPushButton("Open");
         open->setObjectName("secondaryButton");
+        open->setAccessibleName("Open " + entry.value("name").toString());
         actions->addWidget(remove);
-        actions->addStretch();
+
         actions->addWidget(open);
         root->addLayout(actions);
         connect(open, &QPushButton::clicked, this, [this] { emit openRequested(id); });
@@ -338,8 +324,8 @@ public:
         setObjectName("properRoot");
         setWindowTitle("Proper Apps");
         setWindowIcon(properIcon("proper-apps"));
-        resize(980, 540);
-        setMinimumSize(720, 500);
+        resize(980, 660);
+        setMinimumSize(620, 460);
         buildUi();
         loadCatalogue();
         loadWebApps();
@@ -356,6 +342,7 @@ public:
 private:
     void setOperationControlsEnabled(bool enabled) {
         search->setEnabled(enabled);
+        category->setEnabled(enabled);
         navBar->setEnabled(enabled);
         catalogueGrid->setEnabled(enabled);
         webGrid->setEnabled(enabled);
@@ -396,18 +383,18 @@ private:
         auto *titleBlock = new QVBoxLayout;
         titleLabel = new QLabel("Proper Apps");
         QFont titleFont = titleLabel->font();
-        titleFont.setPixelSize(28);
+        titleFont.setPointSizeF(titleFont.pointSizeF() * 1.8);
         titleFont.setBold(true);
         titleLabel->setFont(titleFont);
         titleBlock->addWidget(titleLabel);
-        subtitleLabel = new QLabel("Your browser and terminal are ready. Add a few favourites.");
+        subtitleLabel = new QLabel("A few favourites. A wider catalogue when you need it.");
         subtitleLabel->setObjectName("subtitle");
+        subtitleLabel->setWordWrap(true);
         titleBlock->addWidget(subtitleLabel);
-        header->addLayout(titleBlock);
-        header->addStretch();
-        agentButton = new QPushButton("Coding agent…");
+        header->addLayout(titleBlock, 1);
+        agentButton = new QPushButton("Choose coding agent…");
         agentButton->setObjectName("secondaryButton");
-        header->addWidget(agentButton, 0, Qt::AlignBottom);
+
         agentCancelButton = new QPushButton("Cancel");
         agentCancelButton->setObjectName("secondaryButton");
         agentCancelButton->hide();
@@ -415,12 +402,12 @@ private:
         search = new QLineEdit;
         search->setPlaceholderText("Search apps");
         search->setClearButtonEnabled(true);
-        search->setFixedWidth(240);
-        header->addWidget(search, 0, Qt::AlignBottom);
+        search->setAccessibleName("Search applications");
         root->addLayout(header);
+        root->addWidget(search);
 
         navBar = new QWidget;
-        auto *navRow = new QHBoxLayout(navBar);
+        auto *navRow = new FlowLayout(navBar, 0, 8, 8);
         navRow->setContentsMargins(0, 0, 0, 0);
         navGroup = new QButtonGroup(this);
         navGroup->setExclusive(true);
@@ -436,16 +423,20 @@ private:
             if (i == 0)
                 button->setChecked(true);
         }
-        navRow->addStretch();
         category = new QComboBox;
         category->setMinimumWidth(176);
-        navRow->addWidget(category);
+
         countLabel = new QLabel;
         countLabel->setObjectName("countLabel");
-        navRow->addWidget(countLabel);
+
         category->hide();
         countLabel->hide();
         root->addWidget(navBar);
+        auto *context = new QHBoxLayout;
+        context->addWidget(category);
+        context->addWidget(countLabel);
+        context->addStretch();
+        root->addLayout(context);
 
         banner = new QLabel;
         banner->setObjectName("banner");
@@ -457,6 +448,7 @@ private:
         root->addWidget(operationProgress);
         stack = new QStackedWidget;
         root->addWidget(stack, 1);
+        root->addWidget(agentButton, 0, Qt::AlignRight);
 
         auto *cataloguePage = new QWidget;
         auto *catalogueLayout = new QVBoxLayout(cataloguePage);
@@ -465,7 +457,10 @@ private:
         catalogueScroll->setWidgetResizable(true);
         catalogueScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         catalogueGrid = new QWidget;
-        catalogueFlow = new FlowLayout(catalogueGrid, 2, 16, 16);
+        catalogueFlow = new QVBoxLayout(catalogueGrid);
+        catalogueFlow->setContentsMargins(0, 0, 8, 0);
+        catalogueFlow->setSpacing(8);
+        catalogueFlow->setAlignment(Qt::AlignTop);
         catalogueScroll->setWidget(catalogueGrid);
         catalogueLayout->addWidget(catalogueScroll);
         stack->addWidget(cataloguePage);
@@ -480,7 +475,7 @@ private:
         auto *heroText = new QVBoxLayout;
         auto *heroTitle = new QLabel("Turn any website into an app");
         heroTitle->setObjectName("cardTitle");
-        auto *heroDescription = new QLabel("Give it a name and optional icon. Proper creates a removable Chromium app window and launcher entry.");
+        auto *heroDescription = new QLabel("Keep a favourite site in its own window, with an icon in your launcher.");
         heroDescription->setObjectName("cardDescription");
         heroDescription->setWordWrap(true);
         heroText->addWidget(heroTitle);
@@ -494,7 +489,10 @@ private:
         webScroll->setWidgetResizable(true);
         webScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         webGrid = new QWidget;
-        webFlow = new FlowLayout(webGrid, 2, 16, 16);
+        webFlow = new QVBoxLayout(webGrid);
+        webFlow->setContentsMargins(0, 0, 8, 0);
+        webFlow->setSpacing(8);
+        webFlow->setAlignment(Qt::AlignTop);
         webScroll->setWidget(webGrid);
         webLayout->addWidget(webScroll, 1);
         stack->addWidget(webPage);
@@ -505,6 +503,8 @@ private:
             view = id;
             const bool web = id == 3;
             stack->setCurrentIndex(web ? 1 : 0);
+            search->show();
+            category->setCurrentIndex(0);
             category->setVisible(id == 2);
             countLabel->setVisible(id == 1 || id == 2);
             search->setPlaceholderText(web ? "Search web apps" : "Search apps");
@@ -680,39 +680,43 @@ private:
         category->blockSignals(false);
     }
 
-    static void clearFlow(FlowLayout *flow) {
+    static void clearFlow(QLayout *flow) {
         while (auto *item = flow->takeAt(0)) {
             delete item->widget();
             delete item;
         }
     }
 
+    bool matchesView(const QJsonObject &entry, bool installed, const QString &query,
+                     const QString &selectedCategory) const {
+        if (agentChooser && !supportedAgentIds().contains(entry.value("id").toString())) return false;
+        // Search from Recommended spans the entire catalogue.
+        if (view == 0 && query.isEmpty() && !entry.value("recommended").toBool()) return false;
+        if (view == 1 && !installed) return false;
+        return selectedCategory == "All categories" || entry.value("category").toString() == selectedCategory;
+    }
+
+    static bool matchesSearch(const QJsonObject &entry, const QString &query) {
+        QString haystack = entry.value("name").toString() + " " + entry.value("description").toString()
+            + " " + entry.value("category").toString();
+        for (const auto &tag : entry.value("tags").toArray()) haystack += " " + tag.toString();
+        return haystack.toLower().contains(query);
+    }
+
     void refresh() {
         if (view == 3) {
+            subtitleLabel->setText("Your favourite websites, in their own windows.");
             refreshWebApps();
             return;
         }
         clearFlow(catalogueFlow);
         const QString query = search->text().trimmed().toLower();
-        const QString selectedCategory = category->currentText();
+        const QString selectedCategory = view == 2 ? category->currentText() : "All categories";
         int shown = 0;
         for (const auto &value : entries) {
             const auto entry = value.toObject();
             const bool installed = isInstalled(entry);
-            if (agentChooser && !supportedAgentIds().contains(entry.value("id").toString()))
-                continue;
-            // Search the whole catalogue from the landing view so an optional
-            // app never looks unavailable merely because it is not featured.
-            if (view == 0 && query.isEmpty() && !entry.value("recommended").toBool())
-                continue;
-            if (view == 1 && !installed)
-                continue;
-            if (selectedCategory != "All categories" && entry.value("category").toString() != selectedCategory)
-                continue;
-            QString haystack = entry.value("name").toString() + " " + entry.value("description").toString() + " " + entry.value("category").toString();
-            for (const auto &tag : entry.value("tags").toArray())
-                haystack += " " + tag.toString();
-            if (!query.isEmpty() && !haystack.toLower().contains(query))
+            if (!matchesView(entry, installed, query, selectedCategory) || !matchesSearch(entry, query))
                 continue;
             auto *card = new AppCard(entry, installed, agentChooser);
             connect(card, &AppCard::primaryRequested, this, &ProperApps::primaryAction);
@@ -721,6 +725,8 @@ private:
             ++shown;
         }
         countLabel->setText(QString::number(shown) + (shown == 1 ? " app" : " apps"));
+        countLabel->setVisible(!agentChooser);
+        updateViewDescription(query);
         if (shown == 0) {
             auto *empty = new QLabel(view == 1 ? "Nothing from the Proper catalogue is installed in this view yet." : "No applications match that search.");
             empty->setObjectName("subtitle");
@@ -728,7 +734,18 @@ private:
             empty->setAlignment(Qt::AlignCenter);
             catalogueFlow->addWidget(empty);
         }
-        catalogueGrid->adjustSize();
+        catalogueGrid->updateGeometry();
+    }
+
+    void updateViewDescription(const QString &query) {
+        if (agentChooser) return;
+        if (view == 1) {
+            subtitleLabel->setText("Installed apps listed in the Proper catalogue.");
+            return;
+        }
+        subtitleLabel->setText(query.isEmpty()
+            ? "A few favourites. A wider catalogue when you need it."
+            : "Search results from the Proper catalogue.");
     }
 
     void refreshWebApps() {
@@ -755,7 +772,7 @@ private:
             empty->setAlignment(Qt::AlignCenter);
             webFlow->addWidget(empty);
         }
-        webGrid->adjustSize();
+        webGrid->updateGeometry();
     }
 
     void refreshInstalledState() {
@@ -812,14 +829,28 @@ private:
         return "Publisher source";
     }
 
+    void clearDetails() {
+        if (detailPage) {
+            stack->removeWidget(detailPage);
+            detailPage->deleteLater();
+        }
+    }
+
     void showDetails(const QString &id) {
         const auto entry = entryFor(id);
         if (entry.isEmpty()) return;
         const bool installed = isInstalled(entry);
-        QDialog dialog(this);
-        dialog.setWindowTitle(entry.value("name").toString() + " · Proper Apps");
-        dialog.resize(590, 520);
-        auto *root = new QVBoxLayout(&dialog);
+        clearDetails();
+        detailPage = new QScrollArea;
+        detailPage->setWidgetResizable(true);
+        detailPage->setFrameShape(QFrame::NoFrame);
+        auto *content = new QWidget;
+        auto *root = new QVBoxLayout(content);
+        auto *back = new QPushButton("Back to apps");
+        back->setObjectName("secondaryButton");
+        back->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Left));
+        root->addWidget(back, 0, Qt::AlignLeft);
+        connect(back, &QPushButton::clicked, this, &ProperApps::leaveDetails);
         root->setContentsMargins(24, 22, 24, 22);
         root->setSpacing(14);
         auto *header = new QHBoxLayout;
@@ -830,9 +861,10 @@ private:
         auto *heading = new QVBoxLayout;
         auto *name = new QLabel(entry.value("name").toString());
         QFont nameFont = name->font();
-        nameFont.setPixelSize(24);
+        nameFont.setPointSizeF(nameFont.pointSizeF() * 1.6);
         nameFont.setBold(true);
         name->setFont(nameFont);
+        name->setWordWrap(true);
         heading->addWidget(name);
         auto *meta = new QLabel(entry.value("category").toString() + "  ·  " + (installed ? "Installed" : "Available"));
         meta->setObjectName("subtitle");
@@ -850,9 +882,9 @@ private:
         }
         auto *website = new QPushButton("Visit website");
         website->setObjectName("secondaryButton");
-        website->setMaximumWidth(140);
-        connect(website, &QPushButton::clicked, &dialog, [entry] { QDesktopServices::openUrl(QUrl(entry.value("homepage").toString())); });
-        root->addWidget(website);
+
+        connect(website, &QPushButton::clicked, detailPage, [entry] { QDesktopServices::openUrl(QUrl(entry.value("homepage").toString())); });
+        root->addWidget(website, 0, Qt::AlignLeft);
         auto *advancedToggle = new QToolButton;
         advancedToggle->setText("Source, licence, and maintenance details");
         advancedToggle->setCheckable(true);
@@ -870,36 +902,46 @@ private:
                  jsonStrings(entry.value("architectures").toArray()).join(", ").toHtmlEscaped(), entry.value("validated").toString().toHtmlEscaped(),
                  entry.value("source_url").toString().toHtmlEscaped()));
         root->addWidget(advanced);
-        connect(advancedToggle, &QToolButton::toggled, &dialog, [advancedToggle, advanced](bool checked) {
+        connect(advancedToggle, &QToolButton::toggled, detailPage, [advancedToggle, advanced](bool checked) {
             advancedToggle->setArrowType(checked ? Qt::DownArrow : Qt::RightArrow);
             advanced->setVisible(checked);
         });
         root->addStretch();
         auto *actions = new QHBoxLayout;
-        auto *close = new QPushButton("Close");
-        close->setObjectName("secondaryButton");
-        actions->addWidget(close);
-        connect(close, &QPushButton::clicked, &dialog, &QDialog::reject);
         if (!agentChooser && installed && entry.value("removable").toBool()) {
             auto *remove = new QPushButton("Remove");
             remove->setObjectName("secondaryButton");
             actions->addWidget(remove);
-            connect(remove, &QPushButton::clicked, &dialog, [this, id, &dialog] { dialog.accept(); removeEntry(id); });
+            connect(remove, &QPushButton::clicked, detailPage, [this, id] { leaveDetails(); removeEntry(id); });
         }
         actions->addStretch();
         if (installed && !entry.value("launch_args").toArray().isEmpty()) {
             auto *open = new QPushButton(agentChooser ? "Use" : "Open");
             open->setObjectName("primaryButton");
             actions->addWidget(open);
-            connect(open, &QPushButton::clicked, &dialog, [this, id, &dialog] { dialog.accept(); primaryAction(id); });
+            connect(open, &QPushButton::clicked, detailPage, [this, id] { leaveDetails(); primaryAction(id); });
         } else if (!installed) {
             auto *install = new QPushButton(agentChooser ? "Install and use" : "Install");
             install->setObjectName("primaryButton");
             actions->addWidget(install);
-            connect(install, &QPushButton::clicked, &dialog, [this, id, &dialog] { dialog.accept(); primaryAction(id); });
+            connect(install, &QPushButton::clicked, detailPage, [this, id] { leaveDetails(); primaryAction(id); });
         }
-        root->addLayout(actions);
-        dialog.exec();
+        header->addLayout(actions);
+        detailPage->setWidget(content);
+        stack->addWidget(detailPage);
+        stack->setCurrentWidget(detailPage);
+        search->hide();
+        category->hide();
+        countLabel->hide();
+        back->setFocus();
+    }
+
+    void leaveDetails() {
+        stack->setCurrentIndex(view == 3 ? 1 : 0);
+        search->setVisible(!agentChooser);
+        category->setVisible(view == 2 && !agentChooser);
+        countLabel->setVisible(!agentChooser);
+        search->setFocus();
     }
 
     void primaryAction(const QString &id) {
@@ -1389,12 +1431,13 @@ private:
     QProgressBar *operationProgress = nullptr;
     QButtonGroup *navGroup = nullptr;
     QStackedWidget *stack = nullptr;
+    QScrollArea *detailPage = nullptr;
     QScrollArea *catalogueScroll = nullptr;
     QWidget *catalogueGrid = nullptr;
-    FlowLayout *catalogueFlow = nullptr;
+    QVBoxLayout *catalogueFlow = nullptr;
     QScrollArea *webScroll = nullptr;
     QWidget *webGrid = nullptr;
-    FlowLayout *webFlow = nullptr;
+    QVBoxLayout *webFlow = nullptr;
     QPushButton *addWebAppButton = nullptr;
     QProcess *process = nullptr;
     QJsonArray activeSteps;

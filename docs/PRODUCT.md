@@ -44,9 +44,11 @@ Proper opens on a clean desktop with no icons, forced tour, welcome carousel,
 or wall of configuration choices. The default is dark, uses Inter for interface
 text and JetBrains Mono where fixed-width text belongs, enables natural
 scrolling for new pointer profiles, and keeps normal application content
-opaque. Translucency is reserved for the shelf, shell popups, authentication,
-and terminal, where it adds a sense of place without making work harder to
-read.
+opaque. The shelf, shell popups, authentication, and terminal use translucent
+materials where they add a sense of place without making work harder to read.
+The next material direction extends denser frost into selected application
+navigation while retaining a solid work canvas. Native prototypes must prove
+legibility and a reliable solid fallback before that treatment ships.
 
 This is the clearest expression of the product: dozens of small defaults work
 together, and none is allowed to become a permanent override of the user's
@@ -153,8 +155,9 @@ The build enforces a complete image below 3 GiB. Start Here presents that as
 evidence of deliberate curation—not as a vanity number—and explains that the
 broader software catalogue remains one click away.
 
-Optional software belongs in Proper Apps. Its cards show recognisable products,
-plain descriptions, and one Install or Open action. Provider, licence, and
+Optional software belongs in Proper Apps. Its flexible rows show recognisable products,
+plain descriptions, and one Install or Open action. Product details open inside the same window, with Back preserving the current
+search and list. Installed identifies its catalogue scope. Provider, licence, and
 maintenance details remain inspectable without dominating the normal flow.
 Proper Apps delegates installation and updates to Fedora, Flatpak, or a vetted
 vendor source; it does not become a package manager. It explains progress,

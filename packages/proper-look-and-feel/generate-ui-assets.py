@@ -58,8 +58,8 @@ QWidget#properRoot QLabel#status,
 QWidget#properRoot QLabel#guideCopy,
 QWidget#properRoot QLabel#guideFooter {{ color: {muted}; }}
 QWidget#properRoot QLabel#guideEyebrow,
-QWidget#properRoot QLabel#guideSectionLabel {{ color: {accent}; font-size: 10px; font-weight: 700; letter-spacing: 1px; }}
-QWidget#properRoot QLabel#guideCardTitle {{ color: {text}; font-size: 15px; font-weight: 650; }}
+QWidget#properRoot QLabel#guideSectionLabel {{ color: {muted}; font-weight: 600; }}
+QWidget#properRoot QLabel#guideCardTitle {{ color: {text}; font-weight: 650; }}
 QWidget#properRoot QLabel#shortcutAction {{ color: {muted}; font-size: 12px; }}
 QWidget#properRoot QLabel#keyJoin {{ color: {muted}; font-size: 10px; }}
 QWidget#properRoot QLabel#keycap {{
@@ -86,7 +86,7 @@ QWidget#properRoot QFrame#shortcutHint,
 QWidget#properRoot QFrame#shortcutLine {{ background: transparent; border: 0; }}
 QDialog, QMessageBox {{ background: {base}; color: {text}; font-family: {qss_font}; }}
 QDialog QLabel, QMessageBox QLabel {{ color: {text}; }}
-QWidget#properRoot QLabel#cardTitle {{ font-size: 16px; font-weight: 650; }}
+QWidget#properRoot QLabel#cardTitle {{ font-weight: 650; }}
 QWidget#properRoot QLabel#sectionTitle {{ font-size: 19px; font-weight: 650; }}
 QWidget#properRoot QLabel#categoryPill {{
     color: {muted}; background: {rgba(accent, 0.100)};
@@ -103,21 +103,12 @@ QWidget#properRoot QLineEdit {{ padding: {unit * 2}px {unit * 3}px; }}
 QWidget#properRoot QComboBox {{ padding: {unit * 2}px 40px {unit * 2}px {unit * 3}px; }}
 QWidget#properRoot QLineEdit:focus,
 QWidget#properRoot QComboBox:focus {{ border: 2px solid {accent}; }}
-QWidget#properRoot QComboBox::drop-down {{
-    subcontrol-origin: border; subcontrol-position: top right; width: 32px;
-    border: 0; border-left: 1px solid {rgba(muted, 0.180)};
-    border-top-right-radius: {control_radius - 1}px;
-    border-bottom-right-radius: {control_radius - 1}px;
-    background: {rgba(muted, 0.070)};
-}}
-QWidget#properRoot QComboBox::drop-down:hover {{ background: {rgba(accent, 0.120)}; }}
-QWidget#properRoot QComboBox::down-arrow {{ width: 10px; height: 7px; }}
 QWidget#properRoot QComboBox QAbstractItemView {{
     background: {surface}; color: {text}; selection-background-color: {rgba(accent, 0.260)};
 }}
 QWidget#properRoot QToolButton {{
     background: {surface}; color: {text}; border: 1px solid {rgba(muted, 0.180)};
-    border-radius: {popup_radius}px; padding: {unit * 2}px; font-size: 14px;
+    border-radius: {popup_radius}px; padding: {unit * 2}px;
 }}
 QWidget#properRoot QToolButton:hover {{
     background: {rgba(accent, 0.120)}; border-color: {rgba(accent, 0.440)};
@@ -134,10 +125,29 @@ QWidget#properRoot QToolButton#navButton:checked {{ background: {rgba(accent, 0.
 QWidget#properRoot QToolButton#quietButton {{ color: {muted}; background: transparent; border: 0; padding: 6px 2px; }}
 QWidget#properRoot QToolButton#quietButton:hover {{ color: {text}; text-decoration: underline; }}
 QWidget#properRoot QToolButton#textPreset {{ min-height: 54px; text-align: left; padding: 8px 14px; }}
+QWidget#properRoot QFrame#appRow {{
+    background: {surface}; border: 0; border-radius: {control_radius}px;
+}}
+QWidget#properRoot QPushButton#appIdentity {{
+    background: transparent; border: 2px solid transparent; padding: 0; text-align: left;
+}}
+QWidget#properRoot QPushButton#appIdentity:hover {{ background: {rgba(accent, 0.060)}; }}
+QWidget#properRoot QPushButton#appIdentity:focus {{ border-color: {accent}; }}
+QWidget#properRoot QPushButton#guideLink {{ background: transparent; border: 2px solid transparent; padding: 0; text-align: left; }}
+QWidget#properRoot QPushButton#guideLink:hover {{ background: {rgba(accent, 0.060)}; }}
+QWidget#properRoot QPushButton#guideLink:focus {{ border-color: {accent}; }}
+QWidget#properRoot QPushButton#guideAction {{
+    background: {surface}; border: 2px solid transparent; padding: 0; text-align: left;
+}}
+QWidget#properRoot QPushButton#guideAction:hover {{ background: {rgba(accent, 0.080)}; }}
+QWidget#properRoot QPushButton#guideAction:focus {{ border-color: {accent}; }}
+QWidget#properRoot QToolButton#navButton:focus,
+QWidget#properRoot QToolButton#quietButton:focus,
+QWidget#properRoot QToolButton:focus {{ border: 2px solid {accent}; }}
 QWidget#properRoot QFrame#appCard {{
     background: {surface}; border: 1px solid {rgba(muted, 0.170)}; border-radius: {popup_radius}px;
 }}
-QWidget#properRoot QFrame#appCard:hover {{ background: {rgba(accent, 0.075)}; border-color: {rgba(accent, 0.300)}; }}
+
 QWidget#properRoot QPushButton {{
     background: {rgba(muted, 0.120)}; color: {text}; border: 1px solid {rgba(muted, 0.200)};
     border-radius: {control_radius}px; min-height: 38px; padding: 0 {unit * 4}px; font-weight: 600;
