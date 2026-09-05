@@ -13,7 +13,7 @@ panel.minimumLength = 560
 panel.maximumLength = 720
 panel.hiding = "none"
 panel.floating = true
-panel.opacity = "adaptive"
+panel.opacity = "translucent"
 
 const tasks = panel.addWidget("org.kde.plasma.icontasks")
 tasks.currentConfigGroup = ["General"]

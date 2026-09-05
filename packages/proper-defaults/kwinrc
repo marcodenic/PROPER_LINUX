@@ -6,3 +6,7 @@ Saturation=150
 [Plugins]
 blurEnabled=true
 proper-workspace-arrangerEnabled=true
+
+[org.kde.kdecoration2]
+BorderSize=None
+BorderSizeAuto=false

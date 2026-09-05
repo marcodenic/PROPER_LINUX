@@ -1,6 +1,6 @@
 Name: proper-apps
 Version: 0.1
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: Proper Linux curated application catalogue
 License: GPL-3.0-or-later
 BuildRequires: qt6-qtbase-devel
@@ -35,6 +35,9 @@ install -pm 0644 %{_sourcedir}/icons/* %{buildroot}%{_datadir}/proper-apps/icons
 %{_datadir}/proper-apps/icons/
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-13
+- Present three optional favourites above the full searchable catalogue
+
 * Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-12
 - Use the active semantic selection palette for generated fallback artwork
 

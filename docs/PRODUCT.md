@@ -69,7 +69,8 @@ of another settings maze.
 
 The desktop uses one centred, floating bottom shelf. Its quiet resting material
 keeps the wallpaper present through native compositor blur, a restrained tint,
-and a directional rim and shadow; it becomes denser when a window meets it.
+and a directional rim and shadow. Its material stays consistent when a window
+meets it.
 It contains the Proper launcher, browser, Files, terminal, running applications,
 system status, and a readable clock and date. A compact gap separates tasks from
 status. Selected status glyphs share consistent rounded strokes; the calendar
@@ -156,8 +157,9 @@ cancellation, partial results, offline state, and storage problems in human
 terms and reconciles what is actually installed before reporting success.
 
 The broad catalogue can include browsers, communication, media, development,
-creative, gaming, container, printer, and AI tools. Its Recommended shelf stays
-narrow so recommendation remains a real product opinion.
+creative, gaming, container, printer, and AI tools. Its Recommended shelf presents Codex Desktop, Spotify, and GitHub Desktop.
+The browser, terminal, and file manager are already installed. Start Here uses
+short, practical guidance rather than a product manifesto.
 
 ### Developer and agent workflow
 

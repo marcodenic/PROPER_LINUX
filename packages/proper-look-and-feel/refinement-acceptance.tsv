@@ -3,7 +3,9 @@ arrival	Installed boot reaches the Proper clock and wallpaper at 1920x1080.
 shelf	Fresh layout offers launcher, browser, Files and terminal with a compact gap, clear status glyphs and clock and date.
 status	Pointer opens Command Centre; headings and live values are readable, the corners are continuous, periodic sampling does not flash the refresh icon, and close works.
 audio	Pointer opens the maintained audio controls with the shared material and clear mute icon.
-apps	Proper Apps uses consistent sans-serif text in headings, cards and buttons; Spotify and Codex remain discoverable.
+apps	Proper Apps uses consistent sans-serif text in headings, cards and buttons; the landing page shows only Spotify, GitHub Desktop and Codex Desktop; the full catalogue and web apps remain reachable.
 preview	Hovering a running task displays its native window preview without obscuring shelf controls.
-attached	A maximised window produces the opaque attached shelf with legible status glyphs.
+attached	A maximised window retains translucent shelf material; Command Centre has four complete rounded corners and an 8-pixel gap.
 notification	A real desktop notification has a coherent frame, legible text and a working dismiss control.
+windows	Floating windows have no grey inset rim and retain pointer resizing and titlebar controls.
+start	Start Here presents concise guidance and usable pointer actions.

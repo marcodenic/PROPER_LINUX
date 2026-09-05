@@ -454,8 +454,8 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
        "$(xmllint --xpath "count(${panel_shadow_selector}[@fill-opacity and number(@fill-opacity) <= 0.001])" "$panel_material")" == 9 &&
        "$(xmllint --xpath "count(//*[@id = 'hint-compose-over-border'])" "$panel_material")" == 0 &&
        "$(xmllint --xpath "count(//*[@id = 'hint-tile-center'])" "$panel_material")" == 1 &&
-       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$panel_material")" == 8 &&
-       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2]/*[local-name()='rect'])" "$panel_material")" == 8 &&
+       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$panel_material")" == 0 &&
+       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2]/*[local-name()='rect'])" "$panel_material")" == 0 &&
        "$(xmllint --xpath "count(//*[starts-with(@id, 'rim-')])" "$panel_material")" == 4 &&
        "$(xmllint --xpath "string(//*[@id = 'floating-hint-bottom-margin']/@height)" "$panel_material")" == 12 ]] || {
       printf 'Built image shelf material lacks the seam-safe tiled frame or floating clearance.\n' >&2
@@ -474,9 +474,9 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
        "$(xmllint --xpath "count(//*[@id = 'hint-tile-center'])" "$popup_material")" == 1 &&
        "$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[1][@fill-opacity='$popup_opacity'])" "$popup_material")" == 4 &&
        "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1][@opacity='$popup_opacity'])" "$popup_material")" == 4 &&
-       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$popup_material")" == 8 &&
+       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[1]/*[local-name()='rect'])" "$popup_material")" == 0 &&
        "$(xmllint --xpath "count(//*[@id='top' or @id='bottom' or @id='left' or @id='right']/*[2][@fill='$popup_rim_color' and @fill-opacity='$popup_rim_opacity'])" "$popup_material")" == 4 &&
-       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2][@opacity='$popup_rim_opacity']/*[local-name()='rect' and @fill='$popup_rim_color'])" "$popup_material")" == 8 ]] || {
+       "$(xmllint --xpath "count(//*[@id='topleft' or @id='topright' or @id='bottomleft' or @id='bottomright']/*[2][@opacity='$popup_rim_opacity']/*[local-name()='rect' and @fill='$popup_rim_color'])" "$popup_material")" == 0 ]] || {
       printf 'Built image popup material is not a uniform seam-safe nine-slice frame: %s\n' "$popup_material" >&2
       exit 1
     }

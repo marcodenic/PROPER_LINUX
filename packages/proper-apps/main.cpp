@@ -211,7 +211,7 @@ public:
     AppCard(const QJsonObject &entry, bool installed, bool agentChoice = false, QWidget *parent = nullptr)
         : QFrame(parent), id(entry.value("id").toString()) {
         setObjectName("appCard");
-        setFixedSize(252, 224);
+        setFixedSize(288, 240);
         setCursor(Qt::PointingHandCursor);
         auto *root = new QVBoxLayout(this);
         root->setContentsMargins(18, 16, 18, 15);
@@ -338,7 +338,7 @@ public:
         setObjectName("properRoot");
         setWindowTitle("Proper Apps");
         setWindowIcon(properIcon("proper-apps"));
-        resize(1180, 760);
+        resize(980, 540);
         setMinimumSize(720, 500);
         buildUi();
         loadCatalogue();
@@ -400,7 +400,7 @@ private:
         titleFont.setBold(true);
         titleLabel->setFont(titleFont);
         titleBlock->addWidget(titleLabel);
-        subtitleLabel = new QLabel("Excellent software, one dependable install path.");
+        subtitleLabel = new QLabel("Your browser and terminal are ready. Add a few favourites.");
         subtitleLabel->setObjectName("subtitle");
         titleBlock->addWidget(subtitleLabel);
         header->addLayout(titleBlock);
@@ -415,7 +415,7 @@ private:
         search = new QLineEdit;
         search->setPlaceholderText("Search apps");
         search->setClearButtonEnabled(true);
-        search->setFixedWidth(320);
+        search->setFixedWidth(240);
         header->addWidget(search, 0, Qt::AlignBottom);
         root->addLayout(header);
 
@@ -424,7 +424,7 @@ private:
         navRow->setContentsMargins(0, 0, 0, 0);
         navGroup = new QButtonGroup(this);
         navGroup->setExclusive(true);
-        const QStringList views = {"Recommended", "Installed", "All", "Web apps"};
+        const QStringList views = {"Recommended", "Installed", "Browse all", "Web apps"};
         for (int i = 0; i < views.size(); ++i) {
             auto *button = new QToolButton;
             button->setText(views[i]);
@@ -443,6 +443,8 @@ private:
         countLabel = new QLabel;
         countLabel->setObjectName("countLabel");
         navRow->addWidget(countLabel);
+        category->hide();
+        countLabel->hide();
         root->addWidget(navBar);
 
         banner = new QLabel;
@@ -503,8 +505,8 @@ private:
             view = id;
             const bool web = id == 3;
             stack->setCurrentIndex(web ? 1 : 0);
-            category->setVisible(!web);
-            countLabel->setVisible(!web);
+            category->setVisible(id == 2);
+            countLabel->setVisible(id == 1 || id == 2);
             search->setPlaceholderText(web ? "Search web apps" : "Search apps");
             refresh();
         });

@@ -330,7 +330,7 @@ public:
         setObjectName("properRoot");
         setWindowTitle("Start Here · Proper Linux");
         setWindowIcon(properIcon("proper-logo-icon"));
-        resize(980, 760);
+        resize(980, 640);
         setMinimumSize(620, 460);
 
         auto *root = new QVBoxLayout(this);
@@ -359,7 +359,7 @@ public:
         auto *eyebrow = new QLabel("WELCOME TO PROPER");
         eyebrow->setObjectName("guideEyebrow");
         copy->addWidget(eyebrow);
-        auto *title = new QLabel("A coherent desktop, without the assembly job.");
+        auto *title = new QLabel("Make yourself at home.");
         QFont titleFont = title->font();
         titleFont.setPixelSize(27);
         titleFont.setBold(true);
@@ -367,9 +367,8 @@ public:
         title->setWordWrap(true);
         copy->addWidget(title);
         auto *intro = new QLabel(
-            "Proper Linux keeps Fedora’s dependable base and KDE’s full capability, then makes opinionated choices about defaults, tools, shortcuts, and visual rhythm. "
-            "The result is curated—not restricted: floating windows and pointer controls stay familiar, while faster paths are ready when you want them. "
-            "That discipline keeps the complete live image under 3 GB: one clear tool for each job, no office suite, duplicate apps or redundant packages. The wider catalogue stays one click away."
+            "Your browser, terminal, and file manager are ready. "
+            "Add your favourite apps, choose a wallpaper, and get on with your day."
         );
         intro->setObjectName("guideCopy");
         intro->setWordWrap(true);
@@ -377,24 +376,13 @@ public:
         header->addLayout(copy, 1);
         page->addWidget(hero);
 
-        auto *principles = new QHBoxLayout;
-        principles->setSpacing(8);
-        for (const QString &principle : {QString("PROVEN FOUNDATIONS"), QString("UNDER 3 GB · NO FILLER"), QString("POINTER + KEYBOARD")}) {
-            auto *pill = new QLabel(principle);
-            pill->setObjectName("principlePill");
-            pill->setAlignment(Qt::AlignCenter);
-            pill->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-            principles->addWidget(pill);
-        }
-        page->addLayout(principles);
-
         status = new QLabel;
         status->setObjectName("errorBanner");
         status->setWordWrap(true);
         status->hide();
         page->addWidget(status);
 
-        auto *section = new QLabel("MAKE IT YOURS");
+        auto *section = new QLabel("A few useful places to start");
         section->setObjectName("guideSectionLabel");
         page->addWidget(section);
 
@@ -402,32 +390,23 @@ public:
         actionGrid->setHorizontalSpacing(12);
         actionGrid->setVerticalSpacing(12);
         actionCards = {
-            makeCard("Search anything", "Apps, files, commands, and actions—one calm summon key.",
-                     "proper-vicinae", {"Meta"}, [this] { launch("/usr/bin/proper-launcher"); }),
-            makeCard("Arrange your workspace", "Choose a layout, then press the same shortcut to restore floating positions.",
-                     "view-grid", {"Meta", "W"}, [this] { launch("/usr/bin/proper-arrange-workspace"); }),
-            makeCard("Open Ghostty", "A fast terminal with Proper’s restrained translucent treatment.",
-                     "utilities-terminal", {"Meta", "Enter"}, [this] { launch("/usr/bin/ghostty"); }),
-            makeCard("Browse curated apps", "A considered shortlist plus the wider catalogue, with honest install diagnostics.",
+            makeCard("Add your favourite apps", "Codex, Spotify, GitHub Desktop, and more when you need them.",
                      "proper-apps", {}, [this] { launch("/usr/bin/proper-apps"); }),
-            makeCard("Change appearance", "Coordinated desktop styles, text sizes, and wallpapers.",
+            makeCard("Choose your look", "Desktop styles, comfortable text sizes, and wallpapers.",
                      "proper-appearance", {}, [this] { launch("/usr/bin/proper-appearance"); }),
-            makeCard("See every shortcut", "A quick keycap overview here, plus a searchable full reference.",
-                     "proper-shortcuts", {"Meta", "/"}, [this] { launch("/usr/bin/proper-welcome", {"--shortcuts"}); }),
-            makeCard("Check for updates", "Fedora system and application updates through Discover.",
-                     "system-software-update", {}, [this] { launch("/usr/bin/proper-tool", {"updates"}); }),
-            makeCard("System Settings", "Networking, displays, accounts, input, accessibility, and the rest.",
+            makeCard("Open your browser", "Chromium is installed and ready to go.",
+                     "chromium-browser", {}, [this] { launch("/usr/bin/chromium-browser"); }),
+            makeCard("Open your terminal", "Ghostty is ready for work.",
+                     "com.mitchellh.ghostty", {"Meta", "Enter"}, [this] { launch("/usr/bin/ghostty"); }),
+            makeCard("System Settings", "Connect devices, adjust displays, and make yourself comfortable.",
                      "systemsettings", {}, [this] { launch("/usr/bin/systemsettings"); }),
-            makeCard("Project and support", "Read the project, understand decisions, or report something that feels off.",
-                     "help-about", {}, [this] {
-                    if (!QDesktopServices::openUrl(QUrl("https://github.com/marcodenic/PROPER_LINUX")))
-                        showFailure("The project page could not be opened in your browser.");
-                })
+            makeCard("Check for updates", "Keep your system and applications up to date.",
+                     "system-software-update", {}, [this] { launch("/usr/bin/proper-tool", {"updates"}); })
         };
         page->addLayout(actionGrid);
         page->addStretch();
 
-        auto *footer = new QLabel("Proper Linux 0.1 · Normal system controls stay available");
+        auto *footer = new QLabel("Proper Linux · Built on Fedora and KDE");
         footer->setObjectName("guideFooter");
         footer->setAlignment(Qt::AlignCenter);
         footer->setWordWrap(true);

@@ -82,8 +82,7 @@ that installed palette or the active Qt palette instead of maintaining another
 set of colours.
 
 The shelf material is generated from the shared design tokens as matched
-translucent and solid Plasma SVG frames. Plasma supplies the supported adaptive
-panel transition, while KWin owns the masked blur, saturation, noise, and
+translucent and solid Plasma SVG frames. Proper disables adaptive transparency in its Plasma Style, while KWin owns the masked blur, saturation, noise, and
 background-contrast pass. Proper does not copy the panel shell or sample the
 desktop through an application-level shader.
 
@@ -282,8 +281,8 @@ The Proper shelf reveal is a small KWin JavaScript effect, installed by
 signal and animation-time scaling, and leaves window management
 and panel geometry upstream. KWin can disable scripted effects on software
 renderers; the ordinary panel remains available in that case. The effect can
-be disabled in Desktop Effects. Plasma's normal adaptive material and
-attachment behaviour remain intact.
+be disabled in Desktop Effects. Plasma’s native attachment behaviour remains intact; the shelf requests a
+consistent translucent material in both states.
 
 Rounded material slices use filled rims with exactly 16-pixel bounds. Qt's
 stroke bounds previously extended the corners to 16.5 pixels while masks
@@ -291,3 +290,11 @@ remained 16 pixels, producing visible seams. The owning RPM renders the SVGs
 with Qt and checks corner bounds and adjoining pixels. Command Centre manual
 refresh remains clickable during periodic sampling; existing controller guards
 prevent duplicate work.
+
+The Plasma 6.7.4 scripting opacity setter calls QWindow::setOpacity rather
+than PanelView::setOpacityMode. Proper therefore declares stable material in
+the style’s AdaptiveTransparency setting. Command Centre uses
+PopupPlasmaWindow’s Never border-removal strategy and an 8-pixel margin.
+Breeze’s outline and physical side/bottom borders are disabled through layered
+KConfig defaults; pointer resizing retains upstream invisible resize borders.
+Stock Breeze has no supported blurred-titlebar setting.

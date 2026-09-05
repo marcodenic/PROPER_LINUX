@@ -1,6 +1,6 @@
 Name:           proper-look-and-feel
 Version:        0.1
-Release:        54%{?dist}
+Release:        55%{?dist}
 Summary:        Proper Linux visual assets
 License:        CC-BY-SA-4.0 AND LGPL-3.0-only AND GPL-2.0-or-later AND GPL-3.0-or-later
 BuildArch:      noarch
@@ -416,6 +416,9 @@ grep -A12 '^\[Colors:Header\]$' %{buildroot}%{_datadir}/color-schemes/Proper.col
 %license %{_licensedir}/%{name}/GPL-3.0-or-later.txt
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-55
+- Keep shelf material consistent in floating and attached states
+
 * Sat Sep 05 2026 Proper Linux contributors - 0.1-54
 - Refine shelf spacing, status artwork and shared surface edges
 - Match rounded slice bounds and reserve icon-to-indicator clearance

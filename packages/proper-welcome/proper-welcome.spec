@@ -1,6 +1,6 @@
 Name:           proper-welcome
 Version:        0.1
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        Proper Linux live-session welcome
 License:        GPL-3.0-or-later
 BuildArch:      x86_64
@@ -37,6 +37,9 @@ install -Dpm 0644 %{_sourcedir}/proper-start.desktop %{buildroot}%{_datadir}/app
 %{_datadir}/applications/proper-start.desktop
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-13
+- Simplify Start Here with concise everyday guidance
+
 * Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-12
 - Draw the live welcome atmosphere and wordmark from the shared semantic palette
 

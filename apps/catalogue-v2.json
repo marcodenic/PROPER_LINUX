@@ -16,7 +16,7 @@
       "description": "Google's supported browser with account sync and proprietary media support.", "homepage": "https://www.google.com/chrome/",
       "source_url": "https://www.google.com/chrome/", "provider": "vendor", "provider_id": "google-chrome-stable",
       "status": "Official Google package", "license": "Proprietary", "architectures": ["x86_64"],
-      "icon": "google-chrome", "accent": "#4285F4", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "google-chrome", "accent": "#4285F4", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "command", "value": "google-chrome"},
       "install_steps": [{"program": "dnf", "args": ["install", "-y", "https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm"], "privileged": true}],
       "uninstall_steps": [{"program": "dnf", "args": ["remove", "-y", "google-chrome-stable"], "privileged": true}],
@@ -27,7 +27,7 @@
       "description": "A fast, private Chromium browser with a deliberately minimal product experience.", "homepage": "https://helium.computer/",
       "source_url": "https://github.com/imputnet/helium-linux", "provider": "vendor", "provider_id": "imput/helium",
       "status": "Official Helium COPR", "license": "GPL-3.0-only and Chromium component licences", "architectures": ["x86_64"],
-      "icon": "helium", "accent": "#3450D1", "recommended": true, "removable": true, "validated": "2026-09-01",
+      "icon": "helium", "accent": "#3450D1", "recommended": false, "removable": true, "validated": "2026-09-01",
       "caveat": "The official package is maintained by Helium in COPR rather than by Fedora.",
       "detection": {"type": "rpm", "value": "helium-bin"},
       "install_steps": [
@@ -94,7 +94,7 @@
       "description": "Private, end-to-end encrypted messaging and calling.", "homepage": "https://signal.org/download/",
       "source_url": "https://flathub.org/apps/org.signal.Signal", "provider": "flatpak", "provider_id": "org.signal.Signal",
       "status": "Flathub catalogue", "license": "AGPL-3.0-only client", "architectures": ["x86_64"],
-      "icon": "org.signal.Signal", "accent": "#3A76F0", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "org.signal.Signal", "accent": "#3A76F0", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "flatpak", "value": "org.signal.Signal"}, "launch_args": ["flatpak", "run", "org.signal.Signal"]
     },
     {
@@ -118,7 +118,7 @@
       "description": "The dependable player for video, music, discs, streams, and unusual formats.", "homepage": "https://www.videolan.org/vlc/",
       "source_url": "https://packages.fedoraproject.org/pkgs/vlc/vlc/", "provider": "fedora", "provider_id": "vlc",
       "status": "Fedora-maintained", "license": "GPL-2.0-or-later and component licences", "architectures": ["x86_64"],
-      "icon": "vlc", "accent": "#FF8800", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "vlc", "accent": "#FF8800", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "rpm", "value": "vlc"}, "launch_args": ["vlc"]
     },
     {
@@ -196,7 +196,7 @@
       "description": "Microsoft's daily code-editor build with the newest features.", "homepage": "https://code.visualstudio.com/insiders/",
       "source_url": "https://code.visualstudio.com/docs/setup/linux", "provider": "vendor", "provider_id": "code-insiders",
       "status": "Official Microsoft repository", "license": "Microsoft proprietary distribution", "architectures": ["x86_64"],
-      "icon": "visual-studio-code-insiders", "accent": "#24BFA5", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "visual-studio-code-insiders", "accent": "#24BFA5", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "command", "value": "code-insiders"},
       "install_steps": [
         {"program": "dnf", "args": ["config-manager", "addrepo", "--overwrite", "--from-repofile=https://packages.microsoft.com/yumrepos/vscode/config.repo"], "privileged": true},
@@ -296,7 +296,7 @@
       "description": "OpenAI's coding agent, launched in Ghostty with provider-managed sign-in.", "homepage": "https://developers.openai.com/codex/",
       "source_url": "https://www.npmjs.com/package/@openai/codex", "provider": "vendor", "provider_id": "@openai/codex",
       "status": "Official OpenAI npm package", "license": "Apache-2.0 client; provider terms apply", "architectures": ["x86_64"],
-      "icon": "applications-development", "accent": "#10A37F", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "applications-development", "accent": "#10A37F", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "command", "value": "codex"},
       "install_steps": [
         {"program": "dnf", "args": ["install", "-y", "nodejs24", "nodejs24-npm"], "privileged": true},
@@ -310,7 +310,7 @@
       "description": "Anthropic's coding agent, installed for your user and launched in Ghostty.", "homepage": "https://docs.anthropic.com/en/docs/claude-code/overview",
       "source_url": "https://www.npmjs.com/package/@anthropic-ai/claude-code", "provider": "vendor", "provider_id": "@anthropic-ai/claude-code",
       "status": "Official Anthropic npm package", "license": "Proprietary client; provider terms apply", "architectures": ["x86_64"],
-      "icon": "applications-development", "accent": "#D97757", "recommended": true, "removable": true, "validated": "2026-08-31",
+      "icon": "applications-development", "accent": "#D97757", "recommended": false, "removable": true, "validated": "2026-08-31",
       "detection": {"type": "command", "value": "claude"},
       "install_steps": [
         {"program": "dnf", "args": ["install", "-y", "nodejs24", "nodejs24-npm"], "privileged": true},

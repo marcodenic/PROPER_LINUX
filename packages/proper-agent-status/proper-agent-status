@@ -468,7 +468,7 @@ if (!found) {
     panel.maximumLength = 260;
     panel.hiding = "normal";
     panel.floating = true;
-    panel.opacity = "adaptive";
+    panel.opacity = "translucent";
     panel.addWidget("com.properlinux.agentstatus");
 }
 print("proper-agent-panel-ready");

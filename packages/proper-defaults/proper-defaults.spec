@@ -1,6 +1,6 @@
 Name:           proper-defaults
 Version:        0.1
-Release:        36%{?dist}
+Release:        37%{?dist}
 Summary:        Proper Linux new-user KDE defaults
 License:        GPL-3.0-or-later
 BuildArch:      noarch
@@ -23,6 +23,9 @@ defaults, while Plasma's Global Theme creates the initial panel. User settings
 remain higher-priority and are never replaced by package updates.
 
 %changelog
+* Sat Sep 05 2026 Proper Linux <proper@example.invalid> - 0.1-37
+- Remove the inset window frame and contrasting Breeze outline by default
+
 * Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 0.1-36
 - Seed KWin's QEMU-only login output profile before the greeter starts
 - Keep runtime display changes out of the login password field
@@ -151,6 +154,7 @@ install -Dpm 0644 %{_sourcedir}/plasmarc %{buildroot}%{_sysconfdir}/xdg/plasmarc
 install -Dpm 0644 %{_sourcedir}/dolphinrc %{buildroot}%{_sysconfdir}/xdg/dolphinrc
 install -Dpm 0644 %{_sourcedir}/plasmashellrc %{buildroot}%{_sysconfdir}/xdg/plasmashellrc
 install -Dpm 0644 %{_sourcedir}/ksplashrc %{buildroot}%{_sysconfdir}/xdg/ksplashrc
+install -Dpm 0644 %{_sourcedir}/breezerc %{buildroot}%{_sysconfdir}/xdg/breezerc
 install -Dpm 0644 %{_sourcedir}/kwinrc %{buildroot}%{_sysconfdir}/xdg/kwinrc
 install -Dpm 0644 %{_sourcedir}/proper-workspace-arranger/metadata.json %{buildroot}%{_datadir}/kwin/scripts/proper-workspace-arranger/metadata.json
 install -Dpm 0644 %{_sourcedir}/proper-workspace-arranger/contents/code/main.js %{buildroot}%{_datadir}/kwin/scripts/proper-workspace-arranger/contents/code/main.js
@@ -185,6 +189,7 @@ test ! -e %{buildroot}%{_sysconfdir}/skel/.config/plasma-org.kde.plasma.desktop-
 %config(noreplace) %{_sysconfdir}/xdg/plasmashellrc
 %config(noreplace) %{_sysconfdir}/xdg/ksplashrc
 %config(noreplace) %{_sysconfdir}/xdg/kwinrc
+%config(noreplace) %{_sysconfdir}/xdg/breezerc
 %{_datadir}/kwin/scripts/proper-workspace-arranger/
 %{_bindir}/proper-natural-scroll-default
 %{_sysconfdir}/xdg/autostart/proper-natural-scroll-default.desktop

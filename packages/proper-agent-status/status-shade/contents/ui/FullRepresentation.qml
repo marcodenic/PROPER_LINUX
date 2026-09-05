@@ -26,6 +26,21 @@ FocusScope {
     Layout.minimumHeight: implicitHeight
     activeFocusOnTab: true
 
+    // Plasma 6.7 PopupPlasmaWindow: keep the whole rounded frame above the shelf,
+    // including when a maximised window makes the shelf attach to the edge.
+    Binding {
+        target: shade.Window.window
+        property: "removeBorderStrategy"
+        value: 0 // PopupPlasmaWindow.Never
+        when: shade.Window.window !== null
+    }
+    Binding {
+        target: shade.Window.window
+        property: "margin"
+        value: 8
+        when: shade.Window.window !== null
+    }
+
     function capacity(bytes, total) {
         if (!Number.isFinite(bytes) || !Number.isFinite(total) || total <= 0) {
             return "—";

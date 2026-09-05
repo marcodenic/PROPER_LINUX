@@ -154,7 +154,7 @@ class AgentStatusTest(unittest.TestCase):
             self.assertIn("panel.height = 56", script)
             self.assertIn("panel.minimumLength = 132", script)
             self.assertIn("panel.floating = true", script)
-            self.assertIn('panel.opacity = "adaptive"', script)
+            self.assertIn('panel.opacity = "translucent"', script)
 
     def test_global_shade_is_seeded_once_without_an_agent(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
