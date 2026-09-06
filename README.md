@@ -59,4 +59,4 @@ claim the USB is ready. Do not commit or push.
 [What we’re changing](docs/PRODUCT.md) ·
 [Build and update details](docs/BUILD.md) ·
 [Architecture](docs/ARCHITECTURE.md) ·
-[Included wallpapers and licences](packages/proper-look-and-feel/ARTWORK.md)
+[Wallpaper gallery and downloads](packages/proper-look-and-feel/ARTWORK.md)
