@@ -42,11 +42,7 @@ Official guidance consulted:
 
 ## Material direction
 
-`experiments/app-material` proves an alpha-backed Qt window with a bounded
-KWindowEffects navigation blur region, an opaque file canvas and a manual solid
-comparison. It is not packaged and is not Dolphin. It uses the active palette
-and a read-only directory model. See its README for exact limitations and
-upstream sources. The shared production helper now powers the actual Apps and Start Here
+The shared production helper powers the actual Apps and Start Here
 windows, using the 80% navigation token, a persisted solid/frosted choice and
 KWindowEffects capability detection. Only the rail receives a blur region;
 content, text and buttons retain their own opacity. It reads the application
