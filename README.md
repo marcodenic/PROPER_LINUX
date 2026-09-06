@@ -10,6 +10,8 @@ From login to everyday work, the aim is a desktop that feels considered.
 Windows move and resize normally, shortcuts are optional, and Fedora stays
 fully available underneath.
 
+![Proper Linux desktop with Rally Night Flight wallpaper and a frosted Ghostty terminal](artwork/previews/proper-linux-ghostty-rally.png)
+
 ![Proper Linux desktop with Highland Sunrise wallpaper and a translucent terminal](artwork/previews/proper-linux-desktop.png)
 
 ## Try it
