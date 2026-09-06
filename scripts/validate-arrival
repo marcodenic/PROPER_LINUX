@@ -67,7 +67,7 @@ grep -q -- '-compress none "BMP3:$logo"' "$project_root/scripts/build-vm-firmwar
 grep -q 'firmware_profile="${PROPER_VM_FIRMWARE:-proper}"' "$project_root/scripts/run-vm"
 grep -q '/EFI/fedora/shimx64.efi' "$project_root/image/firmware/quiet-successful-boot.patch"
 grep -qx 'background-opacity = 0.50' "$project_root/packages/proper-terminal/ghostty.conf"
-grep -qx 'background-blur = false' "$project_root/packages/proper-terminal/ghostty.conf"
+grep -qx 'background-blur = true' "$project_root/packages/proper-terminal/ghostty.conf"
 grep -qx 'window-padding-x = 0' "$project_root/packages/proper-terminal/ghostty.conf"
 grep -qx 'window-padding-y = 0' "$project_root/packages/proper-terminal/ghostty.conf"
 grep -qx 'window-padding-balance = false' "$project_root/packages/proper-terminal/ghostty.conf"

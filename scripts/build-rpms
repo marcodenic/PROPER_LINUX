@@ -58,7 +58,7 @@ for package in "${packages_to_build[@]}"; do
     podman run --rm \
       --volume "$plm_sources:/src:z" \
       --volume "$rpm_root/$package:/out:z" \
-      quay.io/fedora/fedora:44@sha256:c095fee5833adde3e7fb9bdfc30023d34b884a327e8019d597c708cbe8d8dd13 \
+      quay.io/fedora/fedora:44@sha256:aadc45e503a9a4df93b2a30102151d5286d2869c6ba44b8fbf3918abd9ca3862 \
       bash -lc "dnf -y install rpm-build dnf5-plugins >/dev/null && dnf -y builddep /src/plasma-login-manager.spec >/dev/null && mkdir -p /out/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} && cd /src && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /src' --define '_smp_mflags -j8' plasma-login-manager.spec"
   elif [[ -f "$package_root/source-rpm.env" ]]; then
     source "$package_root/source-rpm.env"
@@ -71,7 +71,7 @@ for package in "${packages_to_build[@]}"; do
     podman run --rm \
       --volume "$patched_sources:/src:z" \
       --volume "$rpm_root/$package:/out:z" \
-      quay.io/fedora/fedora:44@sha256:c095fee5833adde3e7fb9bdfc30023d34b884a327e8019d597c708cbe8d8dd13 \
+      quay.io/fedora/fedora:44@sha256:aadc45e503a9a4df93b2a30102151d5286d2869c6ba44b8fbf3918abd9ca3862 \
       bash -lc "dnf -y install rpm-build dnf5-plugins >/dev/null && dnf -y builddep /src/$package.spec >/dev/null && mkdir -p /out/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} && cd /src && rpmbuild -bb --define '_tmppath /tmp' --define '_topdir /out' --define '_sourcedir /src' --define '_smp_mflags -j8' $package.spec"
   elif [[ "$package" == proper-terminal ]]; then
     download_verified https://release.files.ghostty.org/1.3.1/ghostty-1.3.1.tar.gz "$source_cache/ghostty-1.3.1.tar.gz" 3349d25600ffbda281197a18314f7d18791969cffe9474f0ff16a45a9ebfccdb

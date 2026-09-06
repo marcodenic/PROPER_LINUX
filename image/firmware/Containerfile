@@ -1,4 +1,4 @@
-FROM quay.io/fedora/fedora@sha256:a669925a10c2716481d60a46fc93cbbe4cfb9aade058b2ba28cf3f0de0345de2
+FROM quay.io/fedora/fedora@sha256:aadc45e503a9a4df93b2a30102151d5286d2869c6ba44b8fbf3918abd9ca3862
 
 RUN dnf -y install \
         acpica-tools \

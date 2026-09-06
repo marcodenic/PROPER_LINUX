@@ -409,8 +409,8 @@ if [[ "${PROPER_BASELINE:-0}" != 1 ]]; then
     printf 'Built image does not contain the approved clear Ghostty translucency.\n' >&2
     exit 1
   }
-  grep -qx 'background-blur = false' "$image_ghostty_config" || {
-    printf 'Built image still blurs the desktop behind Ghostty.\n' >&2
+  grep -qx 'background-blur = true' "$image_ghostty_config" || {
+    printf 'Built image does not enable the approved Ghostty background blur.\n' >&2
     exit 1
   }
   grep -qx 'window-padding-x = 0' "$image_ghostty_config" &&

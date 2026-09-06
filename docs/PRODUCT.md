@@ -143,7 +143,7 @@ restrained toolbar and sidebar, hides optional panels and duplicated controls
 by default, and adds Open in Ghostty.
 
 Chromium is the promoted browser. Ghostty 1.3.1 is the default terminal, with a
-coherent palette, an edge-to-edge terminal canvas, uniform translucency, and `btop` included.
+coherent palette, an edge-to-edge terminal canvas, uniform translucency with native background blur, and `btop` included.
 These are ordinary applications in ordinary windows, not special modes the user
 must learn.
 

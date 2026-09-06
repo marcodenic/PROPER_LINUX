@@ -1,6 +1,6 @@
 Name: proper-terminal
 Version: 1.3.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Ghostty terminal and Proper developer essentials
 License: MIT
 URL: https://ghostty.org/
@@ -70,6 +70,10 @@ install -Dpm 0644 %{SOURCE8} %{buildroot}%{_sysconfdir}/xdg/autostart/proper-ter
 %{_sysconfdir}/xdg/autostart/proper-terminal-inset-repair.desktop
 %config(noreplace) %{_sysconfdir}/skel/.config/ghostty/config
 %changelog
+* Sun Sep 06 2026 Proper Linux <proper@example.invalid> - 1.3.1-8
+- Enable compositor background blur with the approved 50 percent translucency
+- Seed new profiles only; preserve existing terminal preferences
+
 * Thu Sep 03 2026 Proper Linux <proper@example.invalid> - 1.3.1-7
 - Keep Ghostty defaults only in its supported per-user configuration path
 - Remove the duplicate /etc/xdg copy that Ghostty does not consume
