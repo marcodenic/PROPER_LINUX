@@ -38,5 +38,4 @@ packages/proper-terminal/ghostty-*.tar.gz
 packages/proper-terminal/ghostty-*.minisig
 packages/proper-terminal/zig-*.tar.xz
 packages/proper-terminal/zig-*.minisig
-socket,json,sys,time
 .build/
